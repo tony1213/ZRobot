@@ -105,7 +105,11 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizerI
 				Log.i("ifly", "onResult  isLast" );
 				stopListen();
 				if (!TextUtils.isEmpty(result)) {
-					SpeechImplHandle.startSpeak(DataConfig.SPEAK_TYPE_WELCOME, result);
+					if (result.length() == 1) {
+						beginListen();
+						return;
+					}
+					SpeechImplHandle.understanderText(result);
 
 				} else {
 					beginListen();

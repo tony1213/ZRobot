@@ -125,7 +125,7 @@ public class IflySpeakService extends Service implements SpeechSynthesizerImpl {
 
 	private void responseSpeakCompleted () {
 		switch (currentType) {
-			case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
+			case DataConfig.SPEAK_TYPE_CHAT://对话
 				SpeechImplHandle.startListen();
 				break;
 			default:
