@@ -1,7 +1,13 @@
 package com.robot.et.business;
 
+import android.content.Intent;
 import android.os.Bundle;
+
 import com.robot.et.R;
+import com.robot.et.core.software.iflytek.IflySpeakService;
+import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
+import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
+
 import org.ros.android.RosActivity;
 import org.ros.node.NodeMainExecutor;
 
@@ -17,10 +23,35 @@ public class MainActivity extends RosActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initService();
+    }
+
+    private void initService() {
+        //语音听写
+        startService(new Intent(this, IflyVoiceToTextService.class));
+        //语音合成
+        startService(new Intent(this, IflySpeakService.class));
+        //文本理解
+        startService(new Intent(this, IflyTextUnderstanderService.class));
     }
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        
+        destoryService();
+    }
+
+    private void destoryService() {
+        stopService(new Intent(this, IflyVoiceToTextService.class));
+        stopService(new Intent(this, IflySpeakService.class));
+        stopService(new Intent(this, IflyTextUnderstanderService.class));
+    }
+
 }

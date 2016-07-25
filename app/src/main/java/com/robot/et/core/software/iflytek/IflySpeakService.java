@@ -1,23 +1,26 @@
-package com.robot.et.core.software;
+package com.robot.et.core.software.iflytek;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
-import com.robot.et.core.software.util.IflyUtils;
+import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.iflytek.util.IflyUtils;
+import com.robot.et.impl.SpeechSynthesizerImpl;
+import com.robot.et.util.SpeechImplHandle;
 
-public class IflySpeakService extends Service {
+public class IflySpeakService extends Service implements SpeechSynthesizerImpl {
 	// 语音合成对象
 	private SpeechSynthesizer mTts;
 	private int currentType;
-	private String city,area;
-	private String alarmContent;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -27,8 +30,10 @@ public class IflySpeakService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.i("ifly", "IflySpeakService  onCreate()");
 		// 初始化合成对象
 		mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
+		SpeechImplHandle.setSpeechSynthesizer(this);
 		
 	}
 	
@@ -38,8 +43,8 @@ public class IflySpeakService extends Service {
 	}
 
 
-	private void speak(int speakType,String content,boolean isTypeCloud) {
-		IflyUtils.setTextToVoiceParam(mTts,"nannan","60","50","50");
+	private void speakContent (String content) {
+		IflyUtils.setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "50");
 
 		int code = mTts.startSpeaking(content, mTtsListener);
 		// * 只保存音频不进行播放接口,调用此接口请注释startSpeaking接口
@@ -52,7 +57,7 @@ public class IflySpeakService extends Service {
 			if (code == ErrorCode.ERROR_COMPONENT_NOT_INSTALLED) {
 				// 未安装则跳转到提示安装页面
 			} else {
-
+				Log.i("ifly", "语音合成失败,错误码=== " + code);
 			}
 		}
 	}
@@ -76,7 +81,7 @@ public class IflySpeakService extends Service {
 		// 开始播放
 		@Override
 		public void onSpeakBegin() {
-
+			Log.i("ifly", "IflySpeakService  onSpeakBegin()");
 		}
 		// 暂停播放
 		@Override
@@ -97,6 +102,13 @@ public class IflySpeakService extends Service {
 		}
 		@Override
 		public void onCompleted(SpeechError error) {
+			Log.i("ifly", "IflySpeakService  onCompleted()");
+			if (error == null) {
+				responseSpeakCompleted();
+			} else {
+				Log.i("ifly", "onCompleted  error=" + error.getPlainDescription(true));
+				SpeechImplHandle.startListen();
+			}
 
 		}
 
@@ -110,15 +122,45 @@ public class IflySpeakService extends Service {
 			// }
 		}
 	};
+
+	private void responseSpeakCompleted () {
+		switch (currentType) {
+			case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
+				SpeechImplHandle.startListen();
+				break;
+			default:
+				break;
+		}
+	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		stopSpeak();
+		// 退出时释放连接
+		mTts.destroy();
+	}
+
+	private void stopSpeak () {
 		if(mTts.isSpeaking()){
 			mTts.stopSpeaking();
 		}
-		// 退出时释放连接
-		mTts.destroy();
+	}
+
+	@Override
+	public void startSpeak(int speakType, String speakContent) {
+		Log.i("ifly", "IflySpeakService  speakType===" + speakType);
+		Log.i("ifly", "IflySpeakService  speakContent===" + speakContent);
+		currentType = speakType;
+		if (!TextUtils.isEmpty(speakContent)) {
+			speakContent(speakContent);
+		}
+
+	}
+
+	@Override
+	public void cancelSpeak() {
+		stopSpeak();
 	}
 
 }
