@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechError;
@@ -124,7 +123,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 		if (!TextUtils.isEmpty(answer)) {
 			SpeechImplHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
 		} else {
-			SpeechImplHandle.startListen();
+			SpeechImplHandle.turingUnderstander(question);
 		}
 
 	}
