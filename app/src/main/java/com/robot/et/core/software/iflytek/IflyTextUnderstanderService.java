@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechError;
@@ -269,7 +270,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 
 			@Override
 			public void onError(String errorMsg) {
-				SpeechImplHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "主人，没有查到呢，换个试试吧。");
+				SpeechImplHandle.startListen();
 			}
 		});
 
