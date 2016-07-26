@@ -1,7 +1,10 @@
 package com.robot.et.service.software.system.music;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -9,9 +12,9 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.service.software.impl.PlayerHand;
-import com.robot.et.service.software.impl.SpeechlHandle;
 
 import java.io.IOException;
 
@@ -19,6 +22,7 @@ public class MusicPlayerService extends Service implements Player {
 
     // 媒体播放器对象
     private MediaPlayer mediaPlayer;
+    private Intent intent;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -32,6 +36,7 @@ public class MusicPlayerService extends Service implements Player {
         PlayerHand.setPlayer(this);
 
         mediaPlayer = new MediaPlayer();
+        intent = new Intent();
 
         //设置音乐播放完成时的监听器
         mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
@@ -39,11 +44,27 @@ public class MusicPlayerService extends Service implements Player {
             @Override
             public void onCompletion(MediaPlayer arg0) {
                 Log.i("music", "音乐播放完成");
-                SpeechlHandle.startListen();
+                intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
+                sendBroadcast(intent);
             }
         });
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
+        registerReceiver(receiver, filter);
+
     }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
+                Log.i("music", "onReceive   音乐开始播放");
+                String musicUrl = intent.getStringExtra("musicUrl");
+                play(musicUrl);
+            }
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -51,20 +72,13 @@ public class MusicPlayerService extends Service implements Player {
     }
 
     private void musicSrcNotExit() {
-        String tempContent = DataConfig.MUSIC_NOT_EXIT;
-        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, tempContent);
+        intent.setAction(BroadcastAction.ACTION_SPEAK);
+        intent.putExtra("type", DataConfig.SPEAK_TYPE_CHAT);
+        intent.putExtra("content", DataConfig.MUSIC_NOT_EXIT);
+        sendBroadcast(intent);
     }
 
-    @Override
-    public void stopPlay() {
-        if (mediaPlayer.isPlaying()) {
-            // 音乐停止播放
-            mediaPlayer.stop();
-        }
-    }
-
-    @Override
-    public void startPlay(String musicSrc) {
+    private void play(String musicSrc) {
         if (!TextUtils.isEmpty(musicSrc)) {
             try {
                 mediaPlayer.reset();// 把各项参数恢复到初始状态
@@ -86,6 +100,19 @@ public class MusicPlayerService extends Service implements Player {
         }
     }
 
+    @Override
+    public void stopPlay() {
+        if (mediaPlayer.isPlaying()) {
+            // 音乐停止播放
+            mediaPlayer.stop();
+        }
+    }
+
+    @Override
+    public void startPlay(String musicSrc) {
+        play(musicSrc);
+    }
+
     //实现一个OnPrepareLister接口,当音乐准备好的时候开始播放
     private final class PreparedListener implements OnPreparedListener {
         @Override
@@ -105,6 +132,7 @@ public class MusicPlayerService extends Service implements Player {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+        unregisterReceiver(receiver);
     }
 
 }

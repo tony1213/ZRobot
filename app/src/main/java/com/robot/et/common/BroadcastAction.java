@@ -10,4 +10,11 @@ public class BroadcastAction {
     public static String ACTION_WAKE_UP_AND_MOVE = "action.wake.up.and.move";
     //重置语音板的广播
     public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
+    //开始播放音乐
+    public static String ACTION_PLAY_MUSIC_START = "action.play.music.start";
+    //音乐播放完成
+    public static String ACTION_PLAY_MUSIC_END = "action.play.music.end";
+    //说话
+    public static String ACTION_SPEAK = "action.speak";
+
 }

@@ -1,7 +1,10 @@
 package com.robot.et.service.software.iflytek;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -12,9 +15,9 @@ import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SynthesizerListener;
+import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.service.software.SpeechSynthesizer;
-import com.robot.et.service.software.impl.PlayerHand;
 import com.robot.et.service.software.impl.SpeechlHandle;
 import com.robot.et.service.software.system.music.PlayerControl;
 
@@ -35,7 +38,11 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 		// 初始化合成对象
 		mTts = com.iflytek.cloud.SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
 		SpeechlHandle.setSpeechSynthesizer(this);
-		
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BroadcastAction.ACTION_SPEAK);
+		registerReceiver(receiver, filter);
+
 	}
 	
 	@Override
@@ -43,6 +50,20 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	BroadcastReceiver receiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals(BroadcastAction.ACTION_SPEAK)) {//说话
+				currentType = intent.getIntExtra("type", 0);
+				String content = intent.getStringExtra("content");
+				if (!TextUtils.isEmpty(content)) {
+					speakContent(content);
+				} else {
+					SpeechlHandle.startListen();
+				}
+			}
+		}
+	};
 
 	private void speakContent (String content) {
 		setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "50");
@@ -130,7 +151,10 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 				SpeechlHandle.startListen();
 				break;
 			case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
-				PlayerHand.play(PlayerControl.getMusicSrc());
+				Intent intent = new Intent();
+				intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
+				intent.putExtra("musicUrl", PlayerControl.getMusicSrc());
+				sendBroadcast(intent);
 				break;
 			default:
 				break;
@@ -143,6 +167,7 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 		stopSpeak();
 		// 退出时释放连接
 		mTts.destroy();
+		unregisterReceiver(receiver);
 	}
 
 	private void stopSpeak () {
