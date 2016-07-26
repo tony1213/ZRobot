@@ -6,6 +6,6 @@ package com.robot.et.service.software.turing;
  */
 public interface TuringUnderstander {
     // 理解文本
-    public void understanderText(String content);
+    void understanderText(String content);
 
 }

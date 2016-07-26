@@ -54,13 +54,13 @@ public class SpeechlHandle {
         }
     }
 
-    public static void understanderText (String content) {
+    public static void understanderText(String content) {
         if (textUnderstander != null) {
             textUnderstander.understanderText(content);
         }
     }
 
-    public static void turingUnderstander (String content) {
+    public static void turingUnderstander(String content) {
         if (turingUnderstander != null) {
             turingUnderstander.understanderText(content);
         }

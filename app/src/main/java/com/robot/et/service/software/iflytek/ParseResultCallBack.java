@@ -8,8 +8,9 @@ import org.json.JSONObject;
  */
 public interface ParseResultCallBack {
     //解析结果回调
-    public void getResult (String question, String service, JSONObject jObject);
+    void getResult(String question, String service, JSONObject jObject);
+
     //解析异常
-    public void onError (String errorMsg);
+    void onError(String errorMsg);
 
 }

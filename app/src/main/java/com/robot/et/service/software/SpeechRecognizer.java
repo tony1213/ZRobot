@@ -6,8 +6,9 @@ package com.robot.et.service.software;
  */
 public interface SpeechRecognizer {
     //开始语音听写
-    public void startListen();
+    void startListen();
+
     //取消语音听写
-    public void cancelListen();
+    void cancelListen();
 
 }

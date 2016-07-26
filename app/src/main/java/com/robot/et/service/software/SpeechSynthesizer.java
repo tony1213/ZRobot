@@ -6,8 +6,9 @@ package com.robot.et.service.software;
  */
 public interface SpeechSynthesizer {
     //开始语音合成
-    public void startSpeak(int speakType, String speakContent);
+    void startSpeak(int speakType, String speakContent);
+
     //取消语音合成
-    public void cancelSpeak();
+    void cancelSpeak();
 
 }

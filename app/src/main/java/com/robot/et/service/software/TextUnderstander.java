@@ -6,5 +6,5 @@ package com.robot.et.service.software;
  */
 public interface TextUnderstander {
     // 理解文本
-    public void understanderText(String content);
+    void understanderText(String content);
 }

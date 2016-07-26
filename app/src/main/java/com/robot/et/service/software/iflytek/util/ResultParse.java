@@ -71,7 +71,7 @@ public class ResultParse {
     }
 
     /*
-	 * 科大讯飞语义理解的json解析
+     * 科大讯飞语义理解的json解析
 	 * service + question + answer
 	 */
     public static void parseAnswerResult(String result, ParseResultCallBack callBack) {
@@ -93,7 +93,7 @@ public class ResultParse {
     }
 
     //百科,计算器,日期,社区问答,褒贬&问候&情绪,闲聊
-    public static String getAnswerData(JSONObject jObject){
+    public static String getAnswerData(JSONObject jObject) {
         String json = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("answer");
@@ -139,7 +139,7 @@ public class ResultParse {
     }
 
     //获取音乐
-    public static String getMusicData(JSONObject jObject, String musicSplit){
+    public static String getMusicData(JSONObject jObject, String musicSplit) {
         String json = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("data");
@@ -149,11 +149,11 @@ public class ResultParse {
                 JSONObject object = musicArray.getJSONObject(i);
                 String url = object.getString("downloadUrl");// 音乐地址
                 String singer = "";
-                if(object.has("singer")){
+                if (object.has("singer")) {
                     singer = object.getString("singer");//歌手
                 }
                 String musicName = "";
-                if(object.has("name")){
+                if (object.has("name")) {
                     musicName = object.getString("name");//歌曲
                 }
                 if (!TextUtils.isEmpty(url)) {
@@ -175,7 +175,7 @@ public class ResultParse {
     }
 
     //获取提醒
-    public static String getRemindData(JSONObject jObject, String scheduleSplit){
+    public static String getRemindData(JSONObject jObject, String scheduleSplit) {
         String json = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("semantic");
@@ -195,16 +195,16 @@ public class ResultParse {
     }
 
     //获取天气
-    public static String getWeatherData(JSONObject jObject, String city, String area){
+    public static String getWeatherData(JSONObject jObject, String city, String area) {
         String json = "";
         try {
             JSONObject object1 = jObject.getJSONObject("semantic");
             JSONObject object2 = object1.getJSONObject("slots");
             JSONObject object3 = object2.getJSONObject("datetime");
             String time = "";
-            if(object3.has("dateOrig")){
+            if (object3.has("dateOrig")) {
                 time = object3.getString("dateOrig");// 日期
-            }else{
+            } else {
                 time = "今天";
             }
             JSONObject object4 = object2.getJSONObject("location");
@@ -235,16 +235,16 @@ public class ResultParse {
                     if (!TextUtils.isEmpty(iflyArea)) {
                         content = time + iflyCity + iflyArea;
                     } else {
-                        if(TextUtils.equals(iflyCity, "CURRENT_CITY")){
+                        if (TextUtils.equals(iflyCity, "CURRENT_CITY")) {
                             json = time;
                             return json;
-                        }else{
+                        } else {
                             content = time + iflyCity;
                         }
 
                     }
                 }
-                content = content + "天气："+ weather+ ",空气质量："+ airQuality+ ",风力："+ wind+ ",气温："+ tempRange	+ ",";
+                content = content + "天气：" + weather + ",空气质量：" + airQuality + ",风力：" + wind + ",气温：" + tempRange + ",";
 
                 if (!TextUtils.equals(airQuality, "未知")) {
                     weathers.add(content);
@@ -276,7 +276,7 @@ public class ResultParse {
     }
 
     //获取打电话
-    public static String getPhoneData(JSONObject jObject){
+    public static String getPhoneData(JSONObject jObject) {
         String json = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("semantic");
@@ -295,7 +295,7 @@ public class ResultParse {
     }
 
     //获取空气质量
-    public static String getPm25Data(JSONObject jObject, String city, String area){
+    public static String getPm25Data(JSONObject jObject, String city, String area) {
         String json = "";
         try {
             JSONObject json1 = jObject.getJSONObject("semantic");
