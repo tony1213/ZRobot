@@ -48,6 +48,7 @@ public class MusicPlayerService extends Service {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
+        filter.addAction(BroadcastAction.ACTION_STOP_MUSIC);
         registerReceiver(receiver, filter);
 
     }
@@ -59,6 +60,8 @@ public class MusicPlayerService extends Service {
                 Log.i("music", "onReceive   音乐开始播放");
                 String musicUrl = intent.getStringExtra("musicUrl");
                 play(musicUrl);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_MUSIC)) {//停止音乐播放
+                stopPlay();
             }
         }
     };
@@ -75,6 +78,7 @@ public class MusicPlayerService extends Service {
         sendBroadcast(intent);
     }
 
+    //开始播放
     private void play(String musicSrc) {
         if (!TextUtils.isEmpty(musicSrc)) {
             try {
@@ -97,6 +101,13 @@ public class MusicPlayerService extends Service {
         }
     }
 
+    //停止播放
+    private void stopPlay() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+    }
+
     //实现一个OnPrepareLister接口,当音乐准备好的时候开始播放
     private final class PreparedListener implements OnPreparedListener {
         @Override
@@ -110,9 +121,7 @@ public class MusicPlayerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
+            stopPlay();
             mediaPlayer.release();
             mediaPlayer = null;
         }

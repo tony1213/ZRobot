@@ -14,6 +14,8 @@ public class BroadcastAction {
     public static String ACTION_PLAY_MUSIC_START = "action.play.music.start";
     //音乐播放完成
     public static String ACTION_PLAY_MUSIC_END = "action.play.music.end";
+    //停止音乐播放
+    public static String ACTION_STOP_MUSIC = "action.stop.music";
     //说话
     public static String ACTION_SPEAK = "action.speak";
 
