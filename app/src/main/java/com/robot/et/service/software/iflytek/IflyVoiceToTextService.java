@@ -79,7 +79,12 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizer 
             setVoiceToTextParam(mIat, language);
         }
         // 不显示听写对话框
-        mIat.startListening(mRecognizerListener);
+        int ret = mIat.startListening(mRecognizerListener);
+
+        if (ret != ErrorCode.SUCCESS) {
+            Log.i("ifly", "IflyVoiceToTextService  听写失败 ret===" + ret);
+            beginListen();
+        }
 
     }
 

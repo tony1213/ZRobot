@@ -84,6 +84,7 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
                 // 未安装则跳转到提示安装页面
             } else {
                 Log.i("ifly", "语音合成失败,错误码=== " + code);
+                SpeechlHandle.startListen();
             }
         }
     }

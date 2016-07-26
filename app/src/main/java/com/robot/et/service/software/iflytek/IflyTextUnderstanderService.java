@@ -27,6 +27,7 @@ import org.json.JSONObject;
 public class IflyTextUnderstanderService extends Service implements TextUnderstander {
 
     private com.iflytek.cloud.TextUnderstander mTextUnderstander;
+    private String underStandContent;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -57,7 +58,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         int ret = mTextUnderstander.understandText(content, textListener);
         if (ret != 0) {
             Log.i("ifly", "文本理解错误码ret==" + ret);
-            SpeechlHandle.startListen();
+            SpeechlHandle.turingUnderstander(underStandContent);
         }
     }
 
@@ -85,6 +86,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         public void onError(SpeechError error) {
             // 文本语义不能使用回调错误码14002，请确认您下载sdk时是否勾选语义场景和私有语义的发布
             Log.i("ifly", "文本理解onError Code==" + error.getErrorCode());
+            SpeechlHandle.turingUnderstander(underStandContent);
         }
     };
 
@@ -98,11 +100,11 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                 if (!TextUtils.isEmpty(text)) {
                     resultHandle(text);
                 } else {
-                    SpeechlHandle.startListen();
+                    SpeechlHandle.turingUnderstander(underStandContent);
                 }
             } else {
                 Log.i("ifly", "文本理解不正确");
-                SpeechlHandle.startListen();
+                SpeechlHandle.turingUnderstander(underStandContent);
             }
         }
 
@@ -281,6 +283,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
     @Override
     public void understanderText(String content) {
         if (!TextUtils.isEmpty(content)) {
+            underStandContent = content;
             textUnderstander(content);
         } else {
             SpeechlHandle.startListen();
