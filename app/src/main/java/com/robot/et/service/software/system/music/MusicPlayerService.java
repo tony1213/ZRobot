@@ -14,11 +14,10 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.service.software.impl.PlayerHand;
 
 import java.io.IOException;
 
-public class MusicPlayerService extends Service implements Player {
+public class MusicPlayerService extends Service {
 
     // 媒体播放器对象
     private MediaPlayer mediaPlayer;
@@ -33,8 +32,6 @@ public class MusicPlayerService extends Service implements Player {
     public void onCreate() {
         super.onCreate();
         Log.i("music", "MusicPlayerService onCreate()");
-        PlayerHand.setPlayer(this);
-
         mediaPlayer = new MediaPlayer();
         intent = new Intent();
 
@@ -98,19 +95,6 @@ public class MusicPlayerService extends Service implements Player {
             //提示文件不存在
             musicSrcNotExit();
         }
-    }
-
-    @Override
-    public void stopPlay() {
-        if (mediaPlayer.isPlaying()) {
-            // 音乐停止播放
-            mediaPlayer.stop();
-        }
-    }
-
-    @Override
-    public void startPlay(String musicSrc) {
-        play(musicSrc);
     }
 
     //实现一个OnPrepareLister接口,当音乐准备好的时候开始播放
