@@ -7,6 +7,7 @@ import com.robot.et.R;
 import com.robot.et.core.software.iflytek.IflySpeakService;
 import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
 import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
+import com.robot.et.core.software.system.music.MusicPlayerService;
 import com.robot.et.core.software.turing.TuRingService;
 
 import org.ros.android.RosActivity;
@@ -37,6 +38,8 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, IflyTextUnderstanderService.class));
         //图灵
         startService(new Intent(this, TuRingService.class));
+        //音乐
+        startService(new Intent(this, MusicPlayerService.class));
     }
 
     @Override
@@ -56,6 +59,7 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflySpeakService.class));
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
+        stopService(new Intent(this, MusicPlayerService.class));
     }
 
 }

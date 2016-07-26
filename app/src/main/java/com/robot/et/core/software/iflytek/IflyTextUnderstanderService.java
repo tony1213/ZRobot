@@ -20,6 +20,7 @@ import com.robot.et.enums.SceneServiceEnum;
 import com.robot.et.impl.ParseIflyServiceImpl;
 import com.robot.et.impl.TextUnderstanderImpl;
 import com.robot.et.util.EnumManager;
+import com.robot.et.util.PlayerControl;
 import com.robot.et.util.SpeechImplHandle;
 
 import org.json.JSONObject;
@@ -182,7 +183,8 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 									break;
 								case MUSIC://音乐
 									answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
-									speakContent(question, answer);
+									String content = PlayerControl.getMusicSpeakContent(answer, DataConfig.MUSIC_SPLITE);
+									SpeechImplHandle.startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
 
 									break;
 								case RESTAURANT://餐馆

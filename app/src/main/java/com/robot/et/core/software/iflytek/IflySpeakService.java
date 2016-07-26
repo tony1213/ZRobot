@@ -14,7 +14,9 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.iflytek.util.IflyUtils;
+import com.robot.et.core.software.system.music.PlayerImplHandle;
 import com.robot.et.impl.SpeechSynthesizerImpl;
+import com.robot.et.util.PlayerControl;
 import com.robot.et.util.SpeechImplHandle;
 
 public class IflySpeakService extends Service implements SpeechSynthesizerImpl {
@@ -128,6 +130,9 @@ public class IflySpeakService extends Service implements SpeechSynthesizerImpl {
 			case DataConfig.SPEAK_TYPE_CHAT://对话
 				SpeechImplHandle.startListen();
 				break;
+			case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
+				PlayerImplHandle.play(PlayerControl.getMusicSrc());
+				break;
 			default:
 				break;
 		}
@@ -154,6 +159,8 @@ public class IflySpeakService extends Service implements SpeechSynthesizerImpl {
 		currentType = speakType;
 		if (!TextUtils.isEmpty(speakContent)) {
 			speakContent(speakContent);
+		} else {
+			SpeechImplHandle.startListen();
 		}
 
 	}

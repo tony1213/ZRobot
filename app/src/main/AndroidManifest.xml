@@ -39,6 +39,7 @@
         <service android:name="com.robot.et.core.software.iflytek.IflyTextUnderstanderService" />
         <service android:name="com.robot.et.core.software.iflytek.IflyVoiceToTextService" />
         <service android:name="com.robot.et.core.software.turing.TuRingService" />
+        <service android:name="com.robot.et.core.software.system.music.MusicPlayerService" />
 
     </application>
 

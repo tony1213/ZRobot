@@ -17,11 +17,15 @@ public class DataConfig {
 	//说话类型
 	//对话
 	public final static int SPEAK_TYPE_CHAT = 1;
+	//开始播放音乐前的提示
+	public final static int SPEAK_TYPE_MUSIC_START = 2;
 
 
 	//歌曲信息连接符
 	public static String MUSIC_SPLITE = "&";
 	// 提醒内容中间的分隔符
 	public static String SCHEDULE_SPLITE = ",";
+	//音乐文件不存在了
+	public static String MUSIC_NOT_EXIT = "抱歉，主人，音乐文件已经不存在了，再换一首别的歌吧";
 
 }
