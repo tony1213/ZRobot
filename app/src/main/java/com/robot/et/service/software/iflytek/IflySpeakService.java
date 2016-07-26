@@ -25,6 +25,7 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 	// 语音合成对象
 	private com.iflytek.cloud.SpeechSynthesizer mTts;
 	private int currentType;
+	private boolean isFirstSetParam;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -66,7 +67,10 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
 	};
 
 	private void speakContent (String content) {
-		setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "50");
+		if(!isFirstSetParam){
+			isFirstSetParam = true;
+			setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "50");
+		}
 
 		int code = mTts.startSpeaking(content, mTtsListener);
 		// * 只保存音频不进行播放接口,调用此接口请注释startSpeaking接口

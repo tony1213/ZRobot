@@ -23,8 +23,8 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.service.software.SpeechRecognizer;
 import com.robot.et.service.software.iflytek.util.ResultParse;
 import com.robot.et.service.software.impl.SpeechlHandle;
+import com.robot.et.util.FileUtils;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -33,7 +33,7 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizer 
 	private com.iflytek.cloud.SpeechRecognizer mIat;
 	// 用HashMap存储听写结果
 	private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
-	private int ret = 0; // 函数调用返回值
+	private boolean isFirstSetParam;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -74,15 +74,13 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizer 
 	private void listen (String language) {
 		mIatResults.clear();
 		// 设置参数
-		setVoiceToTextParam(mIat, language);
-		// 不显示听写对话框
-		ret = mIat.startListening(mRecognizerListener);
-
-		if (ret != ErrorCode.SUCCESS) {
-			Log.i("ifly", "听写失败,错误码：" + ret);
-		} else {
-			Log.i("ifly", "开始听写");
+		if(!isFirstSetParam){
+			isFirstSetParam = true;
+			setVoiceToTextParam(mIat, language);
 		}
+		// 不显示听写对话框
+		mIat.startListening(mRecognizerListener);
+
 	}
 	
 	 //听写监听器
@@ -181,37 +179,12 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizer 
 	
 	//上传词表
 	private void uploadUserThesaurus(){
-		String contents = readFile("userwords","utf-8");
+		String contents = FileUtils.readFile(this, "userwords", "utf-8");
 		// 指定引擎类型
 		mIat.setParameter(SpeechConstant.ENGINE_TYPE, SpeechConstant.TYPE_CLOUD);
 		// 置编码类型
 		mIat.setParameter(SpeechConstant.TEXT_ENCODING, "utf-8");
-		ret = mIat.updateLexicon("userword", contents, mLexiconListener);
-		if(ret != ErrorCode.SUCCESS){
-			Log.i("voiceresult", "上传热词失败,错误码==" + ret );
-			uploadUserThesaurus();
-		}
-	}
-
-	/**
-	 * 读取asset目录下文件。
-	 * @return content
-	 */
-	public String readFile(String file, String code) {
-		int len = 0;
-		byte[] buf = null;
-		String result = "";
-		try {
-			InputStream in = getResources().getAssets().open(file);
-			len = in.available();
-			buf = new byte[len];
-			in.read(buf, 0, len);
-			result = new String(buf, code);
-			in.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
+		mIat.updateLexicon("userword", contents, mLexiconListener);
 	}
 
 	@Override
