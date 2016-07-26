@@ -4,7 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.iflytek.cloud.RecognizerResult;
-import com.robot.et.service.software.iflytek.ParseIflyService;
+import com.robot.et.service.software.iflytek.ParseResultCallBack;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,7 +74,7 @@ public class ResultParse {
 	 * 科大讯飞语义理解的json解析
 	 * service + question + answer
 	 */
-    public static void parseAnswerResult(String result, ParseIflyService callBack) {
+    public static void parseAnswerResult(String result, ParseResultCallBack callBack) {
         try {
             JSONTokener tokener = new JSONTokener(result);
             JSONObject jObject = new JSONObject(tokener);

@@ -129,7 +129,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 	}
 
 	private void resultHandle (String result) {
-		ResultParse.parseAnswerResult(result, new ParseIflyService() {
+		ResultParse.parseAnswerResult(result, new ParseResultCallBack() {
 			@Override
 			public void getResult(String question, String service, JSONObject jObject) {
 				if (!TextUtils.isEmpty(question)) {
