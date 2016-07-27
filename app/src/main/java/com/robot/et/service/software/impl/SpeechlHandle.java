@@ -1,28 +1,28 @@
 package com.robot.et.service.software.impl;
 
-import com.robot.et.service.software.SpeechRecognizer;
-import com.robot.et.service.software.SpeechSynthesizer;
-import com.robot.et.service.software.TextUnderstander;
+import com.robot.et.service.software.VoiceDictation;
+import com.robot.et.service.software.SpeechSynthesis;
+import com.robot.et.service.software.TextUnderstand;
 import com.robot.et.service.software.turing.TuringUnderstander;
 
 /**
  * Created by houdeming on 2016/7/25.
  */
 public class SpeechlHandle {
-    private static SpeechRecognizer speechRecognizer;
-    private static SpeechSynthesizer speechSynthesizer;
-    private static TextUnderstander textUnderstander;
+    private static VoiceDictation speechRecognizer;
+    private static SpeechSynthesis speechSynthesizer;
+    private static TextUnderstand textUnderstander;
     private static TuringUnderstander turingUnderstander;
 
-    public static void setSpeechRecognizer(SpeechRecognizer speechRecognizer) {
+    public static void setSpeechRecognizer(VoiceDictation speechRecognizer) {
         SpeechlHandle.speechRecognizer = speechRecognizer;
     }
 
-    public static void setSpeechSynthesizer(SpeechSynthesizer speechSynthesizer) {
+    public static void setSpeechSynthesizer(SpeechSynthesis speechSynthesizer) {
         SpeechlHandle.speechSynthesizer = speechSynthesizer;
     }
 
-    public static void setTextUnderstander(TextUnderstander textUnderstander) {
+    public static void setTextUnderstander(TextUnderstand textUnderstander) {
         SpeechlHandle.textUnderstander = textUnderstander;
     }
 

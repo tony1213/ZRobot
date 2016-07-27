@@ -11,12 +11,13 @@ import android.util.Log;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.TextUnderstander;
 import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.SceneServiceEnum;
-import com.robot.et.service.software.TextUnderstander;
+import com.robot.et.service.software.TextUnderstand;
 import com.robot.et.service.software.iflytek.util.ResultParse;
 import com.robot.et.service.software.impl.SpeechlHandle;
 import com.robot.et.service.software.system.music.PlayerControl;
@@ -24,9 +25,9 @@ import com.robot.et.service.software.system.music.PlayerControl;
 import org.json.JSONObject;
 
 //科大讯飞文本理解
-public class IflyTextUnderstanderService extends Service implements TextUnderstander {
+public class IflyTextUnderstanderService extends Service implements TextUnderstand {
 
-    private com.iflytek.cloud.TextUnderstander mTextUnderstander;
+    private TextUnderstander mTextUnderstander;
     private String underStandContent;
 
     @Override
@@ -38,7 +39,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
     public void onCreate() {
         super.onCreate();
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
-        mTextUnderstander = com.iflytek.cloud.TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
+        mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
         SpeechlHandle.setTextUnderstander(this);
     }
 

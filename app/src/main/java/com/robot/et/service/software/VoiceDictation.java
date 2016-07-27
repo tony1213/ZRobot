@@ -4,7 +4,7 @@ package com.robot.et.service.software;
  * Created by houdeming on 2016/7/25.
  * 语音听写的接口
  */
-public interface SpeechRecognizer {
+public interface VoiceDictation {
     //开始语音听写
     void startListen();
 

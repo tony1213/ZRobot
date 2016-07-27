@@ -14,16 +14,17 @@ import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.service.software.SpeechSynthesizer;
+import com.robot.et.service.software.SpeechSynthesis;
 import com.robot.et.service.software.impl.SpeechlHandle;
 import com.robot.et.service.software.system.music.PlayerControl;
 
-public class IflySpeakService extends Service implements SpeechSynthesizer {
+public class IflySpeakService extends Service implements SpeechSynthesis {
     // 语音合成对象
-    private com.iflytek.cloud.SpeechSynthesizer mTts;
+    private SpeechSynthesizer mTts;
     private int currentType;
     private boolean isFirstSetParam;
 
@@ -37,7 +38,7 @@ public class IflySpeakService extends Service implements SpeechSynthesizer {
         super.onCreate();
         Log.i("ifly", "IflySpeakService  onCreate()");
         // 初始化合成对象
-        mTts = com.iflytek.cloud.SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
+        mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechSynthesizer(this);
 
         IntentFilter filter = new IntentFilter();

@@ -4,7 +4,7 @@ package com.robot.et.service.software;
  * Created by houdeming on 2016/7/25.
  * 语音合成接口
  */
-public interface SpeechSynthesizer {
+public interface SpeechSynthesis {
     //开始语音合成
     void startSpeak(int speakType, String speakContent);
 

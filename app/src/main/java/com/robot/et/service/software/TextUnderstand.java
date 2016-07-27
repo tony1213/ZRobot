@@ -4,7 +4,7 @@ package com.robot.et.service.software;
  * Created by houdeming on 2016/7/25.
  * 科大讯飞文本理解接口
  */
-public interface TextUnderstander {
+public interface TextUnderstand {
     // 理解文本
     void understanderText(String content);
 }

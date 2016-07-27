@@ -18,9 +18,10 @@ import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.service.software.SpeechRecognizer;
+import com.robot.et.service.software.VoiceDictation;
 import com.robot.et.service.software.iflytek.util.ResultParse;
 import com.robot.et.service.software.impl.SpeechlHandle;
 import com.robot.et.util.FileUtils;
@@ -28,9 +29,9 @@ import com.robot.et.util.FileUtils;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
-public class IflyVoiceToTextService extends Service implements SpeechRecognizer {
+public class IflyVoiceToTextService extends Service implements VoiceDictation {
     // 语音听写对象
-    private com.iflytek.cloud.SpeechRecognizer mIat;
+    private SpeechRecognizer mIat;
     // 用HashMap存储听写结果
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
     private boolean isFirstSetParam;
@@ -45,7 +46,7 @@ public class IflyVoiceToTextService extends Service implements SpeechRecognizer 
         super.onCreate();
         Log.i("ifly", "IflyVoiceToTextService  onCreate()");
         // 初始化SpeechRecognizer对象
-        mIat = com.iflytek.cloud.SpeechRecognizer.createRecognizer(this, mTtsInitListener);
+        mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechRecognizer(this);
 
         uploadUserThesaurus();//上传词表
