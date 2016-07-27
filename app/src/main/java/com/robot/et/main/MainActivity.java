@@ -4,11 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.robot.et.R;
-import com.robot.et.service.software.iflytek.IflySpeakService;
-import com.robot.et.service.software.iflytek.IflyTextUnderstanderService;
-import com.robot.et.service.software.iflytek.IflyVoiceToTextService;
-import com.robot.et.service.software.system.music.MusicPlayerService;
-import com.robot.et.service.software.turing.TuRingService;
+import com.robot.et.core.hardware.wakeup.WakeUpServices;
+import com.robot.et.core.software.iflytek.IflySpeakService;
+import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
+import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
+import com.robot.et.core.software.system.music.MusicPlayerService;
+import com.robot.et.core.software.turing.TuRingService;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeMainExecutor;
@@ -40,6 +41,8 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, TuRingService.class));
         //音乐
         startService(new Intent(this, MusicPlayerService.class));
+        //唤醒
+        startService(new Intent(this, WakeUpServices.class));
     }
 
     @Override
@@ -60,6 +63,7 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
         stopService(new Intent(this, MusicPlayerService.class));
+        stopService(new Intent(this, WakeUpServices.class));
     }
 
 }

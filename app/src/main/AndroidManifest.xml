@@ -35,11 +35,12 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.software.iflytek.IflySpeakService" />
-        <service android:name=".service.software.iflytek.IflyTextUnderstanderService" />
-        <service android:name=".service.software.iflytek.IflyVoiceToTextService" />
-        <service android:name=".service.software.turing.TuRingService" />
-        <service android:name=".service.software.system.music.MusicPlayerService" />
+        <service android:name=".core.software.iflytek.IflySpeakService" />
+        <service android:name=".core.software.iflytek.IflyTextUnderstanderService" />
+        <service android:name=".core.software.iflytek.IflyVoiceToTextService" />
+        <service android:name=".core.software.turing.TuRingService" />
+        <service android:name=".core.software.system.music.MusicPlayerService" />
+        <service android:name=".core.hardware.wakeup.WakeUpServices"/>
 
     </application>
 
