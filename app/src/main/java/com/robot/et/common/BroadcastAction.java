@@ -6,8 +6,8 @@ package com.robot.et.common;
 public class BroadcastAction {
     //串口数据接收
     public static String ACTION_MOVE_TO_SERIALPORT ="action.control.robot.serialport";
-    //唤醒或打断并且转向的广播
-    public static String ACTION_WAKE_UP_AND_MOVE = "action.wake.up.and.move";
+    //唤醒,打断或者转向的广播
+    public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
     //重置语音板的广播
     public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
     //开始播放音乐

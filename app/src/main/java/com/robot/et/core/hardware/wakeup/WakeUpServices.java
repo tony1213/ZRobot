@@ -68,7 +68,7 @@ public class WakeUpServices extends Service {
 						Log.i("wakeup", "degree:" + degree);
 						WakeUp.setGainDirection(0);// 设置麦克0为主麦
 						Intent intent = new Intent();
-						intent.setAction(BroadcastAction.ACTION_WAKE_UP_AND_MOVE);
+						intent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
 						intent.putExtra("degree", degree);
 						sendBroadcast(intent);
 					} else {
