@@ -10,6 +10,7 @@ import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
 import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
 import com.robot.et.core.software.system.music.MusicPlayerService;
 import com.robot.et.core.software.turing.TuRingService;
+import com.robot.et.core.software.window.AcceptHardwareMsgService;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeMainExecutor;
@@ -43,6 +44,8 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, MusicPlayerService.class));
         //唤醒
         startService(new Intent(this, WakeUpServices.class));
+        //接受硬件发来的消息
+        startService(new Intent(this, AcceptHardwareMsgService.class));
     }
 
     @Override
@@ -64,6 +67,7 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, TuRingService.class));
         stopService(new Intent(this, MusicPlayerService.class));
         stopService(new Intent(this, WakeUpServices.class));
+        stopService(new Intent(this, AcceptHardwareMsgService.class));
     }
 
 }

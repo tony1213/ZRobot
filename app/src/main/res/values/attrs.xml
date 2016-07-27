@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 唤醒后说的话 -->
+    <string-array name="wake_up_speak_content">
+        <item>小的在!</item>
+        <item>本宝宝在!</item>
+        <item>叫人家干嘛?</item>
+        <item>干嘛呀!</item>
+        <item>这呢?</item>
+        <item>我在这呢</item>
+        <item>有何吩咐</item>
+        <item>听候差遣</item>
+    </string-array>
+
+</resources>
