@@ -62,7 +62,7 @@ public class WakeUpServices extends Service {
 			while (true) {
 				if (fd > 0) {
 					wakeUpState = WakeUp.getWakeUpState(fd);
-//					Log.i("nowakeup", "wakeUpState:" + wakeUpState);
+//					Log.i("wakeup", "wakeUpState:" + wakeUpState);
 					if (wakeUpState == 1) {
 						degree = WakeUp.getWakeUpDegree();
 						Log.i("wakeup", "degree:" + degree);
@@ -72,10 +72,10 @@ public class WakeUpServices extends Service {
 						intent.putExtra("degree", degree);
 						sendBroadcast(intent);
 					} else {
-						// Log.i("wakeup", "no wakeUp");
+//						 Log.i("wakeup", "no wakeUp");
 					}
 				} else {
-					// Log.i("wakeup", "未打开I2C");
+//					 Log.i("wakeup", "未打开I2C");
 				}
 			}
 		}
@@ -96,6 +96,7 @@ public class WakeUpServices extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		// 此处不要忘记关闭线程，暂时放在这里.2016-06-08
+		Log.i("wakeup", "WakeUpServices onDestroy()");
 		unregisterReceiver(receiver);
 	}
 }

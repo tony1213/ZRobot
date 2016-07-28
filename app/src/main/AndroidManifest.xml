@@ -16,6 +16,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- 屏幕一直亮着的权限 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 开机自启动服务的权限 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".app.CustomApplication"
@@ -49,6 +51,14 @@
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
         <service android:name=".core.software.face.verify.FaceVerifyService" />
+        <service android:name=".core.software.window.AcceptHardwareMsgService"/>
+
+        <!--All receiver list-->
+        <receiver android:name=".receiver.SystemReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
