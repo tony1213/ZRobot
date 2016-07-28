@@ -43,7 +43,7 @@
         <service android:name=".core.software.turing.TuRingService" />
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
-        <service android:name=".core.software.window.AcceptHardwareMsgService"/>
+        <service android:name=".core.software.window.MsgReceiverService"/>
 
         <receiver android:name=".receiver.SystemReceiver">
             <intent-filter>

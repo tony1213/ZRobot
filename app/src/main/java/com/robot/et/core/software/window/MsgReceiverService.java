@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.R;
@@ -19,7 +20,7 @@ import java.util.Random;
  * Created by houdeming on 2016/7/27.
  * 接受硬件消息的service
  */
-public class AcceptHardwareMsgService extends Service {
+public class MsgReceiverService extends Service {
     private Intent intent;
 
     @Override
@@ -30,11 +31,14 @@ public class AcceptHardwareMsgService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("accept", "AcceptHardwareMsgService  onCreate()");
+        Log.i("accept", "MsgReceiverService  onCreate()");
         intent = new Intent();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
+        filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
+        filter.addAction(BroadcastAction.ACTION_SPEAK);
+
         registerReceiver(receiver, filter);
 
     }
@@ -42,10 +46,23 @@ public class AcceptHardwareMsgService extends Service {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT)) {
-                Log.i("accept", "AcceptHardwareMsgService 接受到唤醒中断的广播");
+            if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT)) {//唤醒中断
+                Log.i("accept", "MsgReceiverService 接受到唤醒中断的广播");
                 responseAwaken();
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_SPEAK)) {//说话
+                Log.i("accept", "MsgReceiverService  说话");
+                int currentType = intent.getIntExtra("type", 0);
+                String content = intent.getStringExtra("content");
+                if (!TextUtils.isEmpty(content)) {
+                    SpeechlHandle.startSpeak(currentType, content);
+                } else {
+                    SpeechlHandle.startListen();
+                }
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_END)) {//音乐播放完成
+                Log.i("accept", "MsgReceiverService  音乐播放完成");
+                SpeechlHandle.startListen();
             }
+
         }
     };
 

@@ -1,10 +1,7 @@
 package com.robot.et.core.software.iflytek;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -41,31 +38,12 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechSynthesizer(this);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastAction.ACTION_SPEAK);
-        registerReceiver(receiver, filter);
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
-
-    BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_SPEAK)) {//说话
-                currentType = intent.getIntExtra("type", 0);
-                String content = intent.getStringExtra("content");
-                if (!TextUtils.isEmpty(content)) {
-                    speakContent(content);
-                } else {
-                    SpeechlHandle.startListen();
-                }
-            }
-        }
-    };
 
     private void speakContent(String content) {
         if (!isFirstSetParam) {
@@ -178,7 +156,6 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         stopSpeak();
         // 退出时释放连接
         mTts.destroy();
-        unregisterReceiver(receiver);
     }
 
     private void stopSpeak() {

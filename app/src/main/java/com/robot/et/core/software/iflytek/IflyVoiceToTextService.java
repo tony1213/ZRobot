@@ -1,10 +1,7 @@
 package com.robot.et.core.software.iflytek;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
@@ -19,7 +16,6 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
-import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.VoiceDictation;
 import com.robot.et.core.software.iflytek.util.ResultParse;
@@ -51,22 +47,8 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
         uploadUserThesaurus();//上传词表
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
-        registerReceiver(receiver, filter);
-
         beginListen();
     }
-
-    BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_END)) {//音乐播放完成
-                Log.i("ifly", "IflyVoiceToTextService  音乐播放完成");
-                beginListen();
-            }
-        }
-    };
 
     private void beginListen() {
         listen(DataConfig.DEFAULT_SPEAK_MEN);
@@ -198,7 +180,6 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         super.onDestroy();
         stopListen();
         mIat.destroy();
-        unregisterReceiver(receiver);
     }
 
     private void stopListen() {
