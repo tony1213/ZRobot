@@ -35,12 +35,20 @@
             </intent-filter>
         </activity>
 
+        <!--人脸检测-->
+        <activity android:name=".core.software.face.detector.FaceDetectorActivity"
+            android:launchMode="singleTask">
+        </activity>
+
+
+        <!--All service list-->
         <service android:name=".core.software.iflytek.IflySpeakService" />
         <service android:name=".core.software.iflytek.IflyTextUnderstanderService" />
         <service android:name=".core.software.iflytek.IflyVoiceToTextService" />
         <service android:name=".core.software.turing.TuRingService" />
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
+        <service android:name=".core.software.face.verify.FaceVerifyService" />
 
     </application>
 
