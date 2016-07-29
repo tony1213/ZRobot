@@ -12,6 +12,7 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 
 import java.util.Random;
@@ -38,6 +39,7 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
         filter.addAction(BroadcastAction.ACTION_SPEAK);
+        filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
 
         registerReceiver(receiver, filter);
 
@@ -61,6 +63,10 @@ public class MsgReceiverService extends Service {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_END)) {//音乐播放完成
                 Log.i("accept", "MsgReceiverService  音乐播放完成");
                 SpeechlHandle.startListen();
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别
+                Log.i("accept", "MsgReceiverService  脸部识别");
+                String contetn = intent.getStringExtra("content");
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
             }
 
         }
@@ -80,6 +86,12 @@ public class MsgReceiverService extends Service {
         //停止唱歌
         intent.setAction(BroadcastAction.ACTION_STOP_MUSIC);
         sendBroadcast(intent);
+
+        //是否在人脸识别
+        if (FaceDetectorActivity.instance != null) {
+            FaceDetectorActivity.instance.finish();
+            FaceDetectorActivity.instance = null;
+        }
 
         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
 

@@ -51,7 +51,6 @@
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
         <service android:name=".core.software.window.MsgReceiverService"/>
-        <service android:name=".core.software.face.verify.FaceVerifyService"></service>
 
         <receiver android:name=".receiver.SystemReceiver">
             <intent-filter>

@@ -1,22 +1,18 @@
 package com.robot.et.core.software.face.detector;
 
-import java.io.IOException;
-import com.iflytek.cloud.FaceDetector;
-import com.iflytek.cloud.util.Accelerometer;
-import com.robot.et.R;
-import com.robot.et.core.software.face.util.FaceRect;
-import com.robot.et.core.software.face.util.FaceUtil;
-import com.robot.et.core.software.face.util.ParseResult;
-
 import android.Manifest.permission;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -27,14 +23,32 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.SurfaceHolder.Callback;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
+
+import com.iflytek.cloud.FaceDetector;
+import com.iflytek.cloud.FaceRequest;
+import com.iflytek.cloud.RequestListener;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.util.Accelerometer;
+import com.robot.et.R;
+import com.robot.et.common.BroadcastAction;
+import com.robot.et.core.software.face.util.FaceRect;
+import com.robot.et.core.software.face.util.FaceUtil;
+import com.robot.et.core.software.face.util.ParseResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class FaceDetectorActivity extends Activity {
 	private SurfaceView mPreviewSurface;
@@ -47,6 +61,8 @@ public class FaceDetectorActivity extends Activity {
 	// 预览帧数据存储数组和缓存数组
 	private byte[] nv21;
 	private byte[] buffer;
+	//识别到的图片信息
+	private byte[] mImageData;
 	// 缩放矩阵
 	private Matrix mScaleMatrix = new Matrix();
 	// 加速度感应器，用于获取手机的朝向
@@ -57,6 +73,9 @@ public class FaceDetectorActivity extends Activity {
 	private boolean mStopTrack;
 	private long mLastClickTime;
 	private int isAlign = 0;
+	private FaceRequest mFaceRequest;
+	private String auId;
+	public static FaceDetectorActivity instance;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +86,11 @@ public class FaceDetectorActivity extends Activity {
 		buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
 		mAcc = new Accelerometer(FaceDetectorActivity.this);
 		mFaceDetector = FaceDetector.createDetector(FaceDetectorActivity.this, null);
+		mFaceRequest = new FaceRequest(this);
+
+		auId = getIntent().getStringExtra("auId");
+
+		instance = this;
 	}
 
 	private Callback mPreviewCallback = new Callback() {
@@ -279,16 +303,18 @@ public class FaceDetectorActivity extends Activity {
 							FaceUtil.drawFaceRect(canvas, face, PREVIEW_WIDTH,PREVIEW_HEIGHT, frontCamera, false);
 						}
 						//检测到一个人脸
+						Log.d("face", "faces.length==" + faces.length);
 						if (faces.length == 1) {
-							Intent intent=new Intent();
-							intent.setAction("com.robot.et.face.verify");
-							intent.putExtra("NV21", nv21);
-							sendBroadcast(intent);
+							mImageData = Bitmap2Bytes(RotateDeg90(decodeToBitMap(nv21)));
+							verify(mImageData);
 						}
 					} else {
 						Log.d("FaceDetector", "faces:0");
 					}
 					mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
+
+					mStopTrack = true;
+
 				}
 			}
 		}).start();
@@ -310,5 +336,158 @@ public class FaceDetectorActivity extends Activity {
 		super.onDestroy();
 		// 销毁对象
 		mFaceDetector.destroy();
+		instance = null;
 	}
+
+	//验证
+	private void verify(byte[] mImageData) {
+		if (null != mImageData && mImageData.length > 0) {
+			// 设置用户标识，格式为6-18个字符（由字母、数字、下划线组成，不得以数字开头，不能包含空格）。
+			// 当不设置时，云端将使用用户设备的设备ID来标识终端用户。
+			mFaceRequest.setParameter(SpeechConstant.AUTH_ID, auId);
+			mFaceRequest.setParameter(SpeechConstant.WFR_SST, "verify");
+			mFaceRequest.sendRequest(mImageData, mRequestListener);
+		} else {
+			Log.i("face", "verify mImageData== null");
+			sendMsg("眼睛看花了，再让我看一次吧");
+		}
+	}
+
+	//注册
+	private void registerFace(byte[] mImageData) {
+		if (null != mImageData && mImageData.length > 0) {
+			mFaceRequest.setParameter(SpeechConstant.AUTH_ID, "1234");
+			mFaceRequest.setParameter(SpeechConstant.WFR_SST, "reg");
+			mFaceRequest.sendRequest(mImageData, mRequestListener);
+		} else {
+			Log.i("face", "registerFace mImageData== null");
+			sendMsg("眼睛看花了，再让我看一次吧");
+		}
+	}
+
+	private RequestListener mRequestListener = new RequestListener() {
+
+		@Override
+		public void onEvent(int eventType, Bundle params) {
+		}
+
+		@Override
+		public void onBufferReceived(byte[] buffer) {
+			boolean isError = false;
+			try {
+				String result = new String(buffer, "utf-8");
+				Log.i("face", "result===" + result);
+
+				JSONObject object = new JSONObject(result);
+				String type = object.optString("sst");
+				if ("reg".equals(type)) {
+					register(object);
+				} else if ("verify".equals(type)) {
+					verify(object);
+				}
+			} catch (UnsupportedEncodingException e) {
+				Log.i("face", "RequestListener  UnsupportedEncodingException");
+				isError = true;
+			} catch (JSONException e) {
+				Log.i("face", "RequestListener  JSONException");
+				isError = true;
+			} finally {
+				if (isError) {
+					sendMsg("眼睛累了，我去歇去喽");
+				}
+			}
+		}
+
+		@Override
+		public void onCompleted(SpeechError error) {
+			if (error != null) {
+				sendMsg("眼睛累了，我去歇去喽");
+			}
+		}
+	};
+
+
+	private void register(JSONObject obj) throws JSONException {
+		int ret = obj.getInt("ret");
+		if (ret != 0) {
+			Log.i("face", "注册失败");
+			sendMsg("让我再认识你一次吧");
+			return;
+		}
+		if ("success".equals(obj.get("rst"))) {
+			Log.i("face", "注册成功");
+			sendMsg("很高兴认识你，请问你怎么称呼呢？");
+		} else {
+			Log.i("face", "注册失败");
+			sendMsg("让我再认识你一次吧");
+		}
+	}
+
+	private void verify(JSONObject obj) throws JSONException {
+		int ret = obj.getInt("ret");
+		if (ret != 0) {
+			Log.i("face", "验证失败");
+//			registerFace(mImageData);
+			sendMsg("我不认识你");
+			return;
+		}
+		if ("success".equals(obj.get("rst"))) {
+			if (obj.getBoolean("verf")) {
+				Log.i("face", "通过验证");
+				sendMsg("我认识你哦,嘿嘿");
+			} else {
+				Log.i("face", "验证不通过");
+//				registerFace(mImageData);
+				sendMsg("我不认识你");
+			}
+		} else {
+			Log.i("face", "验证失败");
+//			registerFace(mImageData);
+			sendMsg("我不认识你");
+		}
+	}
+
+	private void sendMsg(String content) {
+		Intent intent = new Intent();
+		intent.setAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
+		intent.putExtra("content", content);
+		sendBroadcast(intent);
+		finish();
+	}
+
+	private Bitmap decodeToBitMap(byte[] data) {
+		try {
+			YuvImage image = new YuvImage(data, ImageFormat.NV21,PREVIEW_WIDTH, PREVIEW_HEIGHT, null);
+			if (image != null) {
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				image.compressToJpeg(new Rect(0, 0, PREVIEW_WIDTH,PREVIEW_HEIGHT), 80, stream);
+				Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+				stream.close();
+				return bmp;
+			}
+		} catch (Exception ex) {
+			Log.e("face", "Error:" + ex.getMessage());
+		}
+		return null;
+	}
+
+	private Bitmap RotateDeg90(Bitmap bmp) {
+		// 定义矩阵对象
+		Matrix matrix = new Matrix();
+		// 缩放原图
+		matrix.postScale(1f, 1f);
+		// 向左旋转45度，参数为正则向右旋转
+		matrix.postRotate(-90);
+		// bmp.getWidth(), 500分别表示重绘后的位图宽高
+		Bitmap dstbmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(),bmp.getHeight(), matrix, true);
+		return dstbmp;
+	}
+
+	private byte[] Bitmap2Bytes(Bitmap bm) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		return baos.toByteArray();
+	}
+
+
 }

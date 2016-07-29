@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.robot.et.R;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.face.verify.FaceVerifyService;
 import com.robot.et.core.software.iflytek.IflySpeakService;
 import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
 import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
@@ -48,8 +47,6 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, WakeUpServices.class));
         //接受广播发来的消息
         startService(new Intent(this, MsgReceiverService.class));
-        //脸部检测
-        startService(new Intent(this, FaceVerifyService.class));
     }
 
     @Override
@@ -72,7 +69,6 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, MusicPlayerService.class));
         stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
-        stopService(new Intent(this, FaceVerifyService.class));
     }
 
 }

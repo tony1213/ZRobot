@@ -126,6 +126,7 @@ public class commandImpl implements command {
                 Intent faceIntent = new Intent();
                 faceIntent.setClass(context, FaceDetectorActivity.class);
                 faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                faceIntent.putExtra("auId", "1234");
                 context.startActivity(faceIntent);
 
                 break;

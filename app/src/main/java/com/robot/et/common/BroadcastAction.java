@@ -18,5 +18,7 @@ public class BroadcastAction {
     public static String ACTION_STOP_MUSIC = "action.stop.music";
     //说话
     public static String ACTION_SPEAK = "action.speak";
+    //脸部识别
+    public static String ACTION_FACE_DISTINGUISH = "action.face.distinguish";
 
 }
