@@ -19,6 +19,8 @@ public class DataConfig {
 	public final static int SPEAK_TYPE_CHAT = 1;
 	//开始播放音乐前的提示
 	public final static int SPEAK_TYPE_MUSIC_START = 2;
+	//开始播放音乐前的提示
+	public final static int SPEAK_TYPE_DO_NOTHINF = 3;
 
 
 	//歌曲信息连接符

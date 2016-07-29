@@ -18,6 +18,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.VoiceDictation;
+import com.robot.et.core.software.custorm.commandImpl;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.util.FileUtils;
@@ -31,6 +32,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
     // 用HashMap存储听写结果
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
     private boolean isFirstSetParam;
+    private commandImpl command;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -44,6 +46,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         // 初始化SpeechRecognizer对象
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechRecognizer(this);
+        command = new commandImpl(this);
 
         uploadUserThesaurus();//上传词表
 
@@ -109,6 +112,10 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
                 if (!TextUtils.isEmpty(result)) {
                     if (result.length() == 1) {
                         beginListen();
+                        return;
+                    }
+
+                    if (command.isCustorm(result)) {
                         return;
                     }
                     SpeechlHandle.understanderText(result);

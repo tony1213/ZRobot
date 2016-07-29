@@ -145,6 +145,9 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 intent.putExtra("musicUrl", PlayerControl.getMusicSrc());
                 sendBroadcast(intent);
                 break;
+            case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
+                //do nothing
+                break;
             default:
                 break;
         }
