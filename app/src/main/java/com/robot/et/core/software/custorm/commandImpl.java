@@ -9,9 +9,12 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
+import com.robot.et.core.software.face.detector.FaceDataFactory;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.media.MediaManager;
+import com.robot.et.db.RobotDB;
+import com.robot.et.util.MatchStringUtil;
 
 /**
  * Created by houdeming on 2016/7/28.
@@ -36,6 +39,7 @@ public class commandImpl implements command {
         MatchSceneEnum sceneEnum = EnumManager.getScene(result);
         Log.i("ifly", "sceneEnum=====" + sceneEnum);
         if (sceneEnum == null) {
+            DataConfig.isFaceDetector = false;
             return false;
         }
 
@@ -121,12 +125,30 @@ public class commandImpl implements command {
                 flag = false;
 
                 break;
+            case FACE_NAME_SCENE:// 脸部名称
+                if (DataConfig.isFaceDetector) {
+                    DataConfig.isFaceDetector = false;
+                    String faceName = MatchStringUtil.getFaceName(result);
+                    Log.i("ifly", "faceName=====" + faceName);
+                    if (!TextUtils.isEmpty(faceName)) {
+                        flag = true;
+                        FaceDataFactory.addFaceInfo(context, faceName);
+                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
+
+                    } else {
+                        flag = false;
+                    }
+                } else {
+                    flag = false;
+                }
+
+                break;
             case FACE_TEST_SCENE:// 脸部识别
                 flag = true;
                 Intent faceIntent = new Intent();
                 faceIntent.setClass(context, FaceDetectorActivity.class);
                 faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                faceIntent.putExtra("auId", "1234");
+                faceIntent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(context).getFaceInfos());
                 context.startActivity(faceIntent);
 
                 break;
@@ -134,6 +156,7 @@ public class commandImpl implements command {
             default:
                 break;
         }
+        DataConfig.isFaceDetector = false;
         return flag;
     }
 

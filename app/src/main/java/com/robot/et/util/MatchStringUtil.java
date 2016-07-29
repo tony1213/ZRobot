@@ -40,6 +40,8 @@ public class MatchStringUtil {
 	public static String closeHouseholdRegex = "^" + baseRegex + "*关+" + baseRegex + "*(灯|(插座))+" + baseRegex + "*$";
 	// 脸检测
 	public static String faceTestRegex = "^" + baseRegex + "*((猜猜)|(看看))+" + baseRegex + "*(我是谁)+" + baseRegex + "*$";
+	// 识别问名字
+	public static String faceNameRegex = "^" + baseRegex + "*((我的名字是)|(我叫)|(我是))+" + baseRegex + "+$";
 
 
 
@@ -129,6 +131,20 @@ public class MatchStringUtil {
 			}
 		}
 		return carNum;
+	}
+
+	public static String getFaceName(String str) {
+		String content = "";
+		if (!TextUtils.isEmpty(str)) {
+			if (str.contains("是")) {
+				int lastIndes = str.lastIndexOf("是");
+				content = str.substring(lastIndes + 1, str.length());
+			} else if (str.contains("叫")) {
+				int lastIndes = str.lastIndexOf("叫");
+				content = str.substring(lastIndes + 1, str.length());
+			}
+		}
+		return content;
 	}
 
 }

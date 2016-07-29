@@ -39,9 +39,11 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.util.FaceRect;
 import com.robot.et.core.software.face.util.FaceUtil;
 import com.robot.et.core.software.face.util.ParseResult;
+import com.robot.et.entity.FaceInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +51,10 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class FaceDetectorActivity extends Activity {
 	private SurfaceView mPreviewSurface;
@@ -74,8 +80,9 @@ public class FaceDetectorActivity extends Activity {
 	private long mLastClickTime;
 	private int isAlign = 0;
 	private FaceRequest mFaceRequest;
-	private String auId;
 	public static FaceDetectorActivity instance;
+	private List<FaceInfo> faceInfos = new ArrayList<FaceInfo>();
+	private String auId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +95,9 @@ public class FaceDetectorActivity extends Activity {
 		mFaceDetector = FaceDetector.createDetector(FaceDetectorActivity.this, null);
 		mFaceRequest = new FaceRequest(this);
 
-		auId = getIntent().getStringExtra("auId");
-
 		instance = this;
+		faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
+
 	}
 
 	private Callback mPreviewCallback = new Callback() {
@@ -306,7 +313,7 @@ public class FaceDetectorActivity extends Activity {
 						Log.d("face", "faces.length==" + faces.length);
 						if (faces.length == 1) {
 							mImageData = Bitmap2Bytes(RotateDeg90(decodeToBitMap(nv21)));
-							verify(mImageData);
+							handleFace(mImageData, faceInfos);
 						}
 					} else {
 						Log.d("FaceDetector", "faces:0");
@@ -339,8 +346,27 @@ public class FaceDetectorActivity extends Activity {
 		instance = null;
 	}
 
+	//脸部识别后的处理
+	private void handleFace(byte[] mImageData, List<FaceInfo> faceInfos) {
+		if (null != mImageData && mImageData.length > 0) {
+			Log.i("face", "handleFace faceInfos.size()===" + faceInfos.size());
+			if (faceInfos != null && faceInfos.size() > 0) {
+				FaceInfo info = faceInfos.get(0);
+				String auId = info.getAuthorId();
+				FaceDataFactory.setAuthorName(info.getAuthorName());
+				FaceDataFactory.setNewFaceInfo(faceInfos);
+				verify(mImageData, auId);
+			} else {
+				registerFace(mImageData);
+			}
+		} else {
+			Log.i("face", "handleFace mImageData== null");
+			sendMsg("眼睛看花了，再让我看一次吧");
+		}
+	}
+
 	//验证
-	private void verify(byte[] mImageData) {
+	private void verify(byte[] mImageData, String auId) {
 		if (null != mImageData && mImageData.length > 0) {
 			// 设置用户标识，格式为6-18个字符（由字母、数字、下划线组成，不得以数字开头，不能包含空格）。
 			// 当不设置时，云端将使用用户设备的设备ID来标识终端用户。
@@ -356,7 +382,8 @@ public class FaceDetectorActivity extends Activity {
 	//注册
 	private void registerFace(byte[] mImageData) {
 		if (null != mImageData && mImageData.length > 0) {
-			mFaceRequest.setParameter(SpeechConstant.AUTH_ID, "1234");
+			auId = getOnlyTime();
+			mFaceRequest.setParameter(SpeechConstant.AUTH_ID, auId);
 			mFaceRequest.setParameter(SpeechConstant.WFR_SST, "reg");
 			mFaceRequest.sendRequest(mImageData, mRequestListener);
 		} else {
@@ -406,7 +433,6 @@ public class FaceDetectorActivity extends Activity {
 		}
 	};
 
-
 	private void register(JSONObject obj) throws JSONException {
 		int ret = obj.getInt("ret");
 		if (ret != 0) {
@@ -416,6 +442,8 @@ public class FaceDetectorActivity extends Activity {
 		}
 		if ("success".equals(obj.get("rst"))) {
 			Log.i("face", "注册成功");
+			FaceDataFactory.setAuthorId(auId);
+			DataConfig.isFaceDetector = true;
 			sendMsg("很高兴认识你，请问你怎么称呼呢？");
 		} else {
 			Log.i("face", "注册失败");
@@ -427,23 +455,20 @@ public class FaceDetectorActivity extends Activity {
 		int ret = obj.getInt("ret");
 		if (ret != 0) {
 			Log.i("face", "验证失败");
-//			registerFace(mImageData);
-			sendMsg("我不认识你");
+			handleFace(mImageData, FaceDataFactory.getFaceInfos());
 			return;
 		}
 		if ("success".equals(obj.get("rst"))) {
 			if (obj.getBoolean("verf")) {
 				Log.i("face", "通过验证");
-				sendMsg("我认识你哦,嘿嘿");
+				sendMsg("你好，" + FaceDataFactory.getAuthorName() + ",我们又见面了。");
 			} else {
 				Log.i("face", "验证不通过");
-//				registerFace(mImageData);
-				sendMsg("我不认识你");
+				handleFace(mImageData, FaceDataFactory.getFaceInfos());
 			}
 		} else {
 			Log.i("face", "验证失败");
-//			registerFace(mImageData);
-			sendMsg("我不认识你");
+			handleFace(mImageData, FaceDataFactory.getFaceInfos());
 		}
 	}
 
@@ -489,5 +514,12 @@ public class FaceDetectorActivity extends Activity {
 		return baos.toByteArray();
 	}
 
+	//获取时间的唯一数
+	private String getOnlyTime() {
+		Date date = new Date(System.currentTimeMillis());
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+		String dateTime = format.format(date);
+		return dateTime;
+	}
 
 }

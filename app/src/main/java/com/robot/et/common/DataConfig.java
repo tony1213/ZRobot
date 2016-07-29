@@ -30,4 +30,7 @@ public class DataConfig {
 	//音乐文件不存在了
 	public static String MUSIC_NOT_EXIT = "抱歉，主人，音乐文件已经不存在了，再换一首别的歌吧";
 
+	//是否是脸部识别
+	public static boolean isFaceDetector = false;
+
 }

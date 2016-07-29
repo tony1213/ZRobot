@@ -80,6 +80,11 @@ public enum MatchSceneEnum {
 			return MatchStringUtil.matchString(str, MatchStringUtil.faceTestRegex);
 		}
 	},
+	FACE_NAME_SCENE {// 脸部名称
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.faceNameRegex);
+		}
+	},
 	OPEN_HOUSEHOLD_SCENE {// 打开家电
 		public boolean isScene(String str) {
 			return MatchStringUtil.matchString(str, MatchStringUtil.openHouseholdRegex);
