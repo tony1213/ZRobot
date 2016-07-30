@@ -19,8 +19,10 @@ public class DataConfig {
 	public final static int SPEAK_TYPE_CHAT = 1;
 	//开始播放音乐前的提示
 	public final static int SPEAK_TYPE_MUSIC_START = 2;
-	//开始播放音乐前的提示
+	//什么都不做
 	public final static int SPEAK_TYPE_DO_NOTHINF = 3;
+	//打开脸部识别
+	public final static int SPEAK_TYPE_FACE_DETECTOR = 4;
 
 
 	//歌曲信息连接符

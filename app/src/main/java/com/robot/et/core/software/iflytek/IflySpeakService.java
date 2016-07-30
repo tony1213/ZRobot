@@ -16,8 +16,10 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.SpeechSynthesis;
+import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.music.PlayerControl;
+import com.robot.et.db.RobotDB;
 
 public class IflySpeakService extends Service implements SpeechSynthesis {
     // 语音合成对象
@@ -147,6 +149,14 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 //do nothing
+                break;
+            case DataConfig.SPEAK_TYPE_FACE_DETECTOR://脸部识别
+                Intent faceIntent = new Intent();
+                faceIntent.setClass(this, FaceDetectorActivity.class);
+                faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                faceIntent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(this).getFaceInfos());
+                startActivity(faceIntent);
+
                 break;
             default:
                 break;

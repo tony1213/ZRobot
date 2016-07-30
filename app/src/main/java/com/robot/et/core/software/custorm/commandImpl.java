@@ -11,10 +11,8 @@ import com.robot.et.common.RobotLearnManager;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
-import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.media.MediaManager;
-import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.util.MatchStringUtil;
 
@@ -164,11 +162,7 @@ public class commandImpl implements command {
                 break;
             case FACE_TEST_SCENE:// 脸部识别
                 flag = true;
-                Intent faceIntent = new Intent();
-                faceIntent.setClass(context, FaceDetectorActivity.class);
-                faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                faceIntent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(context).getFaceInfos());
-                context.startActivity(faceIntent);
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_FACE_DETECTOR, "好的");
 
                 break;
 
