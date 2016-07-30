@@ -16,6 +16,8 @@ import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.MatchStringUtil;
 
+import java.util.Random;
+
 /**
  * Created by houdeming on 2016/7/28.
  */
@@ -29,8 +31,14 @@ public class commandImpl implements command {
 
     public boolean isCustorm(String result) {
         if (!TextUtils.isEmpty(result)) {
-            return isMatchScene(result);
+            if (isMatchScene(result)) {
+                return true;
+            }
+            if (isControlMove(result)) {
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -158,6 +166,35 @@ public class commandImpl implements command {
         }
         DataConfig.isFaceDetector = false;
         return flag;
+    }
+
+    @Override
+    public boolean isControlMove(String result) {
+        if (!TextUtils.isEmpty(result)) {
+            int moveKey = EnumManager.getMoveKey(result);
+            Log.i("ifly", "moveKey===" + moveKey);
+            if (moveKey != 0) {
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
+                sendMoveAction(moveKey);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //控制移动的时候，随机回答内容
+    private String getRandomAnswer() {
+        String[] randomDatas = new String[]{"好的", "收到"};
+        int randNum = new Random().nextInt(randomDatas.length);
+        return randomDatas[randNum];
+    }
+
+    //控制走的广播
+    private void sendMoveAction(int direction) {
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
+        intent.putExtra("direction", direction);
+        context.sendBroadcast(intent);
     }
 
 }

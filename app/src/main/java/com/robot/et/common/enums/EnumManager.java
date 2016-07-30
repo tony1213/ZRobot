@@ -26,4 +26,17 @@ public class EnumManager {
         return null;
     }
 
+    //获取控制运动的key
+    public static int getMoveKey(String str) {
+        int moveKey = 0;
+        if (!TextUtils.isEmpty(str)) {
+            for (ControlMoveEnum moveEnum: ControlMoveEnum.values()) {
+                if (str.contains(moveEnum.getMoveName())) {
+                    moveKey  =  moveEnum.getMoveKey();
+                }
+            }
+        }
+        return moveKey;
+    }
+
 }

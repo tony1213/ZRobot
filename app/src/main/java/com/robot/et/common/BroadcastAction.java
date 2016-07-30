@@ -20,5 +20,9 @@ public class BroadcastAction {
     public static String ACTION_SPEAK = "action.speak";
     //脸部识别
     public static String ACTION_FACE_DISTINGUISH = "action.face.distinguish";
+    //控制机器人移动(Netty指令)
+    public static String ACTION_CONTROL_ROBOT_MOVE_WITH_NETTY = "action.control.robot.move.with.netty";
+    //控制机器人移动（语音控制）
+    public static String ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE = "action.control.robot.move.with.voice";
 
 }
