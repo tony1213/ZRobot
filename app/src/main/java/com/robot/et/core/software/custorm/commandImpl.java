@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.RobotLearnManager;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
@@ -14,6 +15,7 @@ import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.db.RobotDB;
+import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.util.MatchStringUtil;
 
 import java.util.Random;
@@ -48,7 +50,14 @@ public class commandImpl implements command {
         Log.i("ifly", "sceneEnum=====" + sceneEnum);
         if (sceneEnum == null) {
             DataConfig.isFaceDetector = false;
-            return false;
+            LearnAnswerInfo info = RobotLearnManager.getRobotLearnInfo(context, result);
+            String content = info.getAnswer();//回答的话语
+            boolean flag = false;
+            if (!TextUtils.isEmpty(content)) {
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                flag = true;
+            }
+            return flag;
         }
 
         boolean flag = false;
@@ -90,7 +99,9 @@ public class commandImpl implements command {
 
                 break;
             case QUESTION_ANSWER_SCENE:// 智能学习回答话语
-                flag = false;
+                flag = true;
+                String content = RobotLearnManager.learnBySpeak(context, DataConfig.LEARN_BY_ROBOT, result);
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                 break;
             case DISTURB_OPEN_SCENE:// 免打扰开

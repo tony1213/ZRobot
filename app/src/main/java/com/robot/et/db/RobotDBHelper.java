@@ -27,7 +27,21 @@ public class RobotDBHelper extends SQLiteOpenHelper {
 				"spareContent varchar(50),spareContent2 varchar(50)" +
 				 ")";
 
+		//智能学习问题表
+		String question = "create table question"+
+				"("+
+				"id integer primary key autoincrement,robotNum varchar(30),question varchar(2000),learnType integer"+
+				")";
+
+		//智能学习答案表
+		String answer = "create table answer"+
+				"("+
+				"id integer primary key autoincrement,questionId integer,robotNum varchar(30),answer varchar(2000),action varchar(100),learnType integer"+
+				")";
+
 		db.execSQL(faces);
+		db.execSQL(question);
+		db.execSQL(answer);
 	}
 
 	@Override

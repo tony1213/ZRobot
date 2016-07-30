@@ -33,4 +33,9 @@ public class DataConfig {
 	//是否是脸部识别
 	public static boolean isFaceDetector = false;
 
+	//机器人问答
+	public static final int LEARN_BY_ROBOT = 0;
+	//个人问答
+	public static final int LEARN_BY_PERSON = 1;
+
 }
