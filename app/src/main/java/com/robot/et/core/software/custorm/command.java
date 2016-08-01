@@ -8,5 +8,7 @@ public interface command {
     boolean isMatchScene(String result);
     //是否控制运动
     boolean isControlMove(String result);
+    //是否是自定义问答
+    boolean isCustomDialogue(String result);
 
 }

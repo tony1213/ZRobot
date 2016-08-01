@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RobotLearnManager;
@@ -36,6 +37,10 @@ public class commandImpl implements command {
             }
             if (isControlMove(result)) {
                 return true;
+            }
+
+            if (isCustomDialogue(result)) {
+                return  true;
             }
         }
 
@@ -182,6 +187,24 @@ public class commandImpl implements command {
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
                 sendMoveAction(moveKey);
                 return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isCustomDialogue(String result) {
+        String[] questions = context.getResources().getStringArray(R.array.custom_question);
+        if (questions != null && questions.length > 0) {
+            for (int i = 0; i < questions.length; i++) {
+                String question = questions[i];
+                if (result.contains(question) || question.contains(result)) {
+                    String[] answers = context.getResources().getStringArray(R.array.custom_answer);
+                    if (answers != null && answers.length > 0) {
+                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, answers[i]);
+                        return true;
+                    }
+                }
             }
         }
         return false;
