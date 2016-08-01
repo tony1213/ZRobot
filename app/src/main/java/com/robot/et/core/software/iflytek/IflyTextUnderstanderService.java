@@ -22,6 +22,8 @@ import com.robot.et.core.software.TextUnderstand;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.music.PlayerControl;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 
 import org.json.JSONObject;
 
@@ -30,6 +32,8 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 
     private TextUnderstander mTextUnderstander;
     private String underStandContent;
+    private String city;
+    private String area;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -42,6 +46,11 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
         mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
         SpeechlHandle.setTextUnderstander(this);
+
+        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+        city = share.getString(SharedPreferencesKeys.CITY_KEY, "");
+        area = share.getString(SharedPreferencesKeys.AREA_KEY, "");
+
     }
 
     @Override
@@ -221,13 +230,13 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 
                                     break;
                                 case WEATHER://天气查询
-                                    answer = ResultParse.getWeatherData(jObject, "上海市", "浦东新区");
+                                    answer = ResultParse.getWeatherData(jObject, city, area);
                                     if (!TextUtils.isEmpty(answer)) {
                                         if (answer.contains("空气质量")) {
                                             speakContent(question, answer);
 
                                         } else {
-                                            String weatherContent = answer + "上海市" + "的天气";
+                                            String weatherContent = answer + city + area + "的天气";
                                             textUnderstander(weatherContent);
                                         }
                                     } else {
@@ -256,7 +265,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 
                                     break;
                                 case PM25://空气质量
-                                    answer = ResultParse.getPm25Data(jObject, "上海市", "浦东新区");
+                                    answer = ResultParse.getPm25Data(jObject, city, area);
                                     speakContent(question, answer);
 
                                     break;
@@ -274,13 +283,13 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                         speakContent(question, "");
                     }
                 } else {
-                    SpeechlHandle.startListen();
+                    speakContent(underStandContent, "");
                 }
             }
 
             @Override
             public void onError(String errorMsg) {
-                SpeechlHandle.startListen();
+                speakContent(underStandContent, "");
             }
         });
 

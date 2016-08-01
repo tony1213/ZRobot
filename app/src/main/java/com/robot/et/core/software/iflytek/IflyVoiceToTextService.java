@@ -50,7 +50,6 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
         uploadUserThesaurus();//上传词表
 
-        beginListen();
     }
 
     private void beginListen() {

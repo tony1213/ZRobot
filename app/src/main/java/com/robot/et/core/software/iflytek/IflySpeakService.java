@@ -21,6 +21,9 @@ import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.music.PlayerControl;
 import com.robot.et.db.RobotDB;
+import com.robot.et.util.DateTools;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 
 public class IflySpeakService extends Service implements SpeechSynthesis {
     // 语音合成对象
@@ -28,6 +31,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
     private int currentType;
     private boolean isFirstSetParam;
     private Intent mIntent;
+    private SharedPreferencesUtils share;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -42,6 +46,14 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechSynthesizer(this);
         mIntent = new Intent();
+
+        //记录位置
+        share = SharedPreferencesUtils.getInstance();
+        share.putString(SharedPreferencesKeys.CITY_KEY, "台州市");
+        share.putString(SharedPreferencesKeys.AREA_KEY, "椒江区");
+        share.commitValue();
+
+        startSpeak(DataConfig.SPEAK_TYPE_WELCOME, getWelcomeContent());
     }
 
     @Override
@@ -52,7 +64,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
     private void speakContent(String content) {
         if (!isFirstSetParam) {
             isFirstSetParam = true;
-            setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "50");
+            setTextToVoiceParam(mTts, DataConfig.DEFAULT_SPEAK_MEN, "60", "50", "100");
         }
 
         int code = mTts.startSpeaking(content, mTtsListener);
@@ -158,12 +170,14 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 faceIntent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(this).getFaceInfos());
                 startActivity(faceIntent);
-
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 String alarmContent = AlarmRemindManager.getMoreAlarmContent();
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
-
+                break;
+            case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
+                String weatherContent = "今天" + share.getString(SharedPreferencesKeys.CITY_KEY, "") + share.getString(SharedPreferencesKeys.AREA_KEY, "") + "天气";
+                SpeechlHandle.understanderText(weatherContent);
                 break;
             default:
                 break;
@@ -233,6 +247,22 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         mTts.setParameter(SpeechConstant.STREAM_TYPE, "3");
         // 设置播放合成音频打断音乐播放，默认为true
         mTts.setParameter(SpeechConstant.KEY_REQUEST_FOCUS, "true");
+    }
+
+    //得到当前时间的欢迎语
+    private String getWelcomeContent() {
+        int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
+        String content = "";
+        if (0 <= currentHour && currentHour < 12) {// 早上
+            content = "主人，早上好";
+        } else if (12 <= currentHour && currentHour < 13) {// 中午
+            content = "主人，中午好";
+        } else if (13 <= currentHour && currentHour < 18) {// 下午
+            content = "主人，下午好";
+        } else if (18 <= currentHour && currentHour < 24) {// 晚上
+            content = "主人，晚上好";
+        }
+        return content;
     }
 
 }

@@ -25,6 +25,8 @@ public class DataConfig {
 	public final static int SPEAK_TYPE_FACE_DETECTOR = 4;
 	//闹铃提醒
 	public static final int SPEAK_TYPE_REMIND_TIPS = 5;
+	//欢迎语
+	public static final int SPEAK_TYPE_WELCOME = 6;
 
 
 	//歌曲信息连接符
