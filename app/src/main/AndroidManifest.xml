@@ -42,6 +42,7 @@
         </activity>
 
         <activity android:name=".core.software.face.detector.FaceDetectorActivity"
+            android:screenOrientation="portrait"
             ></activity>
 
         <service android:name=".core.software.iflytek.IflySpeakService" />

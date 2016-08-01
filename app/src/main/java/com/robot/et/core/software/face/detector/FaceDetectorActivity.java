@@ -314,7 +314,7 @@ public class FaceDetectorActivity extends Activity {
 						//检测到一个人脸
 						Log.d("face", "faces.length==" + faces.length);
 						if (faces.length == 1) {
-							mImageData = Bitmap2Bytes(RotateDeg90(decodeToBitMap(nv21)));
+							mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
 							handleFace(mImageData, faceInfos);
 						}
 					} else {
@@ -496,18 +496,6 @@ public class FaceDetectorActivity extends Activity {
 			Log.e("face", "Error:" + ex.getMessage());
 		}
 		return null;
-	}
-
-	private Bitmap RotateDeg90(Bitmap bmp) {
-		// 定义矩阵对象
-		Matrix matrix = new Matrix();
-		// 缩放原图
-		matrix.postScale(1f, 1f);
-		// 向左旋转45度，参数为正则向右旋转
-		matrix.postRotate(-90);
-		// bmp.getWidth(), 500分别表示重绘后的位图宽高
-		Bitmap dstbmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(),bmp.getHeight(), matrix, true);
-		return dstbmp;
 	}
 
 	private byte[] Bitmap2Bytes(Bitmap bm) {
