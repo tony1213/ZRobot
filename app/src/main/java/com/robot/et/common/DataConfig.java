@@ -23,6 +23,8 @@ public class DataConfig {
 	public final static int SPEAK_TYPE_DO_NOTHINF = 3;
 	//打开脸部识别
 	public final static int SPEAK_TYPE_FACE_DETECTOR = 4;
+	//闹铃提醒
+	public static final int SPEAK_TYPE_REMIND_TIPS = 5;
 
 
 	//歌曲信息连接符
@@ -39,5 +41,16 @@ public class DataConfig {
 	public static final int LEARN_BY_ROBOT = 0;
 	//个人问答
 	public static final int LEARN_BY_PERSON = 1;
+
+	//提醒广播的标志
+	public static String ACTION_REMIND_SIGN = "&ALARM&";
+
+	//已提醒
+	public static final int REMIND_HAD_ID = 1;
+	//未提醒
+	public static final int REMIND_NO_ID = 0;
+
+	//设置为每天的闹铃
+	public static int alarmAllDay = 0;
 
 }

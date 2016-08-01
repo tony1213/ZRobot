@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.robot.et.entity.FaceInfo;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.LearnQuestionInfo;
+import com.robot.et.entity.RemindInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,6 +126,93 @@ public class RobotDB {
         c.close();
         db.close();
         return questionId;
+    }
+
+    //增加提醒
+    public void addRemindInfo(RemindInfo info) {
+        String sql = "insert into reminds(robotNum,date,time,content,remindInt,frequency,originalAlarmTime,remindMen,requireAnswer,spareContent,spareType) " +
+                "values(?,?,?,?,?,?,?,?,?,?,?)";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{info.getRobotNum(), info.getDate(), info.getTime(), info.getContent(), String.valueOf(info.getRemindInt()),
+                String.valueOf(info.getFrequency()), info.getOriginalAlarmTime(), info.getRemindMen(), info.getRequireAnswer(), info.getSpareContent(), String.valueOf(info.getSpareType())});
+        db.close();
+    }
+
+    //根据日期时间查找提醒
+    public List<RemindInfo> getRemindInfos(String date, String time, int remindInt) {
+        String sql = "select * from reminds where date=? and time=? and remindInt=? order by id desc";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery(sql, new String[]{date, time, String.valueOf(remindInt)});
+        List<RemindInfo> mRemindInfos = new ArrayList<RemindInfo>();
+        while (c.moveToNext()) {
+            RemindInfo info = new RemindInfo();
+            info.setRobotNum(c.getString(c.getColumnIndex("robotNum")));
+            info.setDate(c.getString(c.getColumnIndex("date")));
+            info.setTime(c.getString(c.getColumnIndex("time")));
+            info.setContent(c.getString(c.getColumnIndex("content")));
+            info.setRemindInt(c.getInt(c.getColumnIndex("remindInt")));
+            info.setFrequency(c.getInt(c.getColumnIndex("frequency")));
+            info.setOriginalAlarmTime(c.getString(c.getColumnIndex("originalAlarmTime")));
+            info.setRemindMen(c.getString(c.getColumnIndex("remindMen")));
+            info.setRequireAnswer(c.getString(c.getColumnIndex("requireAnswer")));
+            info.setSpareContent(c.getString(c.getColumnIndex("spareContent")));
+            info.setSpareType(c.getInt(c.getColumnIndex("spareType")));
+            mRemindInfos.add(info);
+        }
+
+        c.close();
+        db.close();
+        return mRemindInfos;
+    }
+
+    //根据某一个提醒查找内容
+    public RemindInfo getRemindInfo(RemindInfo remindInfo) {
+        String sql = "select * from reminds where date=? and time=? and content=? and remindInt=? and frequency=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery(sql, new String[]{remindInfo.getDate(), remindInfo.getTime(), remindInfo.getContent(), String.valueOf(remindInfo.getRemindInt()),
+                String.valueOf(remindInfo.getFrequency())});
+        RemindInfo info = null;
+        if (c.moveToNext()) {
+            info = new RemindInfo();
+            info.setRobotNum(c.getString(c.getColumnIndex("robotNum")));
+            info.setDate(c.getString(c.getColumnIndex("date")));
+            info.setTime(c.getString(c.getColumnIndex("time")));
+            info.setContent(c.getString(c.getColumnIndex("content")));
+            info.setRemindInt(c.getInt(c.getColumnIndex("remindInt")));
+            info.setFrequency(c.getInt(c.getColumnIndex("frequency")));
+            info.setOriginalAlarmTime(c.getString(c.getColumnIndex("originalAlarmTime")));
+            info.setRemindMen(c.getString(c.getColumnIndex("remindMen")));
+            info.setRequireAnswer(c.getString(c.getColumnIndex("requireAnswer")));
+            info.setSpareContent(c.getString(c.getColumnIndex("spareContent")));
+            info.setSpareType(c.getInt(c.getColumnIndex("spareType")));
+        }
+        c.close();
+        db.close();
+        return info;
+    }
+
+    //根据日期时间删除提醒  不带内容，防止同一时间内有多个提醒
+    public void deleteRemindInfo(String date, String time, int remindInt) {
+        String sql = "delete from reminds where date=? and time=? and remindInt=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{date, time, String.valueOf(remindInt)});
+        db.close();
+    }
+
+    //根据APP原始的闹铃时间删除提醒
+    public void deleteAppRemindInfo(String originalTime) {
+        String sql = "delete from reminds where originalAlarmTime=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{originalTime});
+        db.close();
+    }
+
+    //更改提醒
+    public void updateRemindInfo(RemindInfo info, String data, int frequency) {
+        String sql = "update reminds set date=?,frequency=? where date=? and time=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{data, String.valueOf(frequency), info.getDate(), info.getTime()});
+        db.close();
     }
 
 }

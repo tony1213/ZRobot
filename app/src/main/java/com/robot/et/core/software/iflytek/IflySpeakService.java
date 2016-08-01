@@ -13,6 +13,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
+import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.SpeechSynthesis;
@@ -26,6 +27,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
     private SpeechSynthesizer mTts;
     private int currentType;
     private boolean isFirstSetParam;
+    private Intent mIntent;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -39,7 +41,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechSynthesizer(this);
-
+        mIntent = new Intent();
     }
 
     @Override
@@ -158,6 +160,11 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 startActivity(faceIntent);
 
                 break;
+            case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
+                String alarmContent = AlarmRemindManager.getMoreAlarmContent();
+                startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
+
+                break;
             default:
                 break;
         }
@@ -183,6 +190,14 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         Log.i("ifly", "IflySpeakService  speakContent===" + speakContent);
         currentType = speakType;
         if (!TextUtils.isEmpty(speakContent)) {
+            if (currentType == DataConfig.SPEAK_TYPE_REMIND_TIPS) {//提醒
+                cancelSpeak();
+                SpeechlHandle.cancelListen();
+                //停止唱歌
+                mIntent.setAction(BroadcastAction.ACTION_STOP_MUSIC);
+                sendBroadcast(mIntent);
+            }
+
             speakContent(speakContent);
         } else {
             SpeechlHandle.startListen();

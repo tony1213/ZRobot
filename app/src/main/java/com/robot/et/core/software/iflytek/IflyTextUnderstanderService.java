@@ -14,6 +14,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.TextUnderstander;
 import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
+import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.SceneServiceEnum;
@@ -196,7 +197,11 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
 
                                     break;
                                 case SCHEDULE://提醒
+                                    // 日期 + 时间 + 做什么事
                                     answer = ResultParse.getRemindData(jObject, DataConfig.SCHEDULE_SPLITE);
+                                    if (!TextUtils.isEmpty(answer)) {
+                                        answer = AlarmRemindManager.setIflyRemind(IflyTextUnderstanderService.this, answer);
+                                    }
                                     speakContent(question, answer);
 
                                     break;

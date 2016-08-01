@@ -39,9 +39,17 @@ public class RobotDBHelper extends SQLiteOpenHelper {
 				"id integer primary key autoincrement,questionId integer,robotNum varchar(30),answer varchar(2000),action varchar(100),learnType integer"+
 				")";
 
+		//提醒表
+		String reminds = "create table reminds"+
+				"("+
+				"id integer primary key autoincrement,robotNum varchar(50),date varchar(50),time varchar(20),content varchar(200),remindInt integer," +
+				"frequency integer,originalAlarmTime varchar(50),remindMen varchar(50),requireAnswer varchar(200),spareContent varchar(200),spareType integer"+
+				")";
+
 		db.execSQL(faces);
 		db.execSQL(question);
 		db.execSQL(answer);
+		db.execSQL(reminds);
 	}
 
 	@Override
