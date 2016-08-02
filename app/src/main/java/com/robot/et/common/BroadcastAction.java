@@ -24,5 +24,9 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_ROBOT_MOVE_WITH_NETTY = "action.control.robot.move.with.netty";
     //控制机器人移动（语音控制）
     public static String ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE = "action.control.robot.move.with.voice";
+    //打开netty的广播
+    public static String ACTION_OPEN_NETTY = "action.open.netty";
+    //控制机器人周围小车的广播
+    public static String ACTION_CONTROL_AROUND_TOYCAR = "action.control.around.toycar";
 
 }

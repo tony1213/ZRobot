@@ -13,6 +13,11 @@ public class DataConfig {
 	//图灵的UNIQUEID   填写一个任意的标示，没有具体要求，但一定要写
 	public static final String TURING_UNIQUEID = "131313131";
 
+	//HostName   internet:139.196.185.52  localHost:192.168.1.28
+	public static final String HOST = "139.196.185.52";
+	//Port
+	public static final int PORT = 9999;
+
 
 	//说话类型
 	//对话
@@ -54,5 +59,16 @@ public class DataConfig {
 
 	//设置为每天的闹铃
 	public static int alarmAllDay = 0;
+
+	//mp3文件来自 0:第三方  1:极光推送
+	public static final int MUSIC_SRC_FROM_OTHER = 0;
+	public static final int MUSIC_SRC_FROM_JPUSH = 1;
+
+	//app是否推送了暂停
+	public static boolean isJpushStop = false;
+	//是否正在播放音乐
+	public static boolean isPlayMusic = false;
+	//是用极光推送播放音乐还是第三方科大讯飞
+	public static boolean isJpushPlayMusic = false;
 
 }

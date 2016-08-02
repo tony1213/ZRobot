@@ -10,5 +10,7 @@ public class SharedPreferencesKeys {
 	public static final String CITY_KEY = "city_key";
 	//定位的区域
 	public static final String AREA_KEY = "area_key";
+	//记录agora正在通话的手机号
+	public static final String AGORA_CALL_PHONENUM = "agora_call_phonenum";
 
 }

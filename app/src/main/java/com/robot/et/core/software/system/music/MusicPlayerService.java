@@ -14,6 +14,9 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.PlayerControl;
+import com.robot.et.core.software.netty.NettyClientHandler;
+import com.robot.et.core.software.window.network.HttpManager;
 
 import java.io.IOException;
 
@@ -41,6 +44,12 @@ public class MusicPlayerService extends Service {
             @Override
             public void onCompletion(MediaPlayer arg0) {
                 Log.i("music", "音乐播放完成");
+                DataConfig.isPlayMusic = false;
+                //播放的是APP推送来的歌曲，继续播放下一首
+                if (DataConfig.isJpushPlayMusic) {
+                    playAppLower();
+                    return;
+                }
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
                 sendBroadcast(intent);
             }
@@ -65,6 +74,15 @@ public class MusicPlayerService extends Service {
             }
         }
     };
+
+    //播放APP推送来的下一首
+    private void playAppLower() {
+        String musicSrc = PlayerControl.getLowerMusicSrc(PlayerControl.getCurrentMediaType(), PlayerControl.getCurrentPlayName() + ".mp3");
+        Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
+        PlayerControl.setCurrentPlayName(PlayerControl.getMusicNameNoMp3(musicSrc));
+        HttpManager.pushMediaState(PlayerControl.getCurrentMediaName(), "open", PlayerControl.getCurrentPlayName(), new NettyClientHandler(this));
+        play(musicSrc);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -113,6 +131,7 @@ public class MusicPlayerService extends Service {
         @Override
         public void onPrepared(MediaPlayer mp) {
             Log.i("music", "音乐开始播放");
+            DataConfig.isPlayMusic = true;
             mediaPlayer.start(); // 开始播放
         }
     }

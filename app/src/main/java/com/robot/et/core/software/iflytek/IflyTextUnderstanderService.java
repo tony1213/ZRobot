@@ -16,12 +16,12 @@ import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.PlayerControl;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.SceneServiceEnum;
 import com.robot.et.core.software.TextUnderstand;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.core.software.impl.SpeechlHandle;
-import com.robot.et.core.software.system.music.PlayerControl;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
@@ -196,7 +196,8 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                     break;
                                 case MUSIC://音乐
                                     answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
-                                    String content = PlayerControl.getMusicSpeakContent(answer, DataConfig.MUSIC_SPLITE);
+                                    DataConfig.isJpushPlayMusic = false;
+                                    String content = PlayerControl.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
                                     SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
 
                                     break;

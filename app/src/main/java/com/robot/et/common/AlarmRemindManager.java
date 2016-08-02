@@ -42,7 +42,7 @@ public class AlarmRemindManager {
     }
 
     // 设置极光推送发来的闹铃
-    public static void setAlarm(Context context, JpushInfo info) {
+    public static void setAppAlarm(Context context, JpushInfo info) {
         // yyyy-MM-dd HH:mm:ss
         String alarmTime = info.getAlarmTime();
         String originalTime = alarmTime;
@@ -155,9 +155,7 @@ public class AlarmRemindManager {
     // 删除app传来的提醒
     public static void deleteAppRemindTips(Context context, String originalTime) {
         if (!TextUtils.isEmpty(originalTime)) {
-            if (!TextUtils.isEmpty(originalTime)) {
-                RobotDB.getInstance(context).deleteAppRemindInfo(originalTime);
-            }
+            RobotDB.getInstance(context).deleteAppRemindInfo(originalTime);
         }
     }
 

@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.BroadcastCommon;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
@@ -84,8 +85,7 @@ public class MsgReceiverService extends Service {
         //停止听
         SpeechlHandle.cancelListen();
         //停止唱歌
-        intent.setAction(BroadcastAction.ACTION_STOP_MUSIC);
-        sendBroadcast(intent);
+        BroadcastCommon.stopMusic(this);
 
         //是否在人脸识别
         if (FaceDetectorActivity.instance != null) {

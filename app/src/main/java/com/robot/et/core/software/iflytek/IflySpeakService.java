@@ -14,12 +14,12 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.AlarmRemindManager;
-import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.BroadcastCommon;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.PlayerControl;
 import com.robot.et.core.software.SpeechSynthesis;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
-import com.robot.et.core.software.system.music.PlayerControl;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.DateTools;
 import com.robot.et.util.SharedPreferencesKeys;
@@ -156,10 +156,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 SpeechlHandle.startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
-                Intent intent = new Intent();
-                intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
-                intent.putExtra("musicUrl", PlayerControl.getMusicSrc());
-                sendBroadcast(intent);
+                PlayerControl.startPlayMusic(this, PlayerControl.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 //do nothing
@@ -208,8 +205,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 cancelSpeak();
                 SpeechlHandle.cancelListen();
                 //停止唱歌
-                mIntent.setAction(BroadcastAction.ACTION_STOP_MUSIC);
-                sendBroadcast(mIntent);
+                BroadcastCommon.stopMusic(IflySpeakService.this);
             }
 
             speakContent(speakContent);
