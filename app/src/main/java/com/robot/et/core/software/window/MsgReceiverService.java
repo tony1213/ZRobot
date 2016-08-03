@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.BroadcastCommon;
+import com.robot.et.common.BroadcastFactory;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
@@ -85,13 +85,17 @@ public class MsgReceiverService extends Service {
         //停止听
         SpeechlHandle.cancelListen();
         //停止唱歌
-        BroadcastCommon.stopMusic(this);
+        BroadcastFactory.stopMusic(this);
 
         //是否在人脸识别
         if (FaceDetectorActivity.instance != null) {
             FaceDetectorActivity.instance.finish();
             FaceDetectorActivity.instance = null;
         }
+
+        DataConfig.isScriptQA = false;
+        DataConfig.isAppPushRemind = false;
+        DataConfig.isStartTime = false;
 
         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
 

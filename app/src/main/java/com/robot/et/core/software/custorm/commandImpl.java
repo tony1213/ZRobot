@@ -2,21 +2,33 @@ package com.robot.et.core.software.custorm;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
+import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.RequestType;
 import com.robot.et.common.RobotLearnManager;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
 import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.core.software.netty.NettyClientHandler;
+import com.robot.et.core.software.script.ScriptFactory;
+import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
+import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.entity.LearnAnswerInfo;
+import com.robot.et.entity.ResponseAppRemindInfo;
+import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.util.MatchStringUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -32,15 +44,24 @@ public class commandImpl implements command {
 
     public boolean isCustorm(String result) {
         if (!TextUtils.isEmpty(result)) {
+            if (isAppPushRemind(result)) {
+                return true;
+            }
+
+            if (isScriptQA(result)) {
+                return true;
+            }
+
             if (isMatchScene(result)) {
                 return true;
             }
+
             if (isControlMove(result)) {
                 return true;
             }
 
             if (isCustomDialogue(result)) {
-                return  true;
+                return true;
             }
         }
 
@@ -140,11 +161,15 @@ public class commandImpl implements command {
 
                 break;
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
-                flag = false;
+                flag = true;
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                HttpManager.pushMsgToApp("开", RequestType.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
             case CLOSE_HOUSEHOLD_SCENE:// 关闭家电
-                flag = false;
+                flag = true;
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                HttpManager.pushMsgToApp("关", RequestType.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称
@@ -210,6 +235,45 @@ public class commandImpl implements command {
         return false;
     }
 
+    @Override
+    public boolean isAppPushRemind(String result) {
+        if (DataConfig.isAppPushRemind) {
+            handleAppRemind(result);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isScriptQA(String result) {
+        if (DataConfig.isScriptQA) {
+            handleAppScriptQA(result);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void noResponseApp() {
+        if (!DataConfig.isStartTime) {
+            DataConfig.isStartTime = true;
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (DataConfig.isStartTime) {
+                        ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
+                        mInfo.setAnswer("");
+                        mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
+                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestType.TO_APP_REMIND, new NettyClientHandler(context));
+
+                        doAppRemindNoResponse();
+                    }
+                }
+            }, 15 * 1000);
+        }
+    }
+
     //控制移动的时候，随机回答内容
     private String getRandomAnswer() {
         String[] randomDatas = new String[]{"好的", "收到"};
@@ -223,6 +287,62 @@ public class commandImpl implements command {
         intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         intent.putExtra("direction", direction);
         context.sendBroadcast(intent);
+    }
+
+    //APP发来的提醒需求处理
+    private void handleAppRemind(String result) {
+        ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
+        mInfo.setAnswer(result);
+        mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
+        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestType.TO_APP_REMIND, new NettyClientHandler(context));
+
+        if (!TextUtils.isEmpty(result)) {
+            String answer = AlarmRemindManager.getRequireAnswer();
+            if (!TextUtils.isEmpty(answer)) {
+                if (result.contains(answer)) {//回答正确
+                    DataConfig.isAppPushRemind = false;
+                    DataConfig.isStartTime = false;
+                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "嘿嘿，我可以去玩喽");
+                } else {//回答错误
+                    doAppRemindNoResponse();
+                }
+            }
+        }
+    }
+
+    //APP发来的提醒没有按照主人设置要求的话的处理
+    private void doAppRemindNoResponse() {
+        DataConfig.isAppPushRemind = false;
+        DataConfig.isStartTime = false;
+        SpeechlHandle.cancelSpeak();
+        SpeechlHandle.cancelListen();
+        int type = AlarmRemindManager.getSpareType();
+        if (type != 0) {
+            List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
+            ScriptActionInfo info = new ScriptActionInfo();
+            info.setActionType(type);
+            info.setContent(AlarmRemindManager.getSpareContent());
+            infos.add(info);
+            DataConfig.isPlayScript = false;
+            ScriptHandler.doScriptAction(context, infos);
+        } else {
+            SpeechlHandle.startListen();
+        }
+    }
+
+    //APP剧本的对话
+    private void handleAppScriptQA(String result) {
+        if (!TextUtils.isEmpty(result)) {
+            String answer = ScriptFactory.getScriptAnswer();
+            if (!TextUtils.isEmpty(answer)) {
+                if (result.contains(answer)) {//回答正确
+                    DataConfig.isScriptQA = false;
+                    new ScriptHandler().scriptSpeak(context);
+                } else {//回答错误
+                    SpeechlHandle.startListen();
+                }
+            }
+        }
     }
 
 }

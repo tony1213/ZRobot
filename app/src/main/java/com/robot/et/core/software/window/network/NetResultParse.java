@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.entity.JpushInfo;
+import com.robot.et.entity.RemindInfo;
 import com.robot.et.entity.RobotInfo;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
@@ -160,6 +161,42 @@ public class NetResultParse {
             } catch (JSONException e) {
                 Log.i("netty", "getJpushInfo JSONException");
                 info = null;
+            }
+        }
+        return info;
+    }
+
+    //解析app发来的提醒
+    public static RemindInfo parseAppRemind(String jsonContent) {
+        RemindInfo info = new RemindInfo();
+        if (!TextUtils.isEmpty(jsonContent)) {
+            try {
+                JSONTokener tokener = new JSONTokener(jsonContent);
+                JSONObject json = new JSONObject(tokener);
+                info.setOriginalAlarmTime(json.getString("remindTime"));
+                info.setContent(json.getString("remindContent"));
+                info.setRemindMen(json.getString("remindMen"));
+                if (json.has("requireAnswer")) {
+                    String requireAnswer = json.getString("requireAnswer");
+                    if (!TextUtils.isEmpty(requireAnswer)) {
+                        info.setRequireAnswer(requireAnswer);
+                    }
+                }
+                if (json.has("spareContent")) {
+                    String spareContent = json.getString("spareContent");
+                    if (!TextUtils.isEmpty(spareContent)) {
+                        info.setSpareContent(spareContent);
+                    }
+                }
+                if (json.has("spareType")) {
+                    String spareType = json.getString("spareType");
+                    if (!TextUtils.isEmpty(spareType)) {
+                        info.setSpareType(Integer.parseInt(spareType));
+                    }
+                }
+                return info;
+            } catch (Exception e) {
+                Log.i("alarm", "parseAppRemind  JSONException");
             }
         }
         return info;

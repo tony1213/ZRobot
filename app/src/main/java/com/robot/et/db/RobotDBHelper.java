@@ -46,10 +46,27 @@ public class RobotDBHelper extends SQLiteOpenHelper {
 				"frequency integer,originalAlarmTime varchar(50),remindMen varchar(50),requireAnswer varchar(200),spareContent varchar(200),spareType integer"+
 				")";
 
+		//剧本表
+		String script = "create table script"+
+				"("+
+				"id integer primary key autoincrement,userPhone varchar(20),robotNum varchar(30),scriptContent varchar(100),scriptType integer,spareContent varchar(500)," +
+				"spareContent2 varchar(500),spareContent3 varchar(500),spareType integer"+
+				")";
+
+		//剧本动作执行表
+		String scriptAction = "create table scriptAction"+
+				"("+
+				"id integer primary key autoincrement,scriptId integer,actionType integer,content varchar(500),spareContent varchar(500),spareContent2 varchar(500)," +
+				"spareContent3 varchar(500),spareType integer"+
+				")";
+
+
 		db.execSQL(faces);
 		db.execSQL(question);
 		db.execSQL(answer);
 		db.execSQL(reminds);
+		db.execSQL(script);
+		db.execSQL(scriptAction);
 	}
 
 	@Override

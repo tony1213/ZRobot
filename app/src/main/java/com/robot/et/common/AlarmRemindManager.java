@@ -12,9 +12,6 @@ import com.robot.et.util.DateTools;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -41,8 +38,8 @@ public class AlarmRemindManager {
         return result;
     }
 
-    // 设置极光推送发来的闹铃
-    public static void setAppAlarm(Context context, JpushInfo info) {
+    //增加极光推送发来的闹铃
+    public static void addAppAlarmClock(Context context, JpushInfo info) {
         // yyyy-MM-dd HH:mm:ss
         String alarmTime = info.getAlarmTime();
         String originalTime = alarmTime;
@@ -83,27 +80,24 @@ public class AlarmRemindManager {
         }
     }
 
-    //App推送来的提醒信息
-    public static void setAppAlarmRemind(Context context, String alarmContent) {
-        if (!TextUtils.isEmpty(alarmContent)) {
-            RemindInfo info = parseAppRemind(alarmContent);
-            if (info != null) {
-                String alarmTime = info.getOriginalAlarmTime();
-                alarmTime = setAlarmTimeFormat(alarmTime);
-                if (TextUtils.isEmpty(alarmTime)) {
-                    return;
-                }
-                String[] times = alarmTime.split(" ");
-                String date = times[0];
-                String time = times[1];
-                Log.i(TAG, "date===" + date);
-                Log.i(TAG, "time===" + time);
-                setAlarmClock(date, time);
-                info.setDate(date);
-                info.setTime(time);
-                info.setRemindInt(DataConfig.REMIND_NO_ID);
-                addAlarm(context, info);
+    //增加App推送来的提醒信息
+    public static void addAppAlarmRemind(Context context, RemindInfo info) {
+        if (info != null) {
+            String alarmTime = info.getOriginalAlarmTime();
+            alarmTime = setAlarmTimeFormat(alarmTime);
+            if (TextUtils.isEmpty(alarmTime)) {
+                return;
             }
+            String[] times = alarmTime.split(" ");
+            String date = times[0];
+            String time = times[1];
+            Log.i(TAG, "date===" + date);
+            Log.i(TAG, "time===" + time);
+            setAlarmClock(date, time);
+            info.setDate(date);
+            info.setTime(time);
+            info.setRemindInt(DataConfig.REMIND_NO_ID);
+            addAlarm(context, info);
         }
     }
 
@@ -118,7 +112,7 @@ public class AlarmRemindManager {
         setAlarmClock(date, time);
     }
 
-    // 获取提醒的内容
+    //获取提醒的内容
     public static List<RemindInfo> getRemindTips(Context context, long minute) {
         String date = DateTools.getCurrentDate(minute);
         int currentHour = DateTools.getCurrentHour(minute);
@@ -138,18 +132,16 @@ public class AlarmRemindManager {
     // 更新已经提醒的条目
     public static void updateRemindInfo(Context context, RemindInfo info, long minute, int frequency) {
         String date = DateTools.getCurrentDate(minute);
-        RobotDB mDao = RobotDB.getInstance(context);
-        mDao.updateRemindInfo(info, date, frequency);
+        RobotDB.getInstance(context).updateRemindInfo(info, date, frequency);
     }
 
-    // 删除已经提醒的条目
+    // 删除当前时间提醒的条目
     public static void deleteCurrentRemindTips(Context context, long minute) {
         String date = DateTools.getCurrentDate(minute);
         int currentHour = DateTools.getCurrentHour(minute);
         String currentMinute = DateTools.get2DigitMinute(minute);
         String time = currentHour + ":" + currentMinute + ":" + "00";
-        RobotDB mDao = RobotDB.getInstance(context);
-        mDao.deleteRemindInfo(date, time, DataConfig.REMIND_NO_ID);
+        RobotDB.getInstance(context).deleteRemindInfo(date, time, DataConfig.REMIND_NO_ID);
     }
 
     // 删除app传来的提醒
@@ -160,7 +152,7 @@ public class AlarmRemindManager {
     }
 
     // 增加Ifly提醒的操作 格式：日期 + 时间 + 做什么事
-    public static boolean addRemindInfo(Context context, String result) {
+    private static boolean addIflyRemind(Context context, String result) {
         if (!TextUtils.isEmpty(result)) {
             Log.i(TAG, "chat  answer===" + result);
             String dates[] = result.split(DataConfig.SCHEDULE_SPLITE);
@@ -171,20 +163,21 @@ public class AlarmRemindManager {
             info.setContent(dates[2]);
             info.setRemindInt(DataConfig.REMIND_NO_ID);
             info.setFrequency(1);
-
-            return addAlarm(context, info);
+            boolean flag = addAlarm(context, info);
+            if (flag) {
+                setAlarmClock(dates[0], dates[1]);
+            }
+            return flag;
         }
         return false;
     }
 
     //讯飞提醒提示
-    public static String setIflyRemind(Context context, String result) {
-        boolean flag = addRemindInfo(context, result);
+    public static String getIflyRemindTips(Context context, String result) {
+        boolean flag = addIflyRemind(context, result);
         String content = "";
         if (flag) {
             content = "主人，您的提醒，我已经记下来了";
-            String dates[] = result.split(DataConfig.SCHEDULE_SPLITE);
-            setAlarmClock(dates[0], dates[1]);
         } else {
             content = "主人，我是一个聪明的小黄人，不用重复提醒哦";
         }
@@ -216,42 +209,6 @@ public class AlarmRemindManager {
         mDb.addRemindInfo(info);
         Log.i(TAG, "增加闹铃成功");
         return true;
-    }
-
-    //解析app发来的提醒
-    private static RemindInfo parseAppRemind(String jsonContent) {
-        RemindInfo info = new RemindInfo();
-        if (!TextUtils.isEmpty(jsonContent)) {
-            try {
-                JSONTokener tokener = new JSONTokener(jsonContent);
-                JSONObject json = new JSONObject(tokener);
-                info.setOriginalAlarmTime(json.getString("remindTime"));
-                info.setContent(json.getString("remindContent"));
-                info.setRemindMen(json.getString("remindMen"));
-                if (json.has("requireAnswer")) {
-                    String requireAnswer = json.getString("requireAnswer");
-                    if (!TextUtils.isEmpty(requireAnswer)) {
-                        info.setRequireAnswer(requireAnswer);
-                    }
-                }
-                if (json.has("spareContent")) {
-                    String spareContent = json.getString("spareContent");
-                    if (!TextUtils.isEmpty(spareContent)) {
-                        info.setSpareContent(spareContent);
-                    }
-                }
-                if (json.has("spareType")) {
-                    String spareType = json.getString("spareType");
-                    if (!TextUtils.isEmpty(spareType)) {
-                        info.setSpareType(Integer.parseInt(spareType));
-                    }
-                }
-                return info;
-            } catch (Exception e) {
-                Log.i("alarm", "parseAppRemind  JSONException");
-            }
-        }
-        return info;
     }
 
     //多次提醒的数据

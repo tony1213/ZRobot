@@ -1,7 +1,5 @@
 package com.robot.et.common;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,20 +9,11 @@ import java.io.File;
 /**
  * Created by houdeming on 2016/7/25.
  */
-public class PlayerControl {
+public class MusicFactory {
     private final static String TAG = "netty";
-    private static String musicSrc;
-
-    public static String getMusicSrc() {
-        return musicSrc;
-    }
-
-    public static void setMusicSrc(String musicSrc) {
-        PlayerControl.musicSrc = musicSrc;
-    }
 
     // 获取播放音频的路径
-    private static String getDetailMusicSrc(int fileType, String musicName) {
+    public static String getDetailMusicSrc(int fileType, String musicName) {
         String fileSrc = getMusicFile(fileType);
         fileSrc += File.separator + musicName + ".mp3";
         return fileSrc;
@@ -135,20 +124,22 @@ public class PlayerControl {
         return content;
     }
 
-    //开始播放音乐
-    public static void startPlayMusic(Context context, String musicUrl) {
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
-        intent.putExtra("musicUrl", musicUrl);
-        context.sendBroadcast(intent);
-    }
-
     //当前播放的媒体类型
     private static int currentMediaType;
     //当前播放的媒体名字
     private static String currentMediaName;
     //当前播放的歌名
     private static String currentPlayName;
+    //音乐src
+    private static String musicSrc;
+
+    public static String getMusicSrc() {
+        return musicSrc;
+    }
+
+    public static void setMusicSrc(String musicSrc) {
+        MusicFactory.musicSrc = musicSrc;
+    }
 
     public static void setCurrentMediaType(int mediaType) {
         currentMediaType = mediaType;

@@ -28,5 +28,15 @@ public class BroadcastAction {
     public static String ACTION_OPEN_NETTY = "action.open.netty";
     //控制机器人周围小车的广播
     public static String ACTION_CONTROL_AROUND_TOYCAR = "action.control.around.toycar";
+    //控制机器人表情
+    public static String ACTION_CONTROL_ROBOT_EMOTION = "action.contorl.robot.emotion";
+    //摆手的广播
+    public static String ACTION_CONTROL_WAVING = "action.control.waving";
+    //控制机器人嘴LED灯的广播
+    public static String ACTION_CONTROL_MOUTH_LED = "action.control.mouth.led";
+    //跟随的广播
+    public static String ACTION_CONTROL_ROBOT_FOLLOW = "action.control.robot.follow";
+    //控制机器人转圈
+    public static String ACTION_CONTROL_ROBOT_TURN ="action.control.robot.turn";
 
 }

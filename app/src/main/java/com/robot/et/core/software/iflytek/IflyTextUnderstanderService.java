@@ -16,7 +16,7 @@ import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.PlayerControl;
+import com.robot.et.common.MusicFactory;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.SceneServiceEnum;
 import com.robot.et.core.software.TextUnderstand;
@@ -197,7 +197,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                 case MUSIC://音乐
                                     answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
                                     DataConfig.isJpushPlayMusic = false;
-                                    String content = PlayerControl.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
+                                    String content = MusicFactory.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
                                     SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
 
                                     break;
@@ -210,7 +210,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                     // 日期 + 时间 + 做什么事
                                     answer = ResultParse.getRemindData(jObject, DataConfig.SCHEDULE_SPLITE);
                                     if (!TextUtils.isEmpty(answer)) {
-                                        answer = AlarmRemindManager.setIflyRemind(IflyTextUnderstanderService.this, answer);
+                                        answer = AlarmRemindManager.getIflyRemindTips(IflyTextUnderstanderService.this, answer);
                                     }
                                     speakContent(question, answer);
 

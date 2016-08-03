@@ -8,6 +8,8 @@ import com.robot.et.entity.FaceInfo;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.LearnQuestionInfo;
 import com.robot.et.entity.RemindInfo;
+import com.robot.et.entity.ScriptActionInfo;
+import com.robot.et.entity.ScriptInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -212,6 +214,84 @@ public class RobotDB {
         String sql = "update reminds set date=?,frequency=? where date=? and time=?";
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(sql, new String[]{data, String.valueOf(frequency), info.getDate(), info.getTime()});
+        db.close();
+    }
+
+    //增加剧本
+    public void addScript(ScriptInfo info) {
+        String sql = "insert into script(userPhone,robotNum,scriptContent,scriptType,spareContent,spareContent2,spareContent3,spareType) values(?,?,?,?,?,?,?,?)";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{info.getUserPhone(), info.getRobotNum(), info.getScriptContent(), String.valueOf(info.getScriptType()), info.getSpareContent(),
+                info.getSpareContent2(), info.getSpareContent3(), String.valueOf(info.getSpareType())});
+        db.close();
+    }
+
+    //根据名字获取剧本ID
+    public int getScriptId(String content) {
+        String sql = "select * from script where scriptContent=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery(sql, new String[]{content});
+        int scriptId = -1;
+        if (c.moveToNext()) {
+            scriptId = c.getInt(c.getColumnIndex("id"));
+        }
+        c.close();
+        db.close();
+        return scriptId;
+    }
+
+    //增加剧本执行的命令
+    public void addScriptAction(ScriptActionInfo info) {
+        String sql = "insert into scriptAction(scriptId,actionType,content,spareContent,spareContent2,spareContent3,spareType) values(?,?,?,?,?,?,?)";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{String.valueOf(info.getScriptId()), String.valueOf(info.getActionType()), info.getContent(), info.getSpareContent(),
+                info.getSpareContent2(), info.getSpareContent3(), String.valueOf(info.getSpareType())});
+        db.close();
+    }
+
+    //根据剧本ID获取执行的动作
+    public List<ScriptActionInfo> getScriptActionInfos(int scriptId) {
+        String sql = "select * from scriptAction where scriptId=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery(sql, new String[]{String.valueOf(scriptId)});
+        List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
+        while (c.moveToNext()) {
+            ScriptActionInfo info = new ScriptActionInfo();
+            info.setScriptId(c.getInt(c.getColumnIndex("scriptId")));
+            info.setActionType(c.getInt(c.getColumnIndex("actionType")));
+            info.setContent(c.getString(c.getColumnIndex("content")));
+            info.setSpareContent(c.getString(c.getColumnIndex("spareContent")));
+            info.setSpareContent2(c.getString(c.getColumnIndex("spareContent2")));
+            info.setSpareContent3(c.getString(c.getColumnIndex("spareContent3")));
+            info.setSpareType(c.getInt(c.getColumnIndex("spareType")));
+            infos.add(info);
+        }
+        c.close();
+        db.close();
+        return infos;
+    }
+
+    //更新剧本的名字
+    public void updateScriptName(int scriptId, String scriptName) {
+        String sql = "update script set scriptContent=? where scriptId=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{scriptName, String.valueOf(scriptId)});
+        db.close();
+    }
+
+    //根据剧本id删除剧本
+    public void deleteScript(int scriptId) {
+        String sql = "delete from script where id=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{String.valueOf(scriptId)});
+        db.close();
+    }
+
+    //根据剧本ID删除剧本动作
+    public void deleteScriptAction(int scriptId) {
+        String sql = "delete from scriptAction where scriptId=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{String.valueOf(scriptId)});
         db.close();
     }
 

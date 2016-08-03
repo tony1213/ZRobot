@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.BroadcastCommon;
+import com.robot.et.common.BroadcastFactory;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.window.network.HttpManager;
@@ -59,7 +59,7 @@ public class NettyService extends Service implements RobotInfoCallBack {
             Log.i("netty", "deviceId===" + deviceId);
             HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, deviceId, this);
         } else {
-            BroadcastCommon.connectNetty(this);
+            BroadcastFactory.connectNetty(this);
         }
     }
 
@@ -133,7 +133,7 @@ public class NettyService extends Service implements RobotInfoCallBack {
             if (!TextUtils.isEmpty(robotNum)) {
                 share.putString(SharedPreferencesKeys.ROBOT_NUM, robotNum);
                 share.commitValue();
-                BroadcastCommon.connectNetty(NettyService.this);
+                BroadcastFactory.connectNetty(NettyService.this);
             }
         } else {//当前设备已经存在机器编号，开始初始化
             HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_START, deviceId, NettyService.this);

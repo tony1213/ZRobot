@@ -76,4 +76,11 @@ public class RequestType {
     //蓝牙控制器
     public final static int JPUSH_BLUETOOTH_CONTROLLER = 40031;
 
+
+    //机器人本体给APP推送code信息标示
+    //返回给APP提醒的情况
+    public final static String TO_APP_REMIND = "REPLY_REMIND";
+    //返回给APP蓝牙控制家电的情况
+    public final static String TO_APP_BLUETOOTH_CONTROLLER = "BLUETOOTH_CONTROLLER";
+
 }

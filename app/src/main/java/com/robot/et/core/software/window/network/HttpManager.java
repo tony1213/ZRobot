@@ -77,5 +77,35 @@ public class HttpManager {
         });
     }
 
+    //向APP推送消息
+    public static void pushMsgToApp(String sendContent, String remindCode, final NettyClient callBack) {
+        final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+        HttpEngine.Param[] params = new HttpEngine.Param[]{
+                new HttpEngine.Param("robotNumber", share.getString(SharedPreferencesKeys.ROBOT_NUM, "")),
+                new HttpEngine.Param("mobile", share.getString(SharedPreferencesKeys.AGORA_CALL_PHONENUM, "")),
+                new HttpEngine.Param("msgType", remindCode),
+                new HttpEngine.Param("msgContent", sendContent)
+        };
+        HttpEngine httpEngine = HttpEngine.getInstance();
+        Request request = httpEngine.createRequest(UrlConfig.PUSH_MESSAGE_TO_APP, params);
+        Call call = httpEngine.createRequestCall(request);
+        call.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Request arg0, IOException arg1) {
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String result = response.body().string();
+                Log.i(TAG, "result====" + result);
+                if (NetResultParse.isSuccess(result)) {
+                    Log.i(TAG, "向APP推送消息成功");
+                }
+                callBack.connect(result);
+            }
+
+        });
+    }
 
 }

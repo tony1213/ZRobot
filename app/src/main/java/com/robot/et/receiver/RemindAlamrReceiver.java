@@ -83,14 +83,22 @@ public class RemindAlamrReceiver extends BroadcastReceiver {
             String remindMen = info.getRemindMen();
             String remindContent = info.getContent();
             String content = "";
+            DataConfig.isAppPushRemind = false;
+
             if (!TextUtils.isEmpty(remindMen)) {
                 //app提醒
-                content = remindContent;
-                AlarmRemindManager.setRequireAnswer(info.getRequireAnswer());
-                AlarmRemindManager.setSpareType(info.getSpareType());
-                AlarmRemindManager.setSpareContent(info.getSpareContent());
-                AlarmRemindManager.setRemindMen(remindMen);
                 AlarmRemindManager.setOriginalAlarmTime(info.getOriginalAlarmTime());
+                String requireAnswer = info.getRequireAnswer();
+                if (!TextUtils.isEmpty(requireAnswer)) {
+                    DataConfig.isAppPushRemind = true;
+                    AlarmRemindManager.setRequireAnswer(requireAnswer);
+                    AlarmRemindManager.setSpareType(info.getSpareType());
+                    AlarmRemindManager.setSpareContent(info.getSpareContent());
+                    AlarmRemindManager.setRemindMen(remindMen);
+                    content = remindContent + "：" + remindMen + ",请回答：" + AlarmRemindManager.getRequireAnswer();
+                } else {
+                    content = remindContent;
+                }
             } else {
                 //闹铃
                 content = "主人您好，您设置的" + remindContent + "提醒时间到了，不要忘记哦。";

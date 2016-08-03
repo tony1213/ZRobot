@@ -14,12 +14,13 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.AlarmRemindManager;
-import com.robot.et.common.BroadcastCommon;
+import com.robot.et.common.BroadcastFactory;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.PlayerControl;
+import com.robot.et.common.MusicFactory;
 import com.robot.et.core.software.SpeechSynthesis;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.DateTools;
 import com.robot.et.util.SharedPreferencesKeys;
@@ -156,7 +157,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 SpeechlHandle.startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
-                PlayerControl.startPlayMusic(this, PlayerControl.getMusicSrc());
+                BroadcastFactory.startPlayMusic(this, MusicFactory.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 //do nothing
@@ -169,12 +170,25 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 startActivity(faceIntent);
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
+                if (DataConfig.isAppPushRemind) {
+                    SpeechlHandle.startListen();
+                    return;
+                }
+
                 String alarmContent = AlarmRemindManager.getMoreAlarmContent();
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
                 String weatherContent = "今天" + share.getString(SharedPreferencesKeys.CITY_KEY, "") + share.getString(SharedPreferencesKeys.AREA_KEY, "") + "天气";
                 SpeechlHandle.understanderText(weatherContent);
+                break;
+            case DataConfig.SPEAK_TYPE_SCRIPT://剧本对话
+                if (DataConfig.isScriptQA) {
+                    SpeechlHandle.startListen();
+                    return;
+                }
+                new ScriptHandler().scriptSpeak(this);
+
                 break;
             default:
                 break;
@@ -205,7 +219,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 cancelSpeak();
                 SpeechlHandle.cancelListen();
                 //停止唱歌
-                BroadcastCommon.stopMusic(IflySpeakService.this);
+                BroadcastFactory.stopMusic(IflySpeakService.this);
             }
 
             speakContent(speakContent);

@@ -53,6 +53,9 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
     }
 
     private void beginListen() {
+        if (DataConfig.isAppPushRemind) {
+            command.noResponseApp();
+        }
         listen(DataConfig.DEFAULT_SPEAK_MEN);
     }
 

@@ -14,8 +14,9 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.PlayerControl;
+import com.robot.et.common.MusicFactory;
 import com.robot.et.core.software.netty.NettyClientHandler;
+import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.window.network.HttpManager;
 
 import java.io.IOException;
@@ -77,10 +78,10 @@ public class MusicPlayerService extends Service {
 
     //播放APP推送来的下一首
     private void playAppLower() {
-        String musicSrc = PlayerControl.getLowerMusicSrc(PlayerControl.getCurrentMediaType(), PlayerControl.getCurrentPlayName() + ".mp3");
+        String musicSrc = MusicFactory.getLowerMusicSrc(MusicFactory.getCurrentMediaType(), MusicFactory.getCurrentPlayName() + ".mp3");
         Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
-        PlayerControl.setCurrentPlayName(PlayerControl.getMusicNameNoMp3(musicSrc));
-        HttpManager.pushMediaState(PlayerControl.getCurrentMediaName(), "open", PlayerControl.getCurrentPlayName(), new NettyClientHandler(this));
+        MusicFactory.setCurrentPlayName(MusicFactory.getMusicNameNoMp3(musicSrc));
+        HttpManager.pushMediaState(MusicFactory.getCurrentMediaName(), "open", MusicFactory.getCurrentPlayName(), new NettyClientHandler(this));
         play(musicSrc);
     }
 
@@ -133,6 +134,11 @@ public class MusicPlayerService extends Service {
             Log.i("music", "音乐开始播放");
             DataConfig.isPlayMusic = true;
             mediaPlayer.start(); // 开始播放
+
+            if (DataConfig.isJpushPlayMusic) {//来自app音乐
+                new ScriptHandler().scriptPlayMusic(MusicPlayerService.this, true);
+            }
+
         }
     }
 
