@@ -4,7 +4,7 @@ package com.robot.et.common;
  * Created by houdeming on 2016/8/1.
  * 推送的类型
  */
-public class RequestType {
+public class RequestConfig {
     //视频
     public final static int JPUSH_CALL_VIDEO = 40004;
     //语音

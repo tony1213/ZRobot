@@ -1,16 +1,14 @@
-package com.robot.et.common;
+package com.robot.et.util;
 
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.system.alarm.AlarmClock;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.JpushInfo;
 import com.robot.et.entity.RemindInfo;
-import com.robot.et.util.DateTools;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;

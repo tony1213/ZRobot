@@ -1,13 +1,16 @@
-package com.robot.et.common;
+package com.robot.et.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.ScriptConfig;
+
 /**
  * Created by houdeming on 2016/8/1.
  */
-public class BroadcastFactory {
+public class BroadcastEnclosure {
 
     private static Intent intent;
 

@@ -1,8 +1,8 @@
-package com.robot.et.core.software.impl;
+package com.robot.et.util;
 
-import com.robot.et.core.software.VoiceDictation;
-import com.robot.et.core.software.SpeechSynthesis;
-import com.robot.et.core.software.TextUnderstand;
+import com.robot.et.core.software.iflytek.VoiceDictation;
+import com.robot.et.core.software.iflytek.SpeechSynthesis;
+import com.robot.et.core.software.iflytek.TextUnderstand;
 import com.robot.et.core.software.turing.TuringUnderstander;
 
 /**

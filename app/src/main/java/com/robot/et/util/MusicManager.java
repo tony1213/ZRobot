@@ -1,15 +1,18 @@
-package com.robot.et.common;
+package com.robot.et.util;
 
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.robot.et.common.DataConfig;
+import com.robot.et.common.RequestConfig;
 
 import java.io.File;
 
 /**
  * Created by houdeming on 2016/7/25.
  */
-public class MusicFactory {
+public class MusicManager {
     private final static String TAG = "netty";
 
     // 获取播放音频的路径
@@ -47,19 +50,19 @@ public class MusicFactory {
                 .getAbsolutePath() + File.separator + "robot" + File.separator;
 
         switch (fileType) {
-            case RequestType.JPUSH_MUSIC:
+            case RequestConfig.JPUSH_MUSIC:
                 fileSrc += "音乐";
                 break;
-            case RequestType.JPUSH_STORY:
+            case RequestConfig.JPUSH_STORY:
                 fileSrc += "故事";
                 break;
-            case RequestType.JPUSH_SYNCHRONOUS_CLASSROOM:
+            case RequestConfig.JPUSH_SYNCHRONOUS_CLASSROOM:
                 fileSrc += "同步课堂";
                 break;
-            case RequestType.JPUSH_THOUSANDS_WHY:
+            case RequestConfig.JPUSH_THOUSANDS_WHY:
                 fileSrc += "十万个为什么";
                 break;
-            case RequestType.JPUSH_ENCYCLOPEDIAS:
+            case RequestConfig.JPUSH_ENCYCLOPEDIAS:
                 fileSrc += "百科";
                 break;
 
@@ -101,19 +104,19 @@ public class MusicFactory {
             setMusicSrc(musicSrc);
 
             switch (mediaType) {
-                case RequestType.JPUSH_MUSIC:
+                case RequestConfig.JPUSH_MUSIC:
                     content = playPrompt + result;
                     break;
-                case RequestType.JPUSH_STORY:
+                case RequestConfig.JPUSH_STORY:
                     content = playPrompt + result;
                     break;
-                case RequestType.JPUSH_SYNCHRONOUS_CLASSROOM:
+                case RequestConfig.JPUSH_SYNCHRONOUS_CLASSROOM:
                     content = playPrompt + result;
                     break;
-                case RequestType.JPUSH_THOUSANDS_WHY:
+                case RequestConfig.JPUSH_THOUSANDS_WHY:
                     content = playPrompt + result;
                     break;
-                case RequestType.JPUSH_ENCYCLOPEDIAS:
+                case RequestConfig.JPUSH_ENCYCLOPEDIAS:
                     content = playPrompt + result;
                     break;
 
@@ -138,7 +141,7 @@ public class MusicFactory {
     }
 
     public static void setMusicSrc(String musicSrc) {
-        MusicFactory.musicSrc = musicSrc;
+        MusicManager.musicSrc = musicSrc;
     }
 
     public static void setCurrentMediaType(int mediaType) {

@@ -17,10 +17,9 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.VoiceDictation;
 import com.robot.et.core.software.custorm.commandImpl;
 import com.robot.et.core.software.iflytek.util.ResultParse;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.SpeechlHandle;
 import com.robot.et.util.FileUtils;
 
 import java.util.HashMap;

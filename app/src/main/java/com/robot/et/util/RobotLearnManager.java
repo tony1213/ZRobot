@@ -1,4 +1,4 @@
-package com.robot.et.common;
+package com.robot.et.util;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -7,9 +7,6 @@ import android.util.Log;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.LearnQuestionInfo;
-import com.robot.et.util.MatchStringUtil;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
 
 import java.util.List;
 import java.util.Random;

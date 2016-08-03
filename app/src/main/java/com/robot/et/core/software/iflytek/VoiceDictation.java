@@ -1,4 +1,4 @@
-package com.robot.et.core.software;
+package com.robot.et.core.software.iflytek;
 
 /**
  * Created by houdeming on 2016/7/25.

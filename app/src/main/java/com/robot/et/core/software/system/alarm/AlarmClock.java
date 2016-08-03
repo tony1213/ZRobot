@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.robot.et.app.CustomApplication;
-import com.robot.et.receiver.RemindAlamrReceiver;
+import com.robot.et.receiver.AlarmRemindReceiver;
 
 import java.util.Calendar;
 
@@ -61,7 +61,7 @@ public class AlarmClock {
 
     private void getOneAlarmPendIntent(String action) {
         Context context = CustomApplication.getInstance().getApplicationContext();
-        Intent intent = new Intent(context, RemindAlamrReceiver.class);
+        Intent intent = new Intent(context, AlarmRemindReceiver.class);
         intent.setAction(action);
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

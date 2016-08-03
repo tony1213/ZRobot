@@ -12,7 +12,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.entity.RobotAction;
@@ -71,7 +71,7 @@ public class ControlMoveService extends Service {
                     }
                 }
 
-                BroadcastFactory.notifySoftware(ControlMoveService.this);
+                BroadcastEnclosure.notifySoftware(ControlMoveService.this);
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_WAVING)) {//举手摆手
                 Log.i("Move", "举手摆手");
@@ -83,7 +83,7 @@ public class ControlMoveService extends Service {
                     handAction(handDirection, handCategory);
                 }
 
-                BroadcastFactory.notifySoftware(ControlMoveService.this);
+                BroadcastEnclosure.notifySoftware(ControlMoveService.this);
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//嘴的LED灯
                 Log.i("Move", "嘴的LED灯");
@@ -97,7 +97,7 @@ public class ControlMoveService extends Service {
                 int toyCarNum = intent.getIntExtra("toyCarNum", 0);
                 DataConfig.controlNum++;
                 if (DataConfig.controlNum < controlNumAways) {
-                    BroadcastFactory.controlToyCarMove(ControlMoveService.this, direction, toyCarNum);
+                    BroadcastEnclosure.controlToyCarMove(ControlMoveService.this, direction, toyCarNum);
                 }
 
             }

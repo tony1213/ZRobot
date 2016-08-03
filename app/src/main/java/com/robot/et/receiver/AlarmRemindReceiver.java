@@ -6,17 +6,17 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.impl.SpeechlHandle;
 import com.robot.et.core.software.system.alarm.AlarmClock;
 import com.robot.et.entity.RemindInfo;
+import com.robot.et.util.AlarmRemindManager;
+import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 //闹铃接受器
-public class RemindAlamrReceiver extends BroadcastReceiver {
+public class AlarmRemindReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,7 +24,7 @@ public class RemindAlamrReceiver extends BroadcastReceiver {
         if (!TextUtils.isEmpty(action)) {
             //只有是特定的广播才接受，做出相应   有提醒时，以时间格式发出的广播，这里只接受闹铃提醒的广播
             if (action.contains(DataConfig.ACTION_REMIND_SIGN)) {
-                Log.i("alarm", "RemindAlamrReceiver 接受到提醒的广播");
+                Log.i("alarm", "接受到提醒的广播");
                 AlarmClock.getInstance().cancelOneAlarm(action);
                 remindTips(context);
             }
@@ -35,9 +35,8 @@ public class RemindAlamrReceiver extends BroadcastReceiver {
     private void remindTips(Context context) {
         long minute = System.currentTimeMillis();
         List<RemindInfo> infos = AlarmRemindManager.getRemindTips(context, minute);
-        Log.i("alarm", "AlarmRemindService  infos.size()===" + infos.size());
+        Log.i("alarm", "infos.size()===" + infos.size());
         if (infos != null && infos.size() > 0) {
-            Log.i("alarm", "infos.size()===" + infos.size());
             List<String> datas = new ArrayList<String>();
             for (int i = 0; i < infos.size(); i++) {
                 //更新已经提醒过的内容

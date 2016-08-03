@@ -5,13 +5,13 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.MusicFactory;
-import com.robot.et.common.RequestType;
+import com.robot.et.util.MusicManager;
+import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.common.enums.EnumManager;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.EnumManager;
+import com.robot.et.util.SpeechlHandle;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
@@ -29,7 +29,7 @@ public class ScriptHandler implements Script {
     //表演剧本
     public static void playScript(Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
-            BroadcastFactory.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+            BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
             List<ScriptActionInfo> infos = getScriptActions(context, content);
             Log.i("netty", "playScript() infos.size()====" + infos.size());
             if (infos != null && infos.size() > 0) {
@@ -51,7 +51,7 @@ public class ScriptHandler implements Script {
                     Log.i("netty", "doScriptAction() 表情");
                     int emotionKey = EnumManager.getEmotionKey(content);
                     Log.i("netty", "doScriptAction() emotionKey====" + emotionKey);
-                    BroadcastFactory.controlRobotEmotion(context, emotionKey);
+                    BroadcastEnclosure.controlRobotEmotion(context, emotionKey);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -60,7 +60,7 @@ public class ScriptHandler implements Script {
                     ScriptFactory.setScriptActionInfos(infos);
                     DataConfig.isScriptPlayMusic = true;
                     DataConfig.isJpushPlayMusic = true;
-                    playScriptMusic(context, RequestType.JPUSH_MUSIC, content, info.getSpareContent());
+                    playScriptMusic(context, RequestConfig.JPUSH_MUSIC, content, info.getSpareContent());
 
                     break;
                 case ScriptConfig.SCRIPT_FOLLOW://跟随
@@ -74,7 +74,7 @@ public class ScriptHandler implements Script {
                     }
                     Log.i("netty", "doScriptAction() robotNum====" + robotNum);
                     Log.i("netty", "doScriptAction() toyCarNum====" + toyCarNum);
-                    BroadcastFactory.controlFollow(context, robotNum, toyCarNum);
+                    BroadcastEnclosure.controlFollow(context, robotNum, toyCarNum);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -83,7 +83,7 @@ public class ScriptHandler implements Script {
                     int direction = ScriptFactory.getTurnDirection(content);
                     Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
-                    BroadcastFactory.controlTurnAround(context, direction, info.getSpareContent());
+                    BroadcastEnclosure.controlTurnAround(context, direction, info.getSpareContent());
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -116,7 +116,7 @@ public class ScriptHandler implements Script {
                     String handCategory = ScriptFactory.getHandCategory(content);
                     Log.i("netty", "doScriptAction() handDirection===" + handDirection);
                     ScriptFactory.setScriptActionInfos(infos);
-                    BroadcastFactory.controlWaving(context, handDirection, handCategory, "1");
+                    BroadcastEnclosure.controlWaving(context, handDirection, handCategory, "1");
 
                     break;
                 case ScriptConfig.SCRIPT_MOVE://走
@@ -129,9 +129,9 @@ public class ScriptHandler implements Script {
                     if (!TextUtils.isEmpty(spareContent)) {
                         if (spareContent.contains("小车")) {
                             num = MatchStringUtil.getToyCarNum(spareContent);
-                            BroadcastFactory.controlToyCarMove(context, moveDirection, num);
+                            BroadcastEnclosure.controlToyCarMove(context, moveDirection, num);
                         } else {
-                            BroadcastFactory.controlMoveByApp(context, moveDirection);
+                            BroadcastEnclosure.controlMoveByApp(context, moveDirection);
                         }
                     }
 
@@ -142,7 +142,7 @@ public class ScriptHandler implements Script {
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
                     ScriptFactory.setScriptActionInfos(infos);
-                    BroadcastFactory.controlMoveByApp(context, turnDirection);
+                    BroadcastEnclosure.controlMoveByApp(context, turnDirection);
 
 
                     new ScriptHandler().scriptAction(context);
@@ -150,7 +150,7 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_STOP://停止
                     Log.i("netty", "doScriptAction() 停止");
-                    BroadcastFactory.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+                    BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -194,8 +194,8 @@ public class ScriptHandler implements Script {
     public static void playScriptStart(Context context) {
         SpeechlHandle.cancelSpeak();
         SpeechlHandle.cancelListen();
-        BroadcastFactory.stopMusic(context);
-        BroadcastFactory.controlMouthLED(context, ScriptConfig.LED_OFF);
+        BroadcastEnclosure.stopMusic(context);
+        BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_OFF);
     }
 
     //剧本执行完毕
@@ -204,11 +204,11 @@ public class ScriptHandler implements Script {
         DataConfig.isPlayScript = false;
         if (!DataConfig.isPlayMusic) {
             SystemClock.sleep(2000);
-            BroadcastFactory.controlMouthLED(context, ScriptConfig.LED_OFF);
-            BroadcastFactory.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+            BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_OFF);
+            BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
         }
         //重连netty
-        BroadcastFactory.connectNetty(context);
+        BroadcastEnclosure.connectNetty(context);
 
     }
 
@@ -226,11 +226,11 @@ public class ScriptHandler implements Script {
     private static void playScriptMusic(Context context, int mediaType, String content, String url) {
         String musicSrc = "";
         if (!TextUtils.isEmpty(content)) {
-            musicSrc = MusicFactory.getDetailMusicSrc(mediaType, content);
+            musicSrc = MusicManager.getDetailMusicSrc(mediaType, content);
         } else {
             musicSrc = url;
         }
-        BroadcastFactory.startPlayMusic(context, musicSrc);
+        BroadcastEnclosure.startPlayMusic(context, musicSrc);
     }
 
     //插入本地剧本
@@ -347,7 +347,7 @@ public class ScriptHandler implements Script {
                 DataConfig.isScriptPlayMusic = false;
                 handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(0));
             } else {
-                playScript(context, MusicFactory.getCurrentPlayName());
+                playScript(context, MusicManager.getCurrentPlayName());
             }
         }
     }

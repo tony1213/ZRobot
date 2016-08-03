@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.MusicFactory;
+import com.robot.et.util.MusicManager;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.window.network.HttpManager;
@@ -78,10 +78,10 @@ public class MusicPlayerService extends Service {
 
     //播放APP推送来的下一首
     private void playAppLower() {
-        String musicSrc = MusicFactory.getLowerMusicSrc(MusicFactory.getCurrentMediaType(), MusicFactory.getCurrentPlayName() + ".mp3");
+        String musicSrc = MusicManager.getLowerMusicSrc(MusicManager.getCurrentMediaType(), MusicManager.getCurrentPlayName() + ".mp3");
         Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
-        MusicFactory.setCurrentPlayName(MusicFactory.getMusicNameNoMp3(musicSrc));
-        HttpManager.pushMediaState(MusicFactory.getCurrentMediaName(), "open", MusicFactory.getCurrentPlayName(), new NettyClientHandler(this));
+        MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
+        HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", MusicManager.getCurrentPlayName(), new NettyClientHandler(this));
         play(musicSrc);
     }
 

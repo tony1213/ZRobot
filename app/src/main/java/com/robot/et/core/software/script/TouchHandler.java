@@ -5,11 +5,11 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.EmotionEnum;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.SpeechlHandle;
 
 /**
  * Created by houdeming on 2016/7/16.
@@ -38,7 +38,7 @@ public class TouchHandler {
                         break;
                     case TOUCH_EYE://眼睛
                         Log.i("netty", "眼睛key===" + EmotionEnum.EMOTION_BLINK_TWO.getEmotionKey());
-                        BroadcastFactory.controlRobotEmotion(context, EmotionEnum.EMOTION_BLINK_TWO.getEmotionKey());
+                        BroadcastEnclosure.controlRobotEmotion(context, EmotionEnum.EMOTION_BLINK_TWO.getEmotionKey());
                         content = "看我眼睛大，你是不是很羡慕呢，嘿嘿";
                         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
@@ -77,9 +77,9 @@ public class TouchHandler {
 
     //摆手
     private static void waving(Context context, String handCategory) {
-        BroadcastFactory.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
         SystemClock.sleep(2000);
-        BroadcastFactory.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
         SpeechlHandle.startListen();
     }
 

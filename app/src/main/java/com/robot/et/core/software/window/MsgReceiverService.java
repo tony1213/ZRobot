@@ -11,10 +11,10 @@ import android.util.Log;
 
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.script.ScriptHandler;
 
 import java.util.Random;
@@ -92,7 +92,7 @@ public class MsgReceiverService extends Service {
         //停止听
         SpeechlHandle.cancelListen();
         //停止唱歌
-        BroadcastFactory.stopMusic(this);
+        BroadcastEnclosure.stopMusic(this);
 
         //是否在人脸识别
         if (FaceDetectorActivity.instance != null) {

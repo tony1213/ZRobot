@@ -13,13 +13,12 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
-import com.robot.et.common.AlarmRemindManager;
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.AlarmRemindManager;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.MusicFactory;
-import com.robot.et.core.software.SpeechSynthesis;
+import com.robot.et.util.MusicManager;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.DateTools;
@@ -157,7 +156,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 SpeechlHandle.startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
-                BroadcastFactory.startPlayMusic(this, MusicFactory.getMusicSrc());
+                BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 //do nothing
@@ -219,7 +218,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 cancelSpeak();
                 SpeechlHandle.cancelListen();
                 //停止唱歌
-                BroadcastFactory.stopMusic(IflySpeakService.this);
+                BroadcastEnclosure.stopMusic(IflySpeakService.this);
             }
 
             speakContent(speakContent);

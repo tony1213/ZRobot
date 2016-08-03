@@ -8,17 +8,17 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
-import com.robot.et.common.AlarmRemindManager;
+import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.BroadcastFactory;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.RequestType;
-import com.robot.et.common.RobotLearnManager;
+import com.robot.et.common.RequestConfig;
+import com.robot.et.util.RobotLearnManager;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.common.enums.EnumManager;
+import com.robot.et.util.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
-import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptFactory;
 import com.robot.et.core.software.script.ScriptHandler;
@@ -172,13 +172,13 @@ public class commandImpl implements command {
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
                 flag = true;
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("开", RequestType.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
+                HttpManager.pushMsgToApp("开", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
             case CLOSE_HOUSEHOLD_SCENE:// 关闭家电
                 flag = true;
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("关", RequestType.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
+                HttpManager.pushMsgToApp("关", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称
@@ -220,7 +220,7 @@ public class commandImpl implements command {
             if (moveKey != 0) {
                 if (DataConfig.isControlToyCar) {//控制小车
                     DataConfig.controlNum = 0;
-                    BroadcastFactory.controlToyCarMove(context, moveKey, getToyCarNum());
+                    BroadcastEnclosure.controlToyCarMove(context, moveKey, getToyCarNum());
                     SpeechlHandle.startListen();
                 } else {//控制机器人
                     SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
@@ -280,7 +280,7 @@ public class commandImpl implements command {
                         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
                         mInfo.setAnswer("");
                         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestType.TO_APP_REMIND, new NettyClientHandler(context));
+                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
 
                         doAppRemindNoResponse();
                     }
@@ -302,11 +302,11 @@ public class commandImpl implements command {
 
     //手臂
     private void hand(int num, String handCategory) {
-        BroadcastFactory.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
         while (true) {
             num++;
             if (num == 150) {
-                BroadcastFactory.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
                 SpeechlHandle.startListen();
                 return;
             }
@@ -333,7 +333,7 @@ public class commandImpl implements command {
         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
         mInfo.setAnswer(result);
         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestType.TO_APP_REMIND, new NettyClientHandler(context));
+        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
 
         if (!TextUtils.isEmpty(result)) {
             String answer = AlarmRemindManager.getRequireAnswer();

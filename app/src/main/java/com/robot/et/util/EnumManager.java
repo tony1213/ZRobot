@@ -1,6 +1,11 @@
-package com.robot.et.common.enums;
+package com.robot.et.util;
 
 import android.text.TextUtils;
+
+import com.robot.et.common.enums.ControlMoveEnum;
+import com.robot.et.common.enums.EmotionEnum;
+import com.robot.et.common.enums.MatchSceneEnum;
+import com.robot.et.common.enums.SceneServiceEnum;
 
 import java.util.Random;
 
