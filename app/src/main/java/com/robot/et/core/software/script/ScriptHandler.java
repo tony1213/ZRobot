@@ -118,9 +118,6 @@ public class ScriptHandler implements Script {
                     ScriptFactory.setScriptActionInfos(infos);
                     BroadcastFactory.controlWaving(context, handDirection, handCategory, "1");
 
-
-                    new ScriptHandler().scriptAction(context);
-
                     break;
                 case ScriptConfig.SCRIPT_MOVE://走
                     Log.i("netty", "doScriptAction() 走");
@@ -177,7 +174,6 @@ public class ScriptHandler implements Script {
         if (infos != null && infos.size() > 0) {
             infos.remove(0);
             ScriptFactory.setScriptActionInfos(infos);
-            //动作的执行全部延迟2000ms
             SystemClock.sleep(delayTime);
 
             if (isResume) {
@@ -349,7 +345,7 @@ public class ScriptHandler implements Script {
         if (isStart) {
             if (DataConfig.isScriptPlayMusic) {
                 DataConfig.isScriptPlayMusic = false;
-                handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, 0);
+                handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(0));
             } else {
                 playScript(context, MusicFactory.getCurrentPlayName());
             }
@@ -358,12 +354,12 @@ public class ScriptHandler implements Script {
 
     @Override
     public void scriptSpeak(Context context) {
-        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, 0);
+        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(0));
     }
 
     @Override
     public void scriptAction(Context context) {
-        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, 0);
+        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(2000));
     }
 
 }

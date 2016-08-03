@@ -53,6 +53,7 @@
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
         <service android:name=".core.software.window.MsgReceiverService"/>
         <service android:name=".core.software.netty.NettyService"/>
+        <service android:name=".core.hardware.move.ControlMoveService"/>
 
         <receiver android:name=".receiver.RemindAlamrReceiver" />
 

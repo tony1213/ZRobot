@@ -15,6 +15,7 @@ import com.robot.et.common.BroadcastFactory;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.impl.SpeechlHandle;
+import com.robot.et.core.software.script.ScriptHandler;
 
 import java.util.Random;
 
@@ -41,6 +42,7 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
         filter.addAction(BroadcastAction.ACTION_SPEAK);
         filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
+        filter.addAction(BroadcastAction.ACTION_NOTIFY_SOFTWARE);
 
         registerReceiver(receiver, filter);
 
@@ -68,6 +70,11 @@ public class MsgReceiverService extends Service {
                 Log.i("accept", "MsgReceiverService  脸部识别");
                 String contetn = intent.getStringExtra("content");
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_NOTIFY_SOFTWARE)) {//接受到硬件反馈
+                Log.i("accept", "MsgReceiverService  接受到硬件反馈");
+                if (DataConfig.isPlayScript) {
+                    new ScriptHandler().scriptAction(MsgReceiverService.this);
+                }
             }
 
         }
@@ -96,6 +103,7 @@ public class MsgReceiverService extends Service {
         DataConfig.isScriptQA = false;
         DataConfig.isAppPushRemind = false;
         DataConfig.isStartTime = false;
+        DataConfig.isControlToyCar = false;
 
         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
 

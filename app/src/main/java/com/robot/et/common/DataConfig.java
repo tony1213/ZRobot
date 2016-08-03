@@ -82,5 +82,10 @@ public class DataConfig {
     public static boolean isStartTime = false;
     //在表演剧本
     public static boolean isPlayScript = false;
+    //是否控制玩具车
+    public static boolean isControlToyCar = false;
+
+    //语音控制小车连续发的次数
+    public static int controlNum = 0;
 
 }

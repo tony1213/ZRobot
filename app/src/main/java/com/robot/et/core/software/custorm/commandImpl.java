@@ -10,9 +10,11 @@ import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
 import com.robot.et.common.AlarmRemindManager;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.BroadcastFactory;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestType;
 import com.robot.et.common.RobotLearnManager;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
@@ -149,15 +151,22 @@ public class commandImpl implements command {
 
                 break;
             case CONTROL_TOYCAR_SCENE:// 控制玩具车
-                flag = false;
+                flag = true;
+                DataConfig.isControlToyCar = true;
+                int toyCarNum = MatchStringUtil.getToyCarNum(result);
+                Log.i("ifly", "toyCarNum=====" + toyCarNum);
+                setToyCarNum(toyCarNum);
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
 
                 break;
             case RAISE_HAND_SCENE:// 抬手
-                flag = false;
+                flag = true;
+                hand(1, ScriptConfig.HAND_RIGHT);
 
                 break;
             case WAVING_SCENE:// 摆手
-                flag = false;
+                flag = true;
+                hand(1, ScriptConfig.HAND_TWO);
 
                 break;
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
@@ -209,8 +218,14 @@ public class commandImpl implements command {
             int moveKey = EnumManager.getMoveKey(result);
             Log.i("ifly", "moveKey===" + moveKey);
             if (moveKey != 0) {
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
-                sendMoveAction(moveKey);
+                if (DataConfig.isControlToyCar) {//控制小车
+                    DataConfig.controlNum = 0;
+                    BroadcastFactory.controlToyCarMove(context, moveKey, getToyCarNum());
+                    SpeechlHandle.startListen();
+                } else {//控制机器人
+                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
+                    sendMoveAction(moveKey);
+                }
                 return true;
             }
         }
@@ -271,6 +286,30 @@ public class commandImpl implements command {
                     }
                 }
             }, 15 * 1000);
+        }
+    }
+
+    //机器人周围的小车的编号
+    private static int mToyCarNum;
+
+    public static int getToyCarNum() {
+        return mToyCarNum;
+    }
+
+    public static void setToyCarNum(int toyCarNum) {
+        mToyCarNum = toyCarNum;
+    }
+
+    //手臂
+    private void hand(int num, String handCategory) {
+        BroadcastFactory.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+        while (true) {
+            num++;
+            if (num == 150) {
+                BroadcastFactory.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+                SpeechlHandle.startListen();
+                return;
+            }
         }
     }
 

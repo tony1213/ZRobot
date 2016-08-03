@@ -38,5 +38,9 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_ROBOT_FOLLOW = "action.control.robot.follow";
     //控制机器人转圈
     public static String ACTION_CONTROL_ROBOT_TURN ="action.control.robot.turn";
+    //控制小车不停车的广播
+    public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
+    //硬件接受到信息通知软件的广播
+    public static String ACTION_NOTIFY_SOFTWARE = "action.notify.software";
 
 }
