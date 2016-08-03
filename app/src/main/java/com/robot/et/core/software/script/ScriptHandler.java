@@ -5,18 +5,18 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.MusicManager;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.util.EnumManager;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.EnumManager;
 import com.robot.et.util.FileUtils;
 import com.robot.et.util.MatchStringUtil;
+import com.robot.et.util.MusicManager;
+import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_MUSIC://音乐
                     Log.i("netty", "doScriptAction() 音乐");
-                    ScriptFactory.setScriptActionInfos(infos);
+                    ScriptManager.setScriptActionInfos(infos);
                     DataConfig.isScriptPlayMusic = true;
                     DataConfig.isJpushPlayMusic = true;
                     playScriptMusic(context, RequestConfig.JPUSH_MUSIC, content, info.getSpareContent());
@@ -80,7 +80,7 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_TURN_AROUND://转圈
                     Log.i("netty", "doScriptAction() 转圈");
-                    int direction = ScriptFactory.getTurnDirection(content);
+                    int direction = ScriptManager.getTurnDirection(content);
                     Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
                     BroadcastEnclosure.controlTurnAround(context, direction, info.getSpareContent());
@@ -89,14 +89,14 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_QUESTION_ANSWER://问答
                     Log.i("netty", "doScriptAction() 问答");
-                    ScriptFactory.setScriptActionInfos(infos);
-                    ScriptFactory.setScriptAnswer("");
+                    ScriptManager.setScriptActionInfos(infos);
+                    ScriptManager.setScriptAnswer("");
                     String requireAnswer = info.getSpareContent();
                     Log.i("netty", "doScriptAction() answer===" + requireAnswer);
                     String speakContent = "";
                     if (!TextUtils.isEmpty(requireAnswer)) {
                         DataConfig.isScriptQA = true;
-                        ScriptFactory.setScriptAnswer(requireAnswer);
+                        ScriptManager.setScriptAnswer(requireAnswer);
                         speakContent = content + "，请回答：" + requireAnswer;
                     } else {
                         speakContent = content;
@@ -106,16 +106,16 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_SPEAK://说话
                     Log.i("netty", "doScriptAction() 说话");
-                    ScriptFactory.setScriptActionInfos(infos);
+                    ScriptManager.setScriptActionInfos(infos);
                     SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_SCRIPT, content);
 
                     break;
                 case ScriptConfig.SCRIPT_HAND://手
                     Log.i("netty", "doScriptAction() 手");
-                    String handDirection = ScriptFactory.getHandDirection(info.getSpareContent());
-                    String handCategory = ScriptFactory.getHandCategory(content);
+                    String handDirection = ScriptManager.getHandDirection(info.getSpareContent());
+                    String handCategory = ScriptManager.getHandCategory(content);
                     Log.i("netty", "doScriptAction() handDirection===" + handDirection);
-                    ScriptFactory.setScriptActionInfos(infos);
+                    ScriptManager.setScriptActionInfos(infos);
                     BroadcastEnclosure.controlWaving(context, handDirection, handCategory, "1");
 
                     break;
@@ -125,7 +125,7 @@ public class ScriptHandler implements Script {
                     String spareContent = info.getSpareContent();
                     Log.i("netty", "spareContent==" + spareContent);
                     int num = 0;
-                    ScriptFactory.setScriptActionInfos(infos);
+                    ScriptManager.setScriptActionInfos(infos);
                     if (!TextUtils.isEmpty(spareContent)) {
                         if (spareContent.contains("小车")) {
                             num = MatchStringUtil.getToyCarNum(spareContent);
@@ -141,7 +141,7 @@ public class ScriptHandler implements Script {
                 case ScriptConfig.SCRIPT_TURN://左转右转
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
-                    ScriptFactory.setScriptActionInfos(infos);
+                    ScriptManager.setScriptActionInfos(infos);
                     BroadcastEnclosure.controlMoveByApp(context, turnDirection);
 
 
@@ -173,7 +173,7 @@ public class ScriptHandler implements Script {
 
         if (infos != null && infos.size() > 0) {
             infos.remove(0);
-            ScriptFactory.setScriptActionInfos(infos);
+            ScriptManager.setScriptActionInfos(infos);
             SystemClock.sleep(delayTime);
 
             if (isResume) {
@@ -345,7 +345,7 @@ public class ScriptHandler implements Script {
         if (isStart) {
             if (DataConfig.isScriptPlayMusic) {
                 DataConfig.isScriptPlayMusic = false;
-                handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(0));
+                handleNewScriptInfos(context, ScriptManager.getScriptActionInfos(), true, getDealyTime(0));
             } else {
                 playScript(context, MusicManager.getCurrentPlayName());
             }
@@ -354,12 +354,27 @@ public class ScriptHandler implements Script {
 
     @Override
     public void scriptSpeak(Context context) {
-        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(0));
+        handleNewScriptInfos(context, ScriptManager.getScriptActionInfos(), true, getDealyTime(0));
     }
 
     @Override
     public void scriptAction(Context context) {
-        handleNewScriptInfos(context, ScriptFactory.getScriptActionInfos(), true, getDealyTime(2000));
+        handleNewScriptInfos(context, ScriptManager.getScriptActionInfos(), true, getDealyTime(2000));
+    }
+
+    @Override
+    public void appScriptQA(Context context, String result) {
+        if (!TextUtils.isEmpty(result)) {
+            String answer = ScriptManager.getScriptAnswer();
+            if (!TextUtils.isEmpty(answer)) {
+                if (result.contains(answer)) {//回答正确
+                    DataConfig.isScriptQA = false;
+                    scriptSpeak(context);
+                } else {//回答错误
+                    SpeechlHandle.startListen();
+                }
+            }
+        }
     }
 
 }

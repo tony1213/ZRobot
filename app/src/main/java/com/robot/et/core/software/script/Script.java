@@ -15,4 +15,7 @@ public interface Script {
     //剧本动作
     void scriptAction(Context context);
 
+    //剧本对话
+    void appScriptQA(Context context, String result);
+
 }

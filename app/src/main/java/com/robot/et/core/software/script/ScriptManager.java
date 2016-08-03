@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by houdeming on 2016/8/3.
  */
-public class ScriptFactory {
+public class ScriptManager {
 
     private static List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
 
@@ -20,7 +20,7 @@ public class ScriptFactory {
     }
 
     public static void setScriptActionInfos(List<ScriptActionInfo> infos) {
-        ScriptFactory.infos = infos;
+        ScriptManager.infos = infos;
     }
 
     private static String scriptAnswer;
@@ -30,7 +30,7 @@ public class ScriptFactory {
     }
 
     public static void setScriptAnswer(String scriptAnswer) {
-        ScriptFactory.scriptAnswer = scriptAnswer;
+        ScriptManager.scriptAnswer = scriptAnswer;
     }
 
     //获取哪一个手

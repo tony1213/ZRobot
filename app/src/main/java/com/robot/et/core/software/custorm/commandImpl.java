@@ -8,26 +8,25 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
-import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.util.RobotLearnManager;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.util.EnumManager;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.face.detector.FaceDataFactory;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.netty.NettyClientHandler;
-import com.robot.et.core.software.script.ScriptFactory;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.ResponseAppRemindInfo;
 import com.robot.et.entity.ScriptActionInfo;
+import com.robot.et.util.AlarmRemindManager;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.EnumManager;
 import com.robot.et.util.MatchStringUtil;
+import com.robot.et.util.RobotLearnManager;
+import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -372,15 +371,7 @@ public class commandImpl implements command {
     //APP剧本的对话
     private void handleAppScriptQA(String result) {
         if (!TextUtils.isEmpty(result)) {
-            String answer = ScriptFactory.getScriptAnswer();
-            if (!TextUtils.isEmpty(answer)) {
-                if (result.contains(answer)) {//回答正确
-                    DataConfig.isScriptQA = false;
-                    new ScriptHandler().scriptSpeak(context);
-                } else {//回答错误
-                    SpeechlHandle.startListen();
-                }
-            }
+            new ScriptHandler().appScriptQA(context, result);
         }
     }
 
