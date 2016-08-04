@@ -39,7 +39,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     private LinearLayout mRemoteUserContainer;
     private int mRemoteUserViewWidth = 0;
     RtcEngine rtcEngine;
-    public static ChannelActivity instance;
     //判断用户是否接通 默认不接通
     private boolean isUserJoined;
     //查看
@@ -59,7 +58,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        instance = this;
         DataConfig.isVideoOrVoice = true;
         //单位标准尺寸转化的一个函数
         mRemoteUserViewWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics());
@@ -344,7 +342,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-        instance = null;
         isUserJoined = true;
         DataConfig.isAlarmTips = true;
         DataConfig.isAgoraLook = false;

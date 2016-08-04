@@ -104,7 +104,7 @@ public class AgoraService extends Service {
                 break;
             case RequestConfig.JPUSH_CALL_CLOSE:// 关闭agora声网
                 Log.i("agoravideo", "关闭agora声网");
-                if (ChannelActivity.instance != null) {
+                if (DataConfig.isVideoOrVoice) {
                     Intent intent = new Intent();
                     intent.setAction(BroadcastAction.ACTION_CLOSE_AGORA);
                     sendBroadcast(intent);
