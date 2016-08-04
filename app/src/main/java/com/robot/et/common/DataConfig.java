@@ -39,6 +39,11 @@ public class DataConfig {
     public static boolean isAgoraLook = false;
     //当前处于视频或语音状态
     public static boolean isVideoOrVoice = false;
+    //机器人状态
+    //正常模式
+    public static final String ROBOT_STATUS_NORMAL = "12015";
+    //免打扰模式
+    public static final String ROBOT_STATUS_DISYURB_NOT = "12014";
 
     //HostName   internet:139.196.185.52  localHost:192.168.1.28
     public static final String HOST = "139.196.185.52";

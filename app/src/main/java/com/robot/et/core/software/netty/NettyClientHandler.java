@@ -13,7 +13,7 @@ import com.robot.et.core.software.script.TouchHandler;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.core.software.window.network.NetResultParse;
-import com.robot.et.core.software.window.network.NettyClient;
+import com.robot.et.core.software.window.network.NettyClientCallBack;
 import com.robot.et.entity.JpushInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -24,7 +24,7 @@ import com.robot.et.util.SpeechlHandle;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-public class NettyClientHandler extends SimpleChannelInboundHandler<Object> implements NettyClient {
+public class NettyClientHandler extends SimpleChannelInboundHandler<Object> implements NettyClientCallBack {
     private Context context;
 
     public NettyClientHandler(Context context) {

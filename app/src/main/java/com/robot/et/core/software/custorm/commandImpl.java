@@ -130,11 +130,15 @@ public class commandImpl implements command {
 
                 break;
             case DISTURB_OPEN_SCENE:// 免打扰开
-                flag = false;
+                flag = true;
+                HttpManager.changeRobotCallStatus(DataConfig.ROBOT_STATUS_DISYURB_NOT);
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，进入免打扰模式");
 
                 break;
             case DISTURB_CLOSE_SCENE:// 免打扰关
-                flag = false;
+                flag = true;
+                HttpManager.changeRobotCallStatus(DataConfig.ROBOT_STATUS_NORMAL);
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，免打扰模式已关闭");
 
                 break;
             case SHUT_UP_SCENE:// 闭嘴

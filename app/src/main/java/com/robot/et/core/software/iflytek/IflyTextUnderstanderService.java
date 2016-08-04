@@ -14,6 +14,10 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.TextUnderstander;
 import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
+import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.iflytek.util.VoicePhoneControl;
+import com.robot.et.core.software.window.network.HttpManager;
+import com.robot.et.core.software.window.network.VoicePhoneCallBack;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.common.DataConfig;
 import com.robot.et.util.MusicManager;
@@ -251,7 +255,22 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                     break;
                                 case TELEPHONE://打电话
                                     answer = ResultParse.getPhoneData(jObject);
-                                    speakContent(question, answer);
+                                    if (!TextUtils.isEmpty(answer)) {
+                                        HttpManager.getRoomNum(answer, new VoicePhoneCallBack() {
+                                            @Override
+                                            public void getPhoneInfo(String userName, String result) {
+                                                String content = VoicePhoneControl.getCallContent(userName, result);
+                                                if (!TextUtils.isEmpty(content)) {
+                                                    DataConfig.isAgoraVideo = true;
+                                                    SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话，" + "要耐心等待哦");
+                                                } else {
+                                                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "主人，还没有这个人的电话呢，换个试试吧");
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        speakContent(question, answer);
+                                    }
 
                                     break;
                                 case MESSAGE://发短信
