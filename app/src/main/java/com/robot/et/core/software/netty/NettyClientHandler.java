@@ -181,6 +181,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_PLAY_SCRIPT:// 表演剧本
                     Log.i("netty", "表演剧本");
+                    if (DataConfig.isVideoOrVoice) {
+                        return;
+                    }
                     ScriptHandler.playScriptStart(context);
                     ScriptHandler.playScript(context, musicContent);
 
@@ -206,6 +209,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_SCENE_INTERACTION:// 场景互动
                     Log.i("netty", "场景互动");
+                    if (DataConfig.isVideoOrVoice) {
+                        return;
+                    }
                     ScriptHandler.playScriptStart(context);
                     ScriptHandler.playScript(context, musicContent);
 
@@ -217,6 +223,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_FROLIC:// 嬉闹
                     Log.i("netty", "嬉闹");
+                    if (DataConfig.isVideoOrVoice) {
+                        return;
+                    }
                     ScriptHandler.playScriptStart(context);
                     TouchHandler.responseTouch(context, musicContent);
 
@@ -242,6 +251,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
         MusicManager.setCurrentPlayName(musicName);
 
         HttpManager.pushMediaState(mediaName, "open", musicName, this);
+        if (DataConfig.isVideoOrVoice) {
+            return;
+        }
         SpeechlHandle.cancelSpeak();
         BroadcastEnclosure.stopMusic(context);
         SpeechlHandle.cancelListen();
