@@ -4,6 +4,19 @@ package com.robot.et.common;
  * Created by Tony on 2016/7/25.
  */
 public class BroadcastAction {
+
+    //网络连接
+    public static String ACTION_MONITOR_WATCH_NETWORK_CONNECT = "action.monitor.watch.network.connect";
+    //网络断开
+    public static String ACTION_MONITOR_WATCH_NETWORK_DISCONNECT = "action.monitor.watch.network.disconnect";
+    //网络流量状态监控
+    public static String ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_OPEN = "action.monitor.watch.network.traffic.open";
+    //关闭网络流量状态监控
+    public static String ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_CLOSE = "action.monitor.watch.network.traffic.close";
+    //检测网络变化
+    public static String ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED = "action.monitor.watch.network.traffic.speed";
+
+
     //串口数据接收
     public static String ACTION_MOVE_TO_SERIALPORT ="action.control.robot.serialport";
     //唤醒,打断或者转向的广播
@@ -42,5 +55,13 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
     //硬件接受到信息通知软件的广播
     public static String ACTION_NOTIFY_SOFTWARE = "action.notify.software";
+    //连接agora的广播
+    public static String ACTION_CONNECT_AGORA = "action.connect.agora";
+    //进入agora的广播
+    public static String ACTION_JOIN_AGORA_ROOM = "action.join.agora.room";
+    //极光推送关闭声网agora
+    public static String ACTION_CLOSE_AGORA = "action.close.agora";
+    //监听电话挂断的广播
+    public static String ACTION_PHONE_HANGUP = "com.robot.et.phone.hangup";
 
 }

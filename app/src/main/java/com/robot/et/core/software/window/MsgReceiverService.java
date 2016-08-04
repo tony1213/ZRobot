@@ -43,6 +43,7 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_SPEAK);
         filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
         filter.addAction(BroadcastAction.ACTION_NOTIFY_SOFTWARE);
+        filter.addAction(BroadcastAction.ACTION_PHONE_HANGUP);
 
         registerReceiver(receiver, filter);
 
@@ -75,6 +76,9 @@ public class MsgReceiverService extends Service {
                 if (DataConfig.isPlayScript) {
                     new ScriptHandler().scriptAction(MsgReceiverService.this);
                 }
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_PHONE_HANGUP)) {//查看时电话挂断
+                Log.i("accept", "MsgReceiverService  查看时电话挂断");
+                // do nothing
             }
 
         }

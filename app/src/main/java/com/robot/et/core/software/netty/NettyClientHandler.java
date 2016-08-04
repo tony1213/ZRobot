@@ -1,16 +1,13 @@
 package com.robot.et.core.software.netty;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.util.AlarmRemindManager;
-import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.MusicManager;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.util.RobotLearnManager;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.script.TouchHandler;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -18,6 +15,11 @@ import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.core.software.window.network.NetResultParse;
 import com.robot.et.core.software.window.network.NettyClient;
 import com.robot.et.entity.JpushInfo;
+import com.robot.et.util.AlarmRemindManager;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.MusicManager;
+import com.robot.et.util.RobotLearnManager;
+import com.robot.et.util.SpeechlHandle;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -221,6 +223,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
 
                 default:// agora音视频
+                    Log.i("netty", "agora音视频");
+                    Intent intent = new Intent();
+                    intent.setAction(BroadcastAction.ACTION_JOIN_AGORA_ROOM);
+                    intent.putExtra("JpushInfo", info);
+                    context.sendBroadcast(intent);
+
                     break;
             }
 

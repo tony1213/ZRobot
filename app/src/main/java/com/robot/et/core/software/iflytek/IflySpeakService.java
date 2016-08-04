@@ -13,6 +13,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
+import com.robot.et.common.RequestConfig;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
@@ -188,6 +189,15 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 }
                 new ScriptHandler().scriptSpeak(this);
 
+                break;
+            case RequestConfig.JPUSH_CALL_CLOSE://视频或语音时电话挂断
+                // do nothing
+                break;
+            case RequestConfig.JPUSH_CALL_VIDEO://视频通话
+                BroadcastEnclosure.connectAgora(this, RequestConfig.JPUSH_CALL_VIDEO);
+                break;
+            case RequestConfig.JPUSH_CALL_VOICE://语音通话
+                BroadcastEnclosure.connectAgora(this, RequestConfig.JPUSH_CALL_VOICE);
                 break;
             default:
                 break;

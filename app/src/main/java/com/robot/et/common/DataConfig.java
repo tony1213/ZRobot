@@ -13,6 +13,33 @@ public class DataConfig {
     //图灵的UNIQUEID   填写一个任意的标示，没有具体要求，但一定要写
     public static final String TURING_UNIQUEID = "131313131";
 
+    //声网arora key值
+    public static final String AGORA_KEY = "67ddec80abde4933b1672a186c9bdb3e";
+    //声网arora的crasheye key 值
+    public static final String AGORA_CRASHEYE_KEY = "06798b00";
+    //声网arora传递的key值
+    public final static String AGORA_EXTRA_CALLING_TYPE = "extra_calling_type";
+    public final static String AGORA_EXTRA_VENDOR_KEY = "extra_vendor_key";
+    public final static String AGORA_EXTRA_CHANNEL_ID = "extra_channel_id";
+    //打电话类型：被叫
+    public static final int PHONE_CALL_BY_MEN = 0;
+    //打电话类型：主动呼叫
+    public static final int PHONE_CALL_TO_MEN = 1;
+    //agora正常模式 默认
+    public static final int AGORA_CALL_NORMAL_PATTERN = 0;
+    //agora免打扰模式
+    public static final int AGORA_CALL_DISTURB_NOT_PATTERN = 1;
+    //当前是agora视频
+    public static boolean isAgoraVideo = false;
+    //当前是agora语音
+    public static boolean isAgoraVoice = false;
+    //闹铃或提醒是否执行
+    public static boolean isAlarmTips = true;
+    //电话类型，当前正在查看
+    public static boolean isAgoraLook = false;
+    //当前处于视频或语音状态
+    public static boolean isVideoOrVoice = false;
+
     //HostName   internet:139.196.185.52  localHost:192.168.1.28
     public static final String HOST = "139.196.185.52";
     //Port

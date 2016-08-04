@@ -104,4 +104,11 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
+    //连接agora
+    public static void connectAgora(Context context, int type){
+        intent.setAction(BroadcastAction.ACTION_CONNECT_AGORA);
+        intent.putExtra("type", type);
+        context.sendBroadcast(intent);
+    }
+
 }
