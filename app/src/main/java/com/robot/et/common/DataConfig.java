@@ -122,5 +122,7 @@ public class DataConfig {
 
     //是否处于沉睡
     public static boolean isSleep = false;
+    //是否正在人脸识别
+    public static boolean isFaceRecogniseIng  = false;
 
 }

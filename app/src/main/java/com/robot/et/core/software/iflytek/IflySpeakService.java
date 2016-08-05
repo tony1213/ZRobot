@@ -13,7 +13,6 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
-import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.core.software.script.ScriptHandler;
@@ -162,9 +161,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 //do nothing
                 break;
             case DataConfig.SPEAK_TYPE_FACE_DETECTOR://脸部识别
-                Intent intent = new Intent();
-                intent.setAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
-                sendBroadcast(intent);
+                BroadcastEnclosure.openFaceRecognise(this, true);
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 if (DataConfig.isAppPushRemind) {

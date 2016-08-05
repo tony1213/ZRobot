@@ -56,8 +56,14 @@ public class MsgReceiverService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT)) {//唤醒中断
                 Log.i("accept", "MsgReceiverService 接受到唤醒中断的广播");
+                //正在人脸识别
+                if (DataConfig.isFaceRecogniseIng) {
+                    return;
+                }
+
                 DataConfig.isSleep = false;
                 responseAwaken();
+
             } else if (intent.getAction().equals(BroadcastAction.ACTION_SPEAK)) {//说话
                 Log.i("accept", "MsgReceiverService  说话");
                 int currentType = intent.getIntExtra("type", 0);
@@ -78,7 +84,7 @@ public class MsgReceiverService extends Service {
                     DataConfig.isSleep = false;
                     if (isVerifySuccess) {
                         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
-                    }else {
+                    } else {
                         SpeechlHandle.startListen();
                     }
                 } else {//处于唤醒状态
@@ -86,14 +92,24 @@ public class MsgReceiverService extends Service {
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH)) {//打开脸部识别
                 Log.i("accept", "MsgReceiverService  打开脸部识别");
-                SpeechlHandle.cancelSpeak();
-                SpeechlHandle.cancelListen();
-                BroadcastEnclosure.stopMusic(MsgReceiverService.this);
+                boolean isVoiceFaceRecognise = intent.getBooleanExtra("isVoiceFaceRecognise", false);
+                //硬件打开人脸识别
+                if (!isVoiceFaceRecognise) {
+                    //唤醒状态不去人脸识别
+                    if (!DataConfig.isSleep) {
+                        return;
+                    }
+                }
 
-                if (FaceDetectorActivity.instance != null) {
+                //正在脸部识别不检测
+                if (DataConfig.isFaceRecogniseIng) {
                     Log.i("accept", "MsgReceiverService  正在脸部识别");
                     return;
                 }
+
+                SpeechlHandle.cancelSpeak();
+                SpeechlHandle.cancelListen();
+                BroadcastEnclosure.stopMusic(MsgReceiverService.this);
 
                 intent.setClass(MsgReceiverService.this, FaceDetectorActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -125,12 +141,6 @@ public class MsgReceiverService extends Service {
         SpeechlHandle.cancelListen();
         //停止唱歌
         BroadcastEnclosure.stopMusic(this);
-
-        //是否在人脸识别
-        if (FaceDetectorActivity.instance != null) {
-            FaceDetectorActivity.instance.finish();
-            FaceDetectorActivity.instance = null;
-        }
 
         DataConfig.isScriptQA = false;
         DataConfig.isAppPushRemind = false;

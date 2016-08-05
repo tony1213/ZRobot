@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.ShellUtils;
 
 import java.util.ArrayList;
@@ -100,9 +101,7 @@ public class WakeUpServices extends Service {
                         if (faceWakeUpState == 1) {
                             //有人影进入范围
                             Log.i("wakeup", "检测到人影");
-                            Intent intent = new Intent();
-                            intent.setAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
-                            sendBroadcast(intent);
+                            BroadcastEnclosure.openFaceRecognise(WakeUpServices.this, false);
                         } else {
                             //没有人影进入范围
 //                            Log.i("wakeup", "未检测到人影");

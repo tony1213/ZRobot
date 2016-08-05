@@ -111,4 +111,11 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
+    //打开人脸识别
+    public static void openFaceRecognise(Context context, boolean isVoiceFaceRecognise){
+        intent.setAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
+        intent.putExtra("isVoiceFaceRecognise", isVoiceFaceRecognise);
+        context.sendBroadcast(intent);
+    }
+
 }

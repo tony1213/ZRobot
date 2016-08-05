@@ -143,6 +143,7 @@ public class commandImpl implements command {
                 break;
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
+                DataConfig.isSleep = true;
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的,我去玩去了");
                 Intent intent = new Intent();
                 intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
@@ -204,7 +205,7 @@ public class commandImpl implements command {
                 break;
             case FACE_TEST_SCENE:// 脸部识别
                 flag = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_FACE_DETECTOR, "好的");
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_FACE_DETECTOR, "让我看看你");
 
                 break;
 

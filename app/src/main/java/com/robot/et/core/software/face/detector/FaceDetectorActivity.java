@@ -82,7 +82,6 @@ public class FaceDetectorActivity extends Activity {
     private long mLastClickTime;
     private int isAlign = 0;
     private FaceRequest mFaceRequest;
-    public static FaceDetectorActivity instance;
     private List<FaceInfo> faceInfos = new ArrayList<FaceInfo>();
     private String auId;
     private int testCount;//脸部识别的次数
@@ -100,7 +99,7 @@ public class FaceDetectorActivity extends Activity {
         mFaceDetector = FaceDetector.createDetector(FaceDetectorActivity.this, null);
         mFaceRequest = new FaceRequest(this);
 
-        instance = this;
+        DataConfig.isFaceRecogniseIng = true;
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
 
     }
@@ -358,7 +357,7 @@ public class FaceDetectorActivity extends Activity {
         super.onDestroy();
         // 销毁对象
         mFaceDetector.destroy();
-        instance = null;
+        DataConfig.isFaceRecogniseIng = false;
     }
 
     //脸部识别后的处理
