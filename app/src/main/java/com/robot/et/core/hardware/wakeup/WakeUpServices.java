@@ -16,8 +16,8 @@ import java.util.List;
 
 public class WakeUpServices extends Service {
 
-    private int fd;
-    private boolean isFaceWakeUp = true;//脸部唤醒
+    private int voiceFd;
+    private int faceFd;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,15 +31,14 @@ public class WakeUpServices extends Service {
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_RESET);
         registerReceiver(receiver, filter);
 
-        if (isFaceWakeUp) {
-            fd = WakeUp.faceWakeUpInit();
-            faceWakeUp();
-        } else {
-            openI2C();
-            fd = WakeUp.open("", 0);
-            voiceWakeUp();
-        }
-        Log.i("wakeup", "fd:" + fd);
+        faceFd = WakeUp.faceWakeUpInit();
+        Log.i("wakeup", "face faceFd==" + faceFd);
+        faceWakeUp();
+
+        openI2C();
+        voiceFd = WakeUp.wakeUpInit();
+        Log.i("wakeup", "voice voiceFd==" + voiceFd);
+        voiceWakeUp();
 
     }
 
@@ -53,6 +52,11 @@ public class WakeUpServices extends Service {
         commnandList.add("chmod 777 /sys/class/gpio/gpio68/direction");
         commnandList.add("chmod 777 /sys/class/gpio/gpio68/edge");
         commnandList.add("chmod 777 /sys/class/gpio/gpio68/value");
+        commnandList.add("echo 72 > /sys/class/gpio/export");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio72");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio72/direction");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio72/edge");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio72/value");
         commnandList.add("setenforce 0");
         ShellUtils.execCommand(commnandList, true);
     }
@@ -63,8 +67,8 @@ public class WakeUpServices extends Service {
             @Override
             public void run() {
                 while (true) {
-                    if (fd > 0) {
-                        int wakeUpState = WakeUp.getWakeUpState(fd);
+                    if (voiceFd > 0) {
+                        int wakeUpState = WakeUp.getWakeUpState();
 //					Log.i("wakeup", "wakeUpState:" + wakeUpState);
                         if (wakeUpState == 1) {
                             int degree = WakeUp.getWakeUpDegree();
@@ -91,7 +95,7 @@ public class WakeUpServices extends Service {
             @Override
             public void run() {
                 while (true) {
-                    if (fd > 0) {
+                    if (faceFd > 0) {
                         int faceWakeUpState = WakeUp.getFaceWakeUpState();
                         if (faceWakeUpState == 1) {
                             //有人影进入范围

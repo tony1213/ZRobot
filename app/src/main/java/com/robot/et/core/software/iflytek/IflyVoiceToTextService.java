@@ -3,7 +3,9 @@ package com.robot.et.core.software.iflytek;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,11 +21,13 @@ import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.custorm.commandImpl;
 import com.robot.et.core.software.iflytek.util.ResultParse;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.util.FileUtils;
+import com.robot.et.util.SpeechlHandle;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class IflyVoiceToTextService extends Service implements VoiceDictation {
     // 语音听写对象
@@ -32,6 +36,8 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
     private boolean isFirstSetParam;
     private commandImpl command;
+    private Timer timer;
+    private boolean isFirstListen;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -55,8 +61,46 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         if (DataConfig.isAppPushRemind) {
             command.noResponseApp();
         }
+
+        if (!isFirstListen) {
+            isFirstListen = true;
+            startTimer();
+        }
+
         listen(DataConfig.DEFAULT_SPEAK_MEN);
     }
+
+    //开始计时
+    private void startTimer() {
+        stopTimer();
+        if (timer == null) {
+            timer = new Timer();
+        }
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(0);
+            }
+        }, 5 * 60 * 1000);//设置多少分钟沉睡（单位毫秒）
+    }
+
+    //停止计时
+    private void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            DataConfig.isSleep = true;
+            stopTimer();
+            stopListen();
+        }
+    };
 
     private void listen(String language) {
         mIatResults.clear();
@@ -115,6 +159,9 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
                         beginListen();
                         return;
                     }
+
+                    stopTimer();
+                    isFirstListen = false;
 
                     if (command.isCustorm(result)) {
                         return;
@@ -188,6 +235,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         super.onDestroy();
         stopListen();
         mIat.destroy();
+        stopTimer();
     }
 
     private void stopListen() {
@@ -198,6 +246,9 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
     @Override
     public void startListen() {
+        stopTimer();
+        isFirstListen = false;
+
         beginListen();
     }
 

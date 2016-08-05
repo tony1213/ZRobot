@@ -305,7 +305,7 @@ public class FaceDetectorActivity extends Activity {
                     if (faces.length <= 0) {
                         noFaceCount ++;
                         if (noFaceCount >= 280) {
-                            sendMsg("没有看见主人，人家好伤心呢。");
+                            sendMsg("没有看见主人，人家好伤心呢。", false);
                             finish();
                         } else {
                             mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
@@ -375,7 +375,7 @@ public class FaceDetectorActivity extends Activity {
             }
         } else {
             Log.i("face", "handleFace mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧");
+            sendMsg("眼睛看花了，再让我看一次吧", false);
         }
     }
 
@@ -389,7 +389,7 @@ public class FaceDetectorActivity extends Activity {
             mFaceRequest.sendRequest(mImageData, mRequestListener);
         } else {
             Log.i("face", "verify mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧");
+            sendMsg("眼睛看花了，再让我看一次吧", false);
         }
     }
 
@@ -402,7 +402,7 @@ public class FaceDetectorActivity extends Activity {
             mFaceRequest.sendRequest(mImageData, mRequestListener);
         } else {
             Log.i("face", "registerFace mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧");
+            sendMsg("眼睛看花了，再让我看一次吧", false);
         }
     }
 
@@ -434,7 +434,7 @@ public class FaceDetectorActivity extends Activity {
                 isError = true;
             } finally {
                 if (isError) {
-                    sendMsg("眼睛累了，我去歇去喽");
+                    sendMsg("眼睛累了，我去歇去喽", false);
                 }
             }
         }
@@ -446,7 +446,7 @@ public class FaceDetectorActivity extends Activity {
                 if (testCount < 5) {
                     testFace();
                 } else {
-                    sendMsg("眼睛累了，我去歇去喽");
+                    sendMsg("眼睛累了，我去歇去喽", false);
                 }
             }
         }
@@ -456,17 +456,17 @@ public class FaceDetectorActivity extends Activity {
         int ret = obj.getInt("ret");
         if (ret != 0) {
             Log.i("face", "注册失败");
-            sendMsg("让我再认识你一次吧");
+            sendMsg("让我再认识你一次吧", false);
             return;
         }
         if ("success".equals(obj.get("rst"))) {
             Log.i("face", "注册成功");
             FaceDataFactory.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
-            sendMsg("很高兴认识你，请问你怎么称呼呢？");
+            sendMsg("很高兴认识你，请问你怎么称呼呢？", true);
         } else {
             Log.i("face", "注册失败");
-            sendMsg("让我再认识你一次吧");
+            sendMsg("让我再认识你一次吧", false);
         }
     }
 
@@ -480,7 +480,7 @@ public class FaceDetectorActivity extends Activity {
         if ("success".equals(obj.get("rst"))) {
             if (obj.getBoolean("verf")) {
                 Log.i("face", "通过验证");
-                sendMsg("你好，" + FaceDataFactory.getAuthorName() + ",我们又见面了。");
+                sendMsg("你好，" + FaceDataFactory.getAuthorName() + ",我们又见面了。", true);
             } else {
                 Log.i("face", "验证不通过");
                 handleFace(mImageData, FaceDataFactory.getFaceInfos());
@@ -491,10 +491,11 @@ public class FaceDetectorActivity extends Activity {
         }
     }
 
-    private void sendMsg(String content) {
+    private void sendMsg(String content, boolean isVerifySuccess) {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
         intent.putExtra("content", content);
+        intent.putExtra("isVerifySuccess", isVerifySuccess);
         sendBroadcast(intent);
         finish();
     }

@@ -120,4 +120,7 @@ public class DataConfig {
     //语音控制小车连续发的次数
     public static int controlNum = 0;
 
+    //是否处于沉睡
+    public static boolean isSleep = false;
+
 }

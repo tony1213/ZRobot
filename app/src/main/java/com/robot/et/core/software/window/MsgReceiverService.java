@@ -56,6 +56,7 @@ public class MsgReceiverService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT)) {//唤醒中断
                 Log.i("accept", "MsgReceiverService 接受到唤醒中断的广播");
+                DataConfig.isSleep = false;
                 responseAwaken();
             } else if (intent.getAction().equals(BroadcastAction.ACTION_SPEAK)) {//说话
                 Log.i("accept", "MsgReceiverService  说话");
@@ -72,7 +73,17 @@ public class MsgReceiverService extends Service {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别之后要说的话
                 Log.i("accept", "MsgReceiverService  脸部识别之后要说的话");
                 String contetn = intent.getStringExtra("content");
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+                boolean isVerifySuccess = intent.getBooleanExtra("isVerifySuccess", false);
+                if (DataConfig.isSleep) {//处于沉睡状态
+                    DataConfig.isSleep = false;
+                    if (isVerifySuccess) {
+                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+                    }else {
+                        SpeechlHandle.startListen();
+                    }
+                } else {//处于唤醒状态
+                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+                }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH)) {//打开脸部识别
                 Log.i("accept", "MsgReceiverService  打开脸部识别");
                 SpeechlHandle.cancelSpeak();
