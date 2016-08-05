@@ -11,11 +11,12 @@ import android.util.Log;
 
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.core.software.script.ScriptHandler;
+import com.robot.et.db.RobotDB;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.SpeechlHandle;
 
 import java.util.Random;
 
@@ -44,6 +45,7 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
         filter.addAction(BroadcastAction.ACTION_NOTIFY_SOFTWARE);
         filter.addAction(BroadcastAction.ACTION_PHONE_HANGUP);
+        filter.addAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
 
         registerReceiver(receiver, filter);
 
@@ -67,10 +69,26 @@ public class MsgReceiverService extends Service {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_END)) {//音乐播放完成
                 Log.i("accept", "MsgReceiverService  音乐播放完成");
                 SpeechlHandle.startListen();
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别
-                Log.i("accept", "MsgReceiverService  脸部识别");
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别之后要说的话
+                Log.i("accept", "MsgReceiverService  脸部识别之后要说的话");
                 String contetn = intent.getStringExtra("content");
                 SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH)) {//打开脸部识别
+                Log.i("accept", "MsgReceiverService  打开脸部识别");
+                SpeechlHandle.cancelSpeak();
+                SpeechlHandle.cancelListen();
+                BroadcastEnclosure.stopMusic(MsgReceiverService.this);
+
+                if (FaceDetectorActivity.instance != null) {
+                    Log.i("accept", "MsgReceiverService  正在脸部识别");
+                    return;
+                }
+
+                intent.setClass(MsgReceiverService.this, FaceDetectorActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(MsgReceiverService.this).getFaceInfos());
+                startActivity(intent);
+
             } else if (intent.getAction().equals(BroadcastAction.ACTION_NOTIFY_SOFTWARE)) {//接受到硬件反馈
                 Log.i("accept", "MsgReceiverService  接受到硬件反馈");
                 if (DataConfig.isPlayScript) {
@@ -80,7 +98,6 @@ public class MsgReceiverService extends Service {
                 Log.i("accept", "MsgReceiverService  查看时电话挂断");
                 // do nothing
             }
-
         }
     };
 

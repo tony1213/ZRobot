@@ -304,7 +304,7 @@ public class FaceDetectorActivity extends Activity {
 
                     if (faces.length <= 0) {
                         noFaceCount ++;
-                        if (noFaceCount >= 600) {
+                        if (noFaceCount >= 280) {
                             sendMsg("没有看见主人，人家好伤心呢。");
                             finish();
                         } else {

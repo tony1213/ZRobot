@@ -13,18 +13,17 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
+import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
-import com.robot.et.common.DataConfig;
-import com.robot.et.util.MusicManager;
-import com.robot.et.core.software.face.detector.FaceDetectorActivity;
-import com.robot.et.util.SpeechlHandle;
-import com.robot.et.core.software.script.ScriptHandler;
-import com.robot.et.db.RobotDB;
 import com.robot.et.util.DateTools;
+import com.robot.et.util.MusicManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
+import com.robot.et.util.SpeechlHandle;
 
 public class IflySpeakService extends Service implements SpeechSynthesis {
     // 语音合成对象
@@ -163,11 +162,9 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 //do nothing
                 break;
             case DataConfig.SPEAK_TYPE_FACE_DETECTOR://脸部识别
-                Intent faceIntent = new Intent();
-                faceIntent.setClass(this, FaceDetectorActivity.class);
-                faceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                faceIntent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(this).getFaceInfos());
-                startActivity(faceIntent);
+                Intent intent = new Intent();
+                intent.setAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
+                sendBroadcast(intent);
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 if (DataConfig.isAppPushRemind) {
