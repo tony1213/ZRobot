@@ -13,7 +13,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
-import com.robot.et.core.software.face.detector.FaceDataFactory;
+import com.robot.et.util.FaceDataControl;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -191,7 +191,7 @@ public class commandImpl implements command {
                     Log.i("ifly", "faceName=====" + faceName);
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
-                        FaceDataFactory.addFaceInfo(context, faceName);
+                        FaceDataControl.addFaceInfo(context, faceName);
                         SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
 
                     } else {

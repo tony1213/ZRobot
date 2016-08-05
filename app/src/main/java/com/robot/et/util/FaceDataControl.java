@@ -1,4 +1,4 @@
-package com.robot.et.core.software.face.detector;
+package com.robot.et.util;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by houdeming on 2016/7/29.
  */
-public class FaceDataFactory {
+public class FaceDataControl {
     private static List<FaceInfo> infos = new ArrayList<FaceInfo>();
     private static String authorId;
     private static String authorName;
@@ -41,7 +41,7 @@ public class FaceDataFactory {
     }
 
     public static void setAuthorId(String authorId) {
-        FaceDataFactory.authorId = authorId;
+        FaceDataControl.authorId = authorId;
     }
 
     public static String getAuthorName() {
@@ -49,7 +49,7 @@ public class FaceDataFactory {
     }
 
     public static void setAuthorName(String authorName) {
-        FaceDataFactory.authorName = authorName;
+        FaceDataControl.authorName = authorName;
     }
 
 }
