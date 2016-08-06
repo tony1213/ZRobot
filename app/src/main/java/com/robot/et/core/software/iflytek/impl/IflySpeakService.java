@@ -1,4 +1,4 @@
-package com.robot.et.core.software.iflytek;
+package com.robot.et.core.software.iflytek.impl;
 
 import android.app.Service;
 import android.content.Intent;
@@ -16,6 +16,7 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.iflytek.SpeechSynthesis;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -30,7 +31,6 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
     private SpeechSynthesizer mTts;
     private int currentType;
     private boolean isFirstSetParam;
-    private Intent mIntent;
     private SharedPreferencesUtils share;
 
     @Override
@@ -45,7 +45,6 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechSynthesizer(this);
-        mIntent = new Intent();
 
         //记录位置
         share = SharedPreferencesUtils.getInstance();

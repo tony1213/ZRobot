@@ -1,4 +1,4 @@
-package com.robot.et.core.software.iflytek;
+package com.robot.et.core.software.iflytek.impl;
 
 import android.app.Service;
 import android.content.Intent;
@@ -21,6 +21,7 @@ import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.custorm.commandImpl;
+import com.robot.et.core.software.iflytek.VoiceDictation;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;

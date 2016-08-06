@@ -41,7 +41,7 @@ import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.FaceDataControl;
+import com.robot.et.util.FaceManager;
 import com.robot.et.core.software.face.util.FaceRect;
 import com.robot.et.core.software.face.util.FaceUtil;
 import com.robot.et.core.software.face.util.ParseResult;
@@ -367,8 +367,8 @@ public class FaceDetectorActivity extends Activity {
             if (faceInfos != null && faceInfos.size() > 0) {
                 FaceInfo info = faceInfos.get(0);
                 String auId = info.getAuthorId();
-                FaceDataControl.setAuthorName(info.getAuthorName());
-                FaceDataControl.setNewFaceInfo(faceInfos);
+                FaceManager.setAuthorName(info.getAuthorName());
+                FaceManager.setNewFaceInfo(faceInfos);
                 verify(mImageData, auId);
             } else {
                 registerFace(mImageData);
@@ -461,7 +461,7 @@ public class FaceDetectorActivity extends Activity {
         }
         if ("success".equals(obj.get("rst"))) {
             Log.i("face", "注册成功");
-            FaceDataControl.setAuthorId(auId);
+            FaceManager.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
             sendMsg("很高兴认识你，请问你怎么称呼呢？", true);
         } else {
@@ -474,20 +474,20 @@ public class FaceDetectorActivity extends Activity {
         int ret = obj.getInt("ret");
         if (ret != 0) {
             Log.i("face", "验证失败");
-            handleFace(mImageData, FaceDataControl.getFaceInfos());
+            handleFace(mImageData, FaceManager.getFaceInfos());
             return;
         }
         if ("success".equals(obj.get("rst"))) {
             if (obj.getBoolean("verf")) {
                 Log.i("face", "通过验证");
-                sendMsg("你好，" + FaceDataControl.getAuthorName() + ",我们又见面了。", true);
+                sendMsg("你好，" + FaceManager.getAuthorName() + ",我们又见面了。", true);
             } else {
                 Log.i("face", "验证不通过");
-                handleFace(mImageData, FaceDataControl.getFaceInfos());
+                handleFace(mImageData, FaceManager.getFaceInfos());
             }
         } else {
             Log.i("face", "验证失败");
-            handleFace(mImageData, FaceDataControl.getFaceInfos());
+            handleFace(mImageData, FaceManager.getFaceInfos());
         }
     }
 

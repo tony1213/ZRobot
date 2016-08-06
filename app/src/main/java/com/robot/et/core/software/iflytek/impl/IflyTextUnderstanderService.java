@@ -1,4 +1,4 @@
-package com.robot.et.core.software.iflytek;
+package com.robot.et.core.software.iflytek.impl;
 
 import android.app.Service;
 import android.content.Intent;
@@ -15,7 +15,9 @@ import com.iflytek.cloud.TextUnderstander;
 import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.iflytek.util.VoicePhoneControl;
+import com.robot.et.core.software.iflytek.ParseResultCallBack;
+import com.robot.et.core.software.iflytek.TextUnderstand;
+import com.robot.et.core.software.iflytek.util.PhoneManager;
 import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.core.software.window.network.VoicePhoneCallBack;
 import com.robot.et.util.AlarmRemindManager;
@@ -259,7 +261,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                         HttpManager.getRoomNum(answer, new VoicePhoneCallBack() {
                                             @Override
                                             public void getPhoneInfo(String userName, String result) {
-                                                String content = VoicePhoneControl.getCallContent(userName, result);
+                                                String content = PhoneManager.getCallContent(userName, result);
                                                 if (!TextUtils.isEmpty(content)) {
                                                     DataConfig.isAgoraVideo = true;
                                                     SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话，" + "要耐心等待哦");

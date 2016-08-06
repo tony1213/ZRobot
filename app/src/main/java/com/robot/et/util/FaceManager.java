@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by houdeming on 2016/7/29.
  */
-public class FaceDataControl {
+public class FaceManager {
     private static List<FaceInfo> infos = new ArrayList<FaceInfo>();
     private static String authorId;
     private static String authorName;
@@ -41,7 +41,7 @@ public class FaceDataControl {
     }
 
     public static void setAuthorId(String authorId) {
-        FaceDataControl.authorId = authorId;
+        FaceManager.authorId = authorId;
     }
 
     public static String getAuthorName() {
@@ -49,7 +49,7 @@ public class FaceDataControl {
     }
 
     public static void setAuthorName(String authorName) {
-        FaceDataControl.authorName = authorName;
+        FaceManager.authorName = authorName;
     }
 
 }

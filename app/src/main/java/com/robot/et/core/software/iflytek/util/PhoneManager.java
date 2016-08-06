@@ -14,7 +14,7 @@ import org.json.JSONTokener;
 /**
  * Created by houdeming on 2016/8/4.
  */
-public class VoicePhoneControl {
+public class PhoneManager {
     private final static String TAG = "ifly";
 
     private static String userName;//要拨打电话的人的用户名
@@ -24,7 +24,7 @@ public class VoicePhoneControl {
     }
 
     public static void setUserName(String userName) {
-        VoicePhoneControl.userName = userName;
+        PhoneManager.userName = userName;
     }
 
     //获取语音打电话要说的内容
