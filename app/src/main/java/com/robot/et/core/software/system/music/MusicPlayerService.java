@@ -14,10 +14,12 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.MusicManager;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.window.network.HttpManager;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.MusicManager;
 
 import java.io.IOException;
 
@@ -46,6 +48,7 @@ public class MusicPlayerService extends Service {
             public void onCompletion(MediaPlayer arg0) {
                 Log.i("music", "音乐播放完成");
                 DataConfig.isPlayMusic = false;
+                BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_OFF);
                 //播放的是APP推送来的歌曲，继续播放下一首
                 if (DataConfig.isJpushPlayMusic) {
                     playAppLower();
@@ -99,6 +102,8 @@ public class MusicPlayerService extends Service {
 
     //开始播放
     private void play(String musicSrc) {
+        BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_BLINK);
+
         if (!TextUtils.isEmpty(musicSrc)) {
             try {
                 mediaPlayer.reset();// 把各项参数恢复到初始状态

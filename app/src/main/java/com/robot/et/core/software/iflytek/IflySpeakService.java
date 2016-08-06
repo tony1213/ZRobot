@@ -15,6 +15,7 @@ import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -103,6 +104,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         @Override
         public void onSpeakBegin() {
             Log.i("ifly", "IflySpeakService  onSpeakBegin()");
+            BroadcastEnclosure.controlMouthLED(IflySpeakService.this, ScriptConfig.LED_BLINK);
         }
 
         // 暂停播放
@@ -129,6 +131,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         @Override
         public void onCompleted(SpeechError error) {
             Log.i("ifly", "IflySpeakService  onCompleted()");
+            BroadcastEnclosure.controlMouthLED(IflySpeakService.this, ScriptConfig.LED_OFF);
             if (error == null) {
                 responseSpeakCompleted();
             } else {
