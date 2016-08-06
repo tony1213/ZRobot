@@ -236,7 +236,7 @@ public class ScriptHandler implements Script {
     //插入本地剧本
     public static void addLocalScript(final Context context, String scriptName) {
         String content = FileUtils.readFile(context, scriptName, "utf-8");
-        ScriptParse.parseScript(content, new ScriptCallBack() {
+        ScriptParse.parseScript(content, new ScriptInfoCallBack() {
             @Override
             public void getScribt(ScriptInfo info, List<ScriptActionInfo> infos) {
                 if (info != null) {
@@ -253,7 +253,7 @@ public class ScriptHandler implements Script {
     //增加APP发来的图形编辑
     public static void addAppGraphicEdit(final Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
-            ScriptParse.parseScript(content, new ScriptCallBack() {
+            ScriptParse.parseScript(content, new ScriptInfoCallBack() {
                 @Override
                 public void getScribt(ScriptInfo info, List<ScriptActionInfo> infos) {
                     if (info != null) {
@@ -270,7 +270,7 @@ public class ScriptHandler implements Script {
     //增加APP发过来的录制动作
     public static void addAppRecordAction(final Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
-            ScriptParse.parseAppRecordAction(content, new ScriptCallBack() {
+            ScriptParse.parseAppRecordAction(content, new ScriptInfoCallBack() {
                 @Override
                 public void getScribt(ScriptInfo info, List<ScriptActionInfo> infos) {
                     if (info != null) {
@@ -287,7 +287,7 @@ public class ScriptHandler implements Script {
     //增加APP发过来的音乐编舞
     public static void addAppRecordMusic(final Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
-            ScriptParse.parseAppRecordMusic(content, new ScriptCallBack() {
+            ScriptParse.parseAppRecordMusic(content, new ScriptInfoCallBack() {
                 @Override
                 public void getScribt(ScriptInfo info, List<ScriptActionInfo> infos) {
                     if (info != null) {

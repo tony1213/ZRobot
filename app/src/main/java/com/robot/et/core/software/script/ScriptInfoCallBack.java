@@ -9,7 +9,7 @@ import java.util.List;
  * Created by houdeming on 2016/7/22.
  * 解析剧本回调
  */
-public interface ScriptCallBack {
+public interface ScriptInfoCallBack {
 
     //获取剧本
     void getScribt(ScriptInfo info, List<ScriptActionInfo> infos);

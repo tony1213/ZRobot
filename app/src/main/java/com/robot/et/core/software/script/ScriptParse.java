@@ -20,7 +20,7 @@ public class ScriptParse {
     private final static String TAG = "netty";
 
     //获取剧本
-    public static void parseScript(String jsonContent, ScriptCallBack callBack) {
+    public static void parseScript(String jsonContent, ScriptInfoCallBack callBack) {
         if (!TextUtils.isEmpty(jsonContent)) {
             try {
                 JSONTokener tokener = new JSONTokener(jsonContent);
@@ -42,7 +42,7 @@ public class ScriptParse {
     }
 
     //增加APP发过来的录制动作
-    public static void parseAppRecordAction(String jsonContent, ScriptCallBack callBack) {
+    public static void parseAppRecordAction(String jsonContent, ScriptInfoCallBack callBack) {
         if (!TextUtils.isEmpty(jsonContent)) {
             try {
                 JSONTokener tokener = new JSONTokener(jsonContent);
@@ -64,7 +64,7 @@ public class ScriptParse {
     }
 
     //增加APP发过来的音乐编舞
-    public static void parseAppRecordMusic(String jsonContent, ScriptCallBack callBack) {
+    public static void parseAppRecordMusic(String jsonContent, ScriptInfoCallBack callBack) {
         if (!TextUtils.isEmpty(jsonContent)) {
             try {
                 JSONTokener tokener = new JSONTokener(jsonContent);

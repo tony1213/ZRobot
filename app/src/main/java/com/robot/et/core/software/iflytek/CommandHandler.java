@@ -1,4 +1,4 @@
-package com.robot.et.core.software.custorm;
+package com.robot.et.core.software.iflytek;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,6 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
-import com.robot.et.util.FaceManager;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -24,6 +23,7 @@ import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
+import com.robot.et.util.FaceManager;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.RobotLearnManager;
 import com.robot.et.util.SpeechlHandle;
@@ -35,11 +35,11 @@ import java.util.Random;
 /**
  * Created by houdeming on 2016/7/28.
  */
-public class commandImpl implements command {
+public class CommandHandler {
 
     private Context context;
 
-    public commandImpl(Context context) {
+    public CommandHandler(Context context) {
         this.context = context;
     }
 
@@ -69,7 +69,7 @@ public class commandImpl implements command {
         return false;
     }
 
-    @Override
+    // 匹配的场景
     public boolean isMatchScene(String result) {
         MatchSceneEnum sceneEnum = EnumManager.getScene(result);
         Log.i("ifly", "sceneEnum=====" + sceneEnum);
@@ -216,7 +216,7 @@ public class commandImpl implements command {
         return flag;
     }
 
-    @Override
+    //是否控制运动
     public boolean isControlMove(String result) {
         if (!TextUtils.isEmpty(result)) {
             int moveKey = EnumManager.getMoveKey(result);
@@ -236,7 +236,7 @@ public class commandImpl implements command {
         return false;
     }
 
-    @Override
+    //是否是自定义问答
     public boolean isCustomDialogue(String result) {
         String[] questions = context.getResources().getStringArray(R.array.custom_question);
         if (questions != null && questions.length > 0) {
@@ -254,7 +254,7 @@ public class commandImpl implements command {
         return false;
     }
 
-    @Override
+    //是否是APP提醒必须要说的话
     public boolean isAppPushRemind(String result) {
         if (DataConfig.isAppPushRemind) {
             handleAppRemind(result);
@@ -263,16 +263,16 @@ public class commandImpl implements command {
         return false;
     }
 
-    @Override
+    //是否是APP发来的是剧本的问答
     public boolean isScriptQA(String result) {
         if (DataConfig.isScriptQA) {
-            handleAppScriptQA(result);
+            new ScriptHandler().appScriptQA(context, result);
             return true;
         }
         return false;
     }
 
-    @Override
+    //没有响应App的命令
     public void noResponseApp() {
         if (!DataConfig.isStartTime) {
             DataConfig.isStartTime = true;
@@ -370,13 +370,6 @@ public class commandImpl implements command {
             ScriptHandler.doScriptAction(context, infos);
         } else {
             SpeechlHandle.startListen();
-        }
-    }
-
-    //APP剧本的对话
-    private void handleAppScriptQA(String result) {
-        if (!TextUtils.isEmpty(result)) {
-            new ScriptHandler().appScriptQA(context, result);
         }
     }
 

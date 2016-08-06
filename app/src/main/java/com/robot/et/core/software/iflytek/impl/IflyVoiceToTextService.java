@@ -20,7 +20,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.custorm.commandImpl;
+import com.robot.et.core.software.iflytek.CommandHandler;
 import com.robot.et.core.software.iflytek.VoiceDictation;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.util.BroadcastEnclosure;
@@ -38,9 +38,9 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
     // 用HashMap存储听写结果
     private HashMap<String, String> mIatResults = new LinkedHashMap<String, String>();
     private boolean isFirstSetParam;
-    private commandImpl command;
     private Timer timer;
     private boolean isFirstListen;
+    private CommandHandler commandHandler;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -54,7 +54,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         // 初始化SpeechRecognizer对象
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
         SpeechlHandle.setSpeechRecognizer(this);
-        command = new commandImpl(this);
+        commandHandler = new CommandHandler(this);
 
         uploadUserThesaurus();//上传词表
 
@@ -62,7 +62,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
     private void beginListen() {
         if (DataConfig.isAppPushRemind) {
-            command.noResponseApp();
+            commandHandler.noResponseApp();
         }
 
         if (!isFirstListen) {
@@ -168,7 +168,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
                     stopTimer();
                     isFirstListen = false;
 
-                    if (command.isCustorm(result)) {
+                    if (commandHandler.isCustorm(result)) {
                         return;
                     }
                     SpeechlHandle.understanderText(result);
