@@ -7,10 +7,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.system.alarm.AlarmClock;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.util.AlarmRemindManager;
-import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
                 content = "主人您好，您设置的" + remindContent + "提醒时间到了，不要忘记哦。";
             }
 
-            SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, content);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, content);
 
         }
 

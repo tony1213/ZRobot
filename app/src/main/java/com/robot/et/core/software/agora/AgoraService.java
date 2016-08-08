@@ -13,11 +13,11 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.entity.JpushInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
-import com.robot.et.util.SpeechlHandle;
 import com.xsj.crasheye.Crasheye;
 
 public class AgoraService extends Service {
@@ -82,7 +82,7 @@ public class AgoraService extends Service {
                     joinRoomerBegin(roomNum);
                     SystemClock.sleep(500);
                     DataConfig.isAgoraVideo = true;
-                    SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_VIDEO, info.getContent());
+                    SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_VIDEO, info.getContent());
                 }
 
                 break;
@@ -91,7 +91,7 @@ public class AgoraService extends Service {
                     joinRoomerBegin(roomNum);
                     SystemClock.sleep(500);
                     DataConfig.isAgoraVoice = true;
-                    SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_VOICE, info.getContent());
+                    SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_VOICE, info.getContent());
                 }
 
                 break;
@@ -118,8 +118,8 @@ public class AgoraService extends Service {
     }
 
     private void joinRoomerBegin(String roomNum) {
-        SpeechlHandle.cancelSpeak();
-        SpeechlHandle.cancelListen();
+        SpeechImpl.getInstance().cancelSpeak();
+        SpeechImpl.getInstance().cancelListen();
         BroadcastEnclosure.stopMusic(this);
         BroadcastEnclosure.controlWaving(this, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);

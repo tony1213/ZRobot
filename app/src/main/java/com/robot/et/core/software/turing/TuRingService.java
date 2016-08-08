@@ -1,13 +1,13 @@
 package com.robot.et.core.software.turing;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.SpeechlHandle;
+import com.robot.et.core.software.base.BaseService;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.turing.androidsdk.InitListener;
 import com.turing.androidsdk.SDKInit;
 import com.turing.androidsdk.SDKInitBuilder;
@@ -20,7 +20,7 @@ import turing.os.http.core.ErrorMessage;
 import turing.os.http.core.HttpConnectionListener;
 import turing.os.http.core.RequestResult;
 
-public class TuRingService extends Service implements TuringUnderstander {
+public class TuRingService extends BaseService {
 
     private TuringApiManager mTuringApiManager;
 
@@ -33,8 +33,6 @@ public class TuRingService extends Service implements TuringUnderstander {
     public void onCreate() {
         super.onCreate();
         Log.i("turing", "TuRingService  onCreate()");
-
-        SpeechlHandle.setTuringUnderstander(this);
 
         initTuringSDK();
 
@@ -84,27 +82,27 @@ public class TuRingService extends Service implements TuringUnderstander {
                                 content = getWeatherContent(content);
                             }
 
-                            SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
                         } else {
-                            SpeechlHandle.startListen();
+                            SpeechImpl.getInstance().startListen();
                         }
 
                     } else {
-                        SpeechlHandle.startListen();
+                        SpeechImpl.getInstance().startListen();
                     }
                 } catch (JSONException e) {
                     Log.i("turing", "图灵JSONException====" + e.getMessage());
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                 }
             } else {
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
             }
         }
 
         @Override
         public void onError(ErrorMessage errorMessage) {
             Log.i("turing", "图灵errorMessage.getMessage()====" + errorMessage.getMessage());
-            SpeechlHandle.startListen();
+            SpeechImpl.getInstance().startListen();
         }
     };
 
@@ -114,23 +112,24 @@ public class TuRingService extends Service implements TuringUnderstander {
     }
 
     @Override
-    public void understanderText(String content) {
+    public void understanderTextByTuring(String content) {
+        super.understanderTextByTuring(content);
         if (!TextUtils.isEmpty(content)) {
             //发出请求  以防mTuringApiManager为null
             if (mTuringApiManager != null) {
                 mTuringApiManager.requestTuringAPI(content);
             } else {
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
             }
         } else {
-            SpeechlHandle.startListen();
+            SpeechImpl.getInstance().startListen();
         }
     }
 
     /*
-     * content weather格式 上海:05/16 周一,15-24° 23° 晴 北风微风; 05/17 周二,16-26° 晴 东南风微风;
-     * 05/18 周三,17-26° 多云 东风微风; 05/19 周四,19-26° 多云 东风微风;
-     */
+         * content weather格式 上海:05/16 周一,15-24° 23° 晴 北风微风; 05/17 周二,16-26° 晴 东南风微风;
+         * 05/18 周三,17-26° 多云 东风微风; 05/19 周四,19-26° 多云 东风微风;
+         */
     private String getWeatherContent(String content) {
         String result = "";
         if (!TextUtils.isEmpty(content)) {

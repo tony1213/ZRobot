@@ -20,9 +20,9 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
-import com.robot.et.util.SpeechlHandle;
 import com.robot.et.util.Utilities;
 
 import java.util.Random;
@@ -122,7 +122,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                         leaveChannel();
                         isUserJoined = true;
                         String content = "主人，对方暂时没有接听，如果需要，要重新拨通哦";
-                        SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+                        SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
 
                         finish();
                     }
@@ -182,11 +182,11 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
             } else {
                 isNetWorkNotGood = false;
                 String content = "主人，网络质量太差，如果需要，要重新拨通哦";
-                SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+                SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
             }
         } else {
             String content = "主人，对方已挂断，如果需要，要重新拨通哦";
-            SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+            SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
         }
 
         Intent intent = new Intent();
@@ -555,7 +555,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     }
 
     private void showError(String content) {
-        SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+        SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
     }
 
 }

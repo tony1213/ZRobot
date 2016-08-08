@@ -1,6 +1,5 @@
-package com.robot.et.core.software.iflytek.impl;
+package com.robot.et.core.software.iflytek;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -14,26 +13,25 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.TextUnderstander;
 import com.iflytek.cloud.TextUnderstanderListener;
 import com.iflytek.cloud.UnderstanderResult;
+import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.iflytek.ParseResultCallBack;
-import com.robot.et.core.software.iflytek.TextUnderstand;
+import com.robot.et.common.enums.SceneServiceEnum;
+import com.robot.et.core.software.base.BaseService;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.iflytek.util.PhoneManager;
+import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.core.software.window.network.HttpManager;
 import com.robot.et.core.software.window.network.VoicePhoneCallBack;
 import com.robot.et.util.AlarmRemindManager;
-import com.robot.et.common.DataConfig;
-import com.robot.et.util.MusicManager;
 import com.robot.et.util.EnumManager;
-import com.robot.et.common.enums.SceneServiceEnum;
-import com.robot.et.core.software.iflytek.util.ResultParse;
-import com.robot.et.util.SpeechlHandle;
+import com.robot.et.util.MusicManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
 import org.json.JSONObject;
 
 //科大讯飞文本理解
-public class IflyTextUnderstanderService extends Service implements TextUnderstand {
+public class IflyTextUnderstanderService extends BaseService {
 
     private TextUnderstander mTextUnderstander;
     private String underStandContent;
@@ -50,7 +48,6 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         super.onCreate();
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
         mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
-        SpeechlHandle.setTextUnderstander(this);
 
         SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
         city = share.getString(SharedPreferencesKeys.CITY_KEY, "");
@@ -74,7 +71,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         int ret = mTextUnderstander.understandText(content, textListener);
         if (ret != 0) {
             Log.i("ifly", "文本理解错误码ret==" + ret);
-            SpeechlHandle.turingUnderstander(underStandContent);
+            SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
         }
     }
 
@@ -102,7 +99,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         public void onError(SpeechError error) {
             // 文本语义不能使用回调错误码14002，请确认您下载sdk时是否勾选语义场景和私有语义的发布
             Log.i("ifly", "文本理解onError Code==" + error.getErrorCode());
-            SpeechlHandle.turingUnderstander(underStandContent);
+            SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
         }
     };
 
@@ -116,11 +113,11 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                 if (!TextUtils.isEmpty(text)) {
                     resultHandle(text);
                 } else {
-                    SpeechlHandle.turingUnderstander(underStandContent);
+                    SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
                 }
             } else {
                 Log.i("ifly", "文本理解不正确");
-                SpeechlHandle.turingUnderstander(underStandContent);
+                SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
             }
         }
 
@@ -141,9 +138,9 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
         Log.i("ifly", "IflyTextUnderstanderService answer===" + answer);
 
         if (!TextUtils.isEmpty(answer)) {
-            SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
         } else {
-            SpeechlHandle.turingUnderstander(question);
+            SpeechImpl.getInstance().understanderTextByTuring(question);
         }
 
     }
@@ -203,7 +200,7 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                     answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
                                     DataConfig.isJpushPlayMusic = false;
                                     String content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
-                                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
 
                                     break;
                                 case RESTAURANT://餐馆
@@ -264,9 +261,9 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
                                                 String content = PhoneManager.getCallContent(userName, result);
                                                 if (!TextUtils.isEmpty(content)) {
                                                     DataConfig.isAgoraVideo = true;
-                                                    SpeechlHandle.startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话，" + "要耐心等待哦");
+                                                    SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话，" + "要耐心等待哦");
                                                 } else {
-                                                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "主人，还没有这个人的电话呢，换个试试吧");
+                                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "主人，还没有这个人的电话呢，换个试试吧");
                                                 }
                                             }
                                         });
@@ -317,13 +314,13 @@ public class IflyTextUnderstanderService extends Service implements TextUndersta
     }
 
     @Override
-    public void understanderText(String content) {
+    public void understanderTextByIfly(String content) {
+        super.understanderTextByIfly(content);
         if (!TextUtils.isEmpty(content)) {
             underStandContent = content;
             textUnderstander(content);
         } else {
-            SpeechlHandle.startListen();
+            SpeechImpl.getInstance().startListen();
         }
     }
-
 }

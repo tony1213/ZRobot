@@ -12,11 +12,11 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.BroadcastEnclosure;
-import com.robot.et.util.SpeechlHandle;
 
 import java.util.Random;
 
@@ -69,13 +69,13 @@ public class MsgReceiverService extends Service {
                 int currentType = intent.getIntExtra("type", 0);
                 String content = intent.getStringExtra("content");
                 if (!TextUtils.isEmpty(content)) {
-                    SpeechlHandle.startSpeak(currentType, content);
+                    SpeechImpl.getInstance().startSpeak(currentType, content);
                 } else {
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_END)) {//音乐播放完成
                 Log.i("accept", "MsgReceiverService  音乐播放完成");
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
             } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别之后要说的话
                 Log.i("accept", "MsgReceiverService  脸部识别之后要说的话");
                 String contetn = intent.getStringExtra("content");
@@ -83,12 +83,12 @@ public class MsgReceiverService extends Service {
                 if (DataConfig.isSleep) {//处于沉睡状态
                     DataConfig.isSleep = false;
                     if (isVerifySuccess) {
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                     } else {
-                        SpeechlHandle.startListen();
+                        SpeechImpl.getInstance().startListen();
                     }
                 } else {//处于唤醒状态
-                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH)) {//打开脸部识别
                 Log.i("accept", "MsgReceiverService  打开脸部识别");
@@ -132,9 +132,9 @@ public class MsgReceiverService extends Service {
 
     private void responseAwaken() {
         //停止说
-        SpeechlHandle.cancelSpeak();
+        SpeechImpl.getInstance().cancelSpeak();
         //停止听
-        SpeechlHandle.cancelListen();
+        SpeechImpl.getInstance().cancelListen();
         //停止唱歌
         BroadcastEnclosure.stopMusic(this);
 
@@ -143,7 +143,7 @@ public class MsgReceiverService extends Service {
         DataConfig.isStartTime = false;
         DataConfig.isControlToyCar = false;
 
-        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
 
     }
 

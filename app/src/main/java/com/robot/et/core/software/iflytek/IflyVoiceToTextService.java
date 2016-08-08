@@ -1,6 +1,5 @@
-package com.robot.et.core.software.iflytek.impl;
+package com.robot.et.core.software.iflytek;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,19 +19,18 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.iflytek.CommandHandler;
-import com.robot.et.core.software.iflytek.VoiceDictation;
+import com.robot.et.core.software.base.BaseService;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
-import com.robot.et.util.SpeechlHandle;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class IflyVoiceToTextService extends Service implements VoiceDictation {
+public class IflyVoiceToTextService extends BaseService {
     // 语音听写对象
     private SpeechRecognizer mIat;
     // 用HashMap存储听写结果
@@ -53,7 +51,6 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
         Log.i("ifly", "IflyVoiceToTextService  onCreate()");
         // 初始化SpeechRecognizer对象
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
-        SpeechlHandle.setSpeechRecognizer(this);
         commandHandler = new CommandHandler(this);
 
         uploadUserThesaurus();//上传词表
@@ -171,7 +168,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
                     if (commandHandler.isCustorm(result)) {
                         return;
                     }
-                    SpeechlHandle.understanderText(result);
+                    SpeechImpl.getInstance().understanderTextByIfly(result);
 
                 } else {
                     beginListen();
@@ -251,6 +248,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
     @Override
     public void startListen() {
+        super.startListen();
         stopTimer();
         isFirstListen = false;
 
@@ -259,6 +257,7 @@ public class IflyVoiceToTextService extends Service implements VoiceDictation {
 
     @Override
     public void cancelListen() {
+        super.cancelListen();
         stopListen();
     }
 

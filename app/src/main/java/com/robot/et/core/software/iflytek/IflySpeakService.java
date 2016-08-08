@@ -1,6 +1,5 @@
-package com.robot.et.core.software.iflytek.impl;
+package com.robot.et.core.software.iflytek;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,7 +15,8 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.iflytek.SpeechSynthesis;
+import com.robot.et.core.software.base.BaseService;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -24,9 +24,8 @@ import com.robot.et.util.DateTools;
 import com.robot.et.util.MusicManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
-import com.robot.et.util.SpeechlHandle;
 
-public class IflySpeakService extends Service implements SpeechSynthesis {
+public class IflySpeakService extends BaseService {
     // 语音合成对象
     private SpeechSynthesizer mTts;
     private int currentType;
@@ -44,7 +43,6 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
         Log.i("ifly", "IflySpeakService  onCreate()");
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
-        SpeechlHandle.setSpeechSynthesizer(this);
 
         //记录位置
         share = SharedPreferencesUtils.getInstance();
@@ -78,7 +76,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 // 未安装则跳转到提示安装页面
             } else {
                 Log.i("ifly", "语音合成失败,错误码=== " + code);
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
             }
         }
     }
@@ -135,7 +133,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 responseSpeakCompleted();
             } else {
                 Log.i("ifly", "onCompleted  error=" + error.getPlainDescription(true));
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
             }
 
         }
@@ -154,7 +152,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
     private void responseSpeakCompleted() {
         switch (currentType) {
             case DataConfig.SPEAK_TYPE_CHAT://对话
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
                 BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
@@ -164,7 +162,7 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 if (DataConfig.isAppPushRemind) {
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                     return;
                 }
 
@@ -173,11 +171,11 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
                 String weatherContent = "今天" + share.getString(SharedPreferencesKeys.CITY_KEY, "") + share.getString(SharedPreferencesKeys.AREA_KEY, "") + "天气";
-                SpeechlHandle.understanderText(weatherContent);
+                SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
                 break;
             case DataConfig.SPEAK_TYPE_SCRIPT://剧本对话
                 if (DataConfig.isScriptQA) {
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                     return;
                 }
                 new ScriptHandler().scriptSpeak(this);
@@ -213,35 +211,36 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
 
     @Override
     public void startSpeak(int speakType, String speakContent) {
+        super.startSpeak(speakType, speakContent);
         Log.i("ifly", "IflySpeakService  speakType===" + speakType);
         Log.i("ifly", "IflySpeakService  speakContent===" + speakContent);
         currentType = speakType;
         if (!TextUtils.isEmpty(speakContent)) {
             if (currentType == DataConfig.SPEAK_TYPE_REMIND_TIPS) {//提醒
                 cancelSpeak();
-                SpeechlHandle.cancelListen();
+                SpeechImpl.getInstance().cancelListen();
                 //停止唱歌
                 BroadcastEnclosure.stopMusic(IflySpeakService.this);
             }
 
             speakContent(speakContent);
         } else {
-            SpeechlHandle.startListen();
+            SpeechImpl.getInstance().startListen();
         }
-
     }
 
     @Override
     public void cancelSpeak() {
+        super.cancelSpeak();
         stopSpeak();
     }
 
     /*科大讯飞语音合成参数设置
-     * speakMen 发音人
-     * speed 语速
-     * pitch 语调
-     * volume 音量
-     */
+         * speakMen 发音人
+         * speed 语速
+         * pitch 语调
+         * volume 音量
+         */
     private void setTextToVoiceParam(com.iflytek.cloud.SpeechSynthesizer mTts, String speakMen, String speed, String pitch, String volume) {
         // 清空参数
         mTts.setParameter(SpeechConstant.PARAMS, null);

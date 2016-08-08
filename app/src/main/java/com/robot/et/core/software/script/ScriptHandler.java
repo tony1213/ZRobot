@@ -8,6 +8,7 @@ import android.util.Log;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
@@ -16,7 +17,6 @@ import com.robot.et.util.EnumManager;
 import com.robot.et.util.FileUtils;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.MusicManager;
-import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,13 +102,13 @@ public class ScriptHandler implements Script {
                     } else {
                         speakContent = content;
                     }
-                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_SCRIPT, speakContent);
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SCRIPT, speakContent);
 
                     break;
                 case ScriptConfig.SCRIPT_SPEAK://说话
                     Log.i("netty", "doScriptAction() 说话");
                     ScriptManager.setScriptActionInfos(infos);
-                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_SCRIPT, content);
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SCRIPT, content);
 
                     break;
                 case ScriptConfig.SCRIPT_HAND://手
@@ -193,8 +193,8 @@ public class ScriptHandler implements Script {
 
     //表演剧本之前
     public static void playScriptStart(Context context) {
-        SpeechlHandle.cancelSpeak();
-        SpeechlHandle.cancelListen();
+        SpeechImpl.getInstance().cancelSpeak();
+        SpeechImpl.getInstance().cancelListen();
         BroadcastEnclosure.stopMusic(context);
         BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_OFF);
     }
@@ -372,7 +372,7 @@ public class ScriptHandler implements Script {
                     DataConfig.isScriptQA = false;
                     scriptSpeak(context);
                 } else {//回答错误
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                 }
             }
         }

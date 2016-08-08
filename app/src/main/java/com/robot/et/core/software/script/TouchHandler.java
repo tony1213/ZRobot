@@ -5,11 +5,11 @@ import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.EmotionEnum;
-import com.robot.et.util.SpeechlHandle;
+import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.util.BroadcastEnclosure;
 
 /**
  * Created by houdeming on 2016/7/16.
@@ -33,14 +33,14 @@ public class TouchHandler {
                     case TOUCH_HEAD://头
                         Log.i("netty", "头");
                         content = "摸摸我的头，感觉头变小了呢";
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                         break;
                     case TOUCH_EYE://眼睛
                         Log.i("netty", "眼睛key===" + EmotionEnum.EMOTION_BLINK_TWO.getEmotionKey());
                         BroadcastEnclosure.controlRobotEmotion(context, EmotionEnum.EMOTION_BLINK_TWO.getEmotionKey());
                         content = "看我眼睛大，你是不是很羡慕呢，嘿嘿";
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                         break;
                     case TOUCH_HAND_LEFT://左手
@@ -56,13 +56,13 @@ public class TouchHandler {
                     case TOUCH_BELLY://肚子
                         Log.i("netty", "肚子");
                         content = "看我肚子这么大，你有木有羡慕呢，哈哈";
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                         break;
                     case TOUCH_HAND_FOOT://脚
                         Log.i("netty", "脚");
                         content = "好久没人给我挠痒痒了呢，嘿嘿";
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                         break;
                     default:
@@ -80,7 +80,7 @@ public class TouchHandler {
         BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
         SystemClock.sleep(2000);
         BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
-        SpeechlHandle.startListen();
+        SpeechImpl.getInstance().startListen();
     }
 
 }

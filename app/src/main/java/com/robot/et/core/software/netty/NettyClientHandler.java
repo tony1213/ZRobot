@@ -8,6 +8,7 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.script.TouchHandler;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -19,7 +20,6 @@ import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;
 import com.robot.et.util.RobotLearnManager;
-import com.robot.et.util.SpeechlHandle;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -137,7 +137,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                 case RequestConfig.JPUSH_PAUSE:// 音乐暂停
                     Log.i("netty", "音乐暂停");
                     DataConfig.isJpushStop = true;
-                    SpeechlHandle.cancelSpeak();
+                    SpeechImpl.getInstance().cancelSpeak();
                     BroadcastEnclosure.stopMusic(context);
 
                     break;
@@ -254,12 +254,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
         if (DataConfig.isVideoOrVoice) {
             return;
         }
-        SpeechlHandle.cancelSpeak();
+        SpeechImpl.getInstance().cancelSpeak();
         BroadcastEnclosure.stopMusic(context);
-        SpeechlHandle.cancelListen();
+        SpeechImpl.getInstance().cancelListen();
         DataConfig.isJpushPlayMusic = true;
         String speakContent = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_JPUSH, mediaType, musicName);
-        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, speakContent);
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, speakContent);
     }
 
     @Override

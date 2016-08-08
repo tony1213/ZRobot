@@ -13,6 +13,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
+import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.netty.NettyClientHandler;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -26,7 +27,6 @@ import com.robot.et.util.EnumManager;
 import com.robot.et.util.FaceManager;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.RobotLearnManager;
-import com.robot.et.util.SpeechlHandle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +79,7 @@ public class CommandHandler {
             String content = info.getAnswer();//回答的话语
             boolean flag = false;
             if (!TextUtils.isEmpty(content)) {
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
                 flag = true;
             }
             return flag;
@@ -90,61 +90,61 @@ public class CommandHandler {
             case VOICE_BIGGEST_SCENE:// 声音最大
                 flag = true;
                 MediaManager.getInstance(context).setMaxVolume();
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最大");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最大");
 
                 break;
             case VOICE_LITTEST_SCENE:// 声音最小
                 flag = true;
                 MediaManager.getInstance(context).setCurrentVolume(6);
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最小");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最小");
 
                 break;
             case VOICE_BIGGER_INDIRECT_SCENE:// 间接增加声音
                 flag = true;
                 MediaManager.getInstance(context).increaseVolume();
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
 
                 break;
             case VOICE_LITTER_INDIRECT_SCENE://间接降低声音
                 flag = true;
                 MediaManager.getInstance(context).reduceVolume();
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
 
                 break;
             case VOICE_BIGGER_SCENE:// 直接增加声音
                 flag = true;
                 MediaManager.getInstance(context).increaseVolume();
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
 
                 break;
             case VOICE_LITTER_SCENE://直接降低声音
                 flag = true;
                 MediaManager.getInstance(context).reduceVolume();
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
 
                 break;
             case QUESTION_ANSWER_SCENE:// 智能学习回答话语
                 flag = true;
                 String content = RobotLearnManager.learnBySpeak(context, DataConfig.LEARN_BY_ROBOT, result);
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                 break;
             case DISTURB_OPEN_SCENE:// 免打扰开
                 flag = true;
                 HttpManager.changeRobotCallStatus(DataConfig.ROBOT_STATUS_DISYURB_NOT);
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，进入免打扰模式");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，进入免打扰模式");
 
                 break;
             case DISTURB_CLOSE_SCENE:// 免打扰关
                 flag = true;
                 HttpManager.changeRobotCallStatus(DataConfig.ROBOT_STATUS_NORMAL);
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，免打扰模式已关闭");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，免打扰模式已关闭");
 
                 break;
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
                 DataConfig.isSleep = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的,我去玩去了");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的,我去玩去了");
                 Intent intent = new Intent();
                 intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
                 context.sendBroadcast(intent);
@@ -160,7 +160,7 @@ public class CommandHandler {
                 int toyCarNum = MatchStringUtil.getToyCarNum(result);
                 Log.i("ifly", "toyCarNum=====" + toyCarNum);
                 setToyCarNum(toyCarNum);
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
 
                 break;
             case RAISE_HAND_SCENE:// 抬手
@@ -175,13 +175,13 @@ public class CommandHandler {
                 break;
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
                 flag = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                 HttpManager.pushMsgToApp("开", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
             case CLOSE_HOUSEHOLD_SCENE:// 关闭家电
                 flag = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                 HttpManager.pushMsgToApp("关", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
 
                 break;
@@ -193,7 +193,7 @@ public class CommandHandler {
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
                         FaceManager.addFaceInfo(context, faceName);
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
 
                     } else {
                         flag = false;
@@ -205,7 +205,7 @@ public class CommandHandler {
                 break;
             case FACE_TEST_SCENE:// 脸部识别
                 flag = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "让我看看你");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "让我看看你");
                 BroadcastEnclosure.openFaceRecognise(context, true);
 
                 break;
@@ -226,9 +226,9 @@ public class CommandHandler {
                 if (DataConfig.isControlToyCar) {//控制小车
                     DataConfig.controlNum = 0;
                     BroadcastEnclosure.controlToyCarMove(context, moveKey, getToyCarNum());
-                    SpeechlHandle.startListen();
+                    SpeechImpl.getInstance().startListen();
                 } else {//控制机器人
-                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
                     sendMoveAction(moveKey);
                 }
                 return true;
@@ -246,7 +246,7 @@ public class CommandHandler {
                 if (result.contains(question) || question.contains(result)) {
                     String[] answers = context.getResources().getStringArray(R.array.custom_answer);
                     if (answers != null && answers.length > 0) {
-                        SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, answers[i]);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answers[i]);
                         return true;
                     }
                 }
@@ -312,7 +312,7 @@ public class CommandHandler {
             num++;
             if (num == 150) {
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
-                SpeechlHandle.startListen();
+                SpeechImpl.getInstance().startListen();
                 return;
             }
         }
@@ -346,7 +346,7 @@ public class CommandHandler {
                 if (result.contains(answer)) {//回答正确
                     DataConfig.isAppPushRemind = false;
                     DataConfig.isStartTime = false;
-                    SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_CHAT, "嘿嘿，我可以去玩喽");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "嘿嘿，我可以去玩喽");
                 } else {//回答错误
                     doAppRemindNoResponse();
                 }
@@ -358,8 +358,8 @@ public class CommandHandler {
     private void doAppRemindNoResponse() {
         DataConfig.isAppPushRemind = false;
         DataConfig.isStartTime = false;
-        SpeechlHandle.cancelSpeak();
-        SpeechlHandle.cancelListen();
+        SpeechImpl.getInstance().cancelSpeak();
+        SpeechImpl.getInstance().cancelListen();
         int type = AlarmRemindManager.getSpareType();
         if (type != 0) {
             List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
@@ -370,7 +370,7 @@ public class CommandHandler {
             DataConfig.isPlayScript = false;
             ScriptHandler.doScriptAction(context, infos);
         } else {
-            SpeechlHandle.startListen();
+            SpeechImpl.getInstance().startListen();
         }
     }
 

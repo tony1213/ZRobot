@@ -54,9 +54,9 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
-        <service android:name=".core.software.iflytek.impl.IflySpeakService" />
-        <service android:name=".core.software.iflytek.impl.IflyTextUnderstanderService" />
-        <service android:name=".core.software.iflytek.impl.IflyVoiceToTextService" />
+        <service android:name=".core.software.iflytek.IflySpeakService" />
+        <service android:name=".core.software.iflytek.IflyTextUnderstanderService" />
+        <service android:name=".core.software.iflytek.IflyVoiceToTextService" />
         <service android:name=".core.software.turing.TuRingService" />
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
