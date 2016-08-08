@@ -205,7 +205,8 @@ public class CommandHandler {
                 break;
             case FACE_TEST_SCENE:// 脸部识别
                 flag = true;
-                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_FACE_DETECTOR, "让我看看你");
+                SpeechlHandle.startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "让我看看你");
+                BroadcastEnclosure.openFaceRecognise(context, true);
 
                 break;
 

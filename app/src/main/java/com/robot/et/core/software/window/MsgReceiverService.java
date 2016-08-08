@@ -107,10 +107,6 @@ public class MsgReceiverService extends Service {
                     return;
                 }
 
-                SpeechlHandle.cancelSpeak();
-                SpeechlHandle.cancelListen();
-                BroadcastEnclosure.stopMusic(MsgReceiverService.this);
-
                 intent.setClass(MsgReceiverService.this, FaceDetectorActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(MsgReceiverService.this).getFaceInfos());

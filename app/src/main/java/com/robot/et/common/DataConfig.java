@@ -58,8 +58,6 @@ public class DataConfig {
     public final static int SPEAK_TYPE_MUSIC_START = 2;
     //什么都不做
     public final static int SPEAK_TYPE_DO_NOTHINF = 3;
-    //打开脸部识别
-    public final static int SPEAK_TYPE_FACE_DETECTOR = 4;
     //闹铃提醒
     public static final int SPEAK_TYPE_REMIND_TIPS = 5;
     //欢迎语

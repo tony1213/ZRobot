@@ -34,6 +34,7 @@ public class ScriptHandler implements Script {
             Log.i("netty", "playScript() infos.size()====" + infos.size());
             if (infos != null && infos.size() > 0) {
                 DataConfig.isPlayScript = true;
+                DataConfig.isSleep = false;
                 doScriptAction(context, infos);
             }
         }

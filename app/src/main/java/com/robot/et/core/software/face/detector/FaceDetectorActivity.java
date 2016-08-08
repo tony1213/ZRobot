@@ -21,13 +21,9 @@ import android.os.Bundle;
 import android.os.Process;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -41,11 +37,11 @@ import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.util.FaceManager;
 import com.robot.et.core.software.face.util.FaceRect;
 import com.robot.et.core.software.face.util.FaceUtil;
 import com.robot.et.core.software.face.util.ParseResult;
 import com.robot.et.entity.FaceInfo;
+import com.robot.et.util.FaceManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -140,45 +136,7 @@ public class FaceDetectorActivity extends Activity {
         mPreviewSurface.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mFaceSurface.setZOrderOnTop(true);
         mFaceSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        // 点击SurfaceView，切换摄相头
-        mFaceSurface.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Camera.getNumberOfCameras() == 1) {
-                    Log.i("face", "只有后置摄像头，不能切换");
-                    return;
-                }
-                closeCamera();
-                if (CameraInfo.CAMERA_FACING_FRONT == mCameraId) {
-                    mCameraId = CameraInfo.CAMERA_FACING_BACK;
-                } else {
-                    mCameraId = CameraInfo.CAMERA_FACING_FRONT;
-                }
-                openCamera();
-            }
-        });
 
-        // 长按SurfaceView 500ms后松开，摄相头聚集
-        mFaceSurface.setOnTouchListener(new OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        mLastClickTime = System.currentTimeMillis();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        if (System.currentTimeMillis() - mLastClickTime > 500) {
-                            mCamera.autoFocus(null);
-                            return true;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                return false;
-            }
-        });
         setSurfaceSize();
     }
 
@@ -187,7 +145,7 @@ public class FaceDetectorActivity extends Activity {
             return;
         }
         if (!checkCameraPermission()) {
-            Log.e("face", "摄像头权限未打开，请打开后再试");
+            Log.i("face", "摄像头权限未打开，请打开后再试");
             mStopTrack = true;
             return;
         }
@@ -285,12 +243,11 @@ public class FaceDetectorActivity extends Activity {
                         /**
                          * 离线视频流检测功能需要单独下载支持离线人脸的SDK 请开发者前往语音云官网下载对应SDK
                          */
-                        Log.e("face", "本SDK不支持离线视频流检测");
+                        Log.i("face", "本SDK不支持离线视频流检测");
                         break;
                     }
 
                     String result = mFaceDetector.trackNV21(buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, isAlign, direction);
-                    Log.i("face", "result:" + result);
 
                     FaceRect[] faces = ParseResult.parseResult(result);
 
@@ -303,7 +260,7 @@ public class FaceDetectorActivity extends Activity {
                     canvas.setMatrix(mScaleMatrix);
 
                     if (faces.length <= 0) {
-                        noFaceCount ++;
+                        noFaceCount++;
                         if (noFaceCount >= 280) {
                             sendMsg("没有看见主人，人家好伤心呢。", false);
                             finish();
@@ -324,14 +281,14 @@ public class FaceDetectorActivity extends Activity {
                             FaceUtil.drawFaceRect(canvas, face, PREVIEW_WIDTH, PREVIEW_HEIGHT, frontCamera, false);
                         }
                         //检测到一个人脸
-                        Log.d("face", "faces.length==" + faces.length);
+                        Log.i("face", "faces.length==" + faces.length);
                         if (faces.length == 1) {
                             mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
                             noFaceCount = 0;
                             handleFace(mImageData, faceInfos);
                         }
                     } else {
-                        Log.d("FaceDetector", "faces:0");
+                        Log.i("face", "faces===0");
                     }
                     mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
 
@@ -442,7 +399,7 @@ public class FaceDetectorActivity extends Activity {
         @Override
         public void onCompleted(SpeechError error) {
             if (error != null) {
-                testCount ++;
+                testCount++;
                 if (testCount < 5) {
                     testFace();
                 } else {

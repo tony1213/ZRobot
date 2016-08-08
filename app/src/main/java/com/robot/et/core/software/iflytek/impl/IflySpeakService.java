@@ -162,9 +162,6 @@ public class IflySpeakService extends Service implements SpeechSynthesis {
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 //do nothing
                 break;
-            case DataConfig.SPEAK_TYPE_FACE_DETECTOR://脸部识别
-                BroadcastEnclosure.openFaceRecognise(this, true);
-                break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 if (DataConfig.isAppPushRemind) {
                     SpeechlHandle.startListen();
