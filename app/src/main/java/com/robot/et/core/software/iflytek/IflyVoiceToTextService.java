@@ -252,6 +252,7 @@ public class IflyVoiceToTextService extends SpeechService {
         super.startListen();
         stopTimer();
         isFirstListen = false;
+        DataConfig.isSleep = false;
 
         beginListen();
     }

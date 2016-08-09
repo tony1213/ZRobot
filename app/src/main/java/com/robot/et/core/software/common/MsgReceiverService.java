@@ -107,6 +107,8 @@ public class MsgReceiverService extends Service {
                     return;
                 }
 
+                SpeechImpl.getInstance().cancelListen();
+
                 intent.setClass(MsgReceiverService.this, FaceDetectorActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(MsgReceiverService.this).getFaceInfos());
