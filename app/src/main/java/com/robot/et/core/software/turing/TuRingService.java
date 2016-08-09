@@ -33,6 +33,7 @@ public class TuRingService extends BaseService {
     public void onCreate() {
         super.onCreate();
         Log.i("turing", "TuRingService  onCreate()");
+        SpeechImpl.setService(this);
 
         initTuringSDK();
 

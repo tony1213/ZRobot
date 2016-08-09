@@ -51,6 +51,7 @@ public class IflyVoiceToTextService extends BaseService {
         Log.i("ifly", "IflyVoiceToTextService  onCreate()");
         // 初始化SpeechRecognizer对象
         mIat = SpeechRecognizer.createRecognizer(this, mTtsInitListener);
+        SpeechImpl.setService(this);
         commandHandler = new CommandHandler(this);
 
         uploadUserThesaurus();//上传词表

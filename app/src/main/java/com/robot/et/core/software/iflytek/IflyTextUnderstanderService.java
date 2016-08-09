@@ -48,6 +48,7 @@ public class IflyTextUnderstanderService extends BaseService {
         super.onCreate();
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
         mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
+        SpeechImpl.setService(this);
 
         SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
         city = share.getString(SharedPreferencesKeys.CITY_KEY, "");

@@ -14,18 +14,6 @@ public class BaseService extends Service {
         return null;
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        SpeechImpl.setService(this);
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     public void startSpeak(int speakType, String speakContent) {
     }
 

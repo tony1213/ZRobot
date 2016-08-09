@@ -1,11 +1,19 @@
 package com.robot.et.core.software.base;
 
+import com.robot.et.core.software.iflytek.IflySpeakService;
+import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
+import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
+import com.robot.et.core.software.turing.TuRingService;
+
 /**
  * Created by houdeming on 2016/8/8.
  */
 public class SpeechImpl implements Speech {
-    private static BaseService service;
     private static SpeechImpl instance = null;
+    private static IflySpeakService speakService;
+    private static IflyVoiceToTextService voiceToTextService;
+    private static IflyTextUnderstanderService understanderService;
+    private static TuRingService tuRingService;
 
     private SpeechImpl() {
     }
@@ -23,58 +31,60 @@ public class SpeechImpl implements Speech {
 
     @Override
     public void startSpeak(int speakType, String speakContent) {
-        BaseService service = getService();
-        if (service != null) {
-            service.startSpeak(speakType, speakContent);
+        if (speakService != null) {
+            speakService.startSpeak(speakType, speakContent);
         }
     }
 
     @Override
     public void cancelSpeak() {
-        BaseService service = getService();
-        if (service != null) {
-            service.cancelSpeak();
+        if (speakService != null) {
+            speakService.cancelSpeak();
         }
     }
 
     @Override
     public void startListen() {
-        BaseService service = getService();
-        if (service != null) {
-            service.startListen();
+        if (voiceToTextService != null) {
+            voiceToTextService.startListen();
         }
     }
 
     @Override
     public void cancelListen() {
-        BaseService service = getService();
-        if (service != null) {
-            service.cancelListen();
+        if (voiceToTextService != null) {
+            voiceToTextService.cancelListen();
         }
     }
 
     @Override
     public void understanderTextByIfly(String content) {
-        BaseService service = getService();
-        if (service != null) {
-            service.understanderTextByIfly(content);
+        if (understanderService != null) {
+            understanderService.understanderTextByIfly(content);
         }
     }
 
     @Override
     public void understanderTextByTuring(String content) {
-        BaseService service = getService();
-        if (service != null) {
-            service.understanderTextByTuring(content);
+        if (tuRingService != null) {
+            tuRingService.understanderTextByTuring(content);
         }
     }
 
-    public static void setService(BaseService service) {
-        SpeechImpl.service = service;
+    public static void setService(IflySpeakService service) {
+        SpeechImpl.speakService = service;
     }
 
-    public static BaseService getService() {
-        return service;
+    public static void setService(IflyVoiceToTextService service) {
+        SpeechImpl.voiceToTextService = service;
+    }
+
+    public static void setService(IflyTextUnderstanderService service) {
+        SpeechImpl.understanderService = service;
+    }
+
+    public static void setService(TuRingService service) {
+        SpeechImpl.tuRingService = service;
     }
 
 }

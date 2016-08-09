@@ -43,6 +43,7 @@ public class IflySpeakService extends BaseService {
         Log.i("ifly", "IflySpeakService  onCreate()");
         // 初始化合成对象
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
+        SpeechImpl.setService(this);
 
         //记录位置
         share = SharedPreferencesUtils.getInstance();
