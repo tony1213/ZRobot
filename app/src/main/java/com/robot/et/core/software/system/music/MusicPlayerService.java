@@ -16,7 +16,7 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.netty.NettyClientHandler;
-import com.robot.et.core.software.script.ScriptHandler;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;

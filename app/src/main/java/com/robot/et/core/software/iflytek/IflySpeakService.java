@@ -17,7 +17,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.SpeechService;
 import com.robot.et.core.software.common.SpeechImpl;
-import com.robot.et.core.software.script.ScriptHandler;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;

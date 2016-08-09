@@ -13,7 +13,7 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
-import com.robot.et.core.software.script.ScriptHandler;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.BroadcastEnclosure;
 

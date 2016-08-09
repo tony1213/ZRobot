@@ -15,7 +15,7 @@ import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.common.SpeechImpl;
 import com.robot.et.core.software.netty.NettyClientHandler;
-import com.robot.et.core.software.script.ScriptHandler;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.entity.LearnAnswerInfo;

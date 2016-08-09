@@ -1,4 +1,4 @@
-package com.robot.et.core.software.script;
+package com.robot.et.core.software.common.script;
 
 import android.content.Context;
 

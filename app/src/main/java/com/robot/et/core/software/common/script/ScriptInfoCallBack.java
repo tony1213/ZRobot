@@ -1,4 +1,4 @@
-package com.robot.et.core.software.script;
+package com.robot.et.core.software.common.script;
 
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
