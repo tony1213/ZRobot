@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.common.SpeechService;
-import com.robot.et.core.software.common.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechService;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.turing.androidsdk.InitListener;
 import com.turing.androidsdk.SDKInit;
 import com.turing.androidsdk.SDKInitBuilder;

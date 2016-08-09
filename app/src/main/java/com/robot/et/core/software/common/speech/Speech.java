@@ -1,4 +1,4 @@
-package com.robot.et.core.software.common;
+package com.robot.et.core.software.common.speech;
 
 /**
  * Created by houdeming on 2016/8/8.

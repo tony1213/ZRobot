@@ -12,6 +12,7 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.db.RobotDB;

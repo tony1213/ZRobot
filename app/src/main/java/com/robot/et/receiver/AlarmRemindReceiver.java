@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.common.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.system.alarm.AlarmClock;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.util.AlarmRemindManager;

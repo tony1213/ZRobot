@@ -8,7 +8,7 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.common.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.system.media.MediaManager;
