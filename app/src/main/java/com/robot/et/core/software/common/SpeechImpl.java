@@ -1,4 +1,4 @@
-package com.robot.et.core.software.base;
+package com.robot.et.core.software.common;
 
 import com.robot.et.core.software.iflytek.IflySpeakService;
 import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;

@@ -1,4 +1,4 @@
-package com.robot.et.core.software.base;
+package com.robot.et.core.software.common;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.os.IBinder;
 /**
  * Created by houdeming on 2016/8/8.
  */
-public class BaseService extends Service {
+public class SpeechService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {

@@ -16,12 +16,12 @@ import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.SceneServiceEnum;
-import com.robot.et.core.software.base.BaseService;
-import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.core.software.common.SpeechService;
+import com.robot.et.core.software.common.SpeechImpl;
 import com.robot.et.core.software.iflytek.util.PhoneManager;
 import com.robot.et.core.software.iflytek.util.ResultParse;
-import com.robot.et.core.software.window.network.HttpManager;
-import com.robot.et.core.software.window.network.VoicePhoneCallBack;
+import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.network.VoicePhoneCallBack;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.MusicManager;
@@ -31,7 +31,7 @@ import com.robot.et.util.SharedPreferencesUtils;
 import org.json.JSONObject;
 
 //科大讯飞文本理解
-public class IflyTextUnderstanderService extends BaseService {
+public class IflyTextUnderstanderService extends SpeechService {
 
     private TextUnderstander mTextUnderstander;
     private String underStandContent;

@@ -60,7 +60,7 @@
         <service android:name=".core.software.turing.TuRingService" />
         <service android:name=".core.software.system.music.MusicPlayerService" />
         <service android:name=".core.hardware.wakeup.WakeUpServices"/>
-        <service android:name=".core.software.window.MsgReceiverService"/>
+        <service android:name=".core.software.common.MsgReceiverService"/>
         <service android:name=".core.software.netty.NettyService"/>
         <service android:name=".core.hardware.move.ControlMoveService"/>
         <service android:name=".core.software.agora.AgoraService"/>

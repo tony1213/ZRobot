@@ -1,4 +1,4 @@
-package com.robot.et.core.software.window;
+package com.robot.et.core.software.common;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -12,7 +12,6 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.base.SpeechImpl;
 import com.robot.et.core.software.face.detector.FaceDetectorActivity;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.db.RobotDB;

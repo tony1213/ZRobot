@@ -19,8 +19,8 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.base.BaseService;
-import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.core.software.common.SpeechService;
+import com.robot.et.core.software.common.SpeechImpl;
 import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
@@ -30,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class IflyVoiceToTextService extends BaseService {
+public class IflyVoiceToTextService extends SpeechService {
     // 语音听写对象
     private SpeechRecognizer mIat;
     // 用HashMap存储听写结果

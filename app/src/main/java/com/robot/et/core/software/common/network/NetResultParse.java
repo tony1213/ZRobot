@@ -1,4 +1,4 @@
-package com.robot.et.core.software.window.network;
+package com.robot.et.core.software.common.network;
 
 import android.text.TextUtils;
 import android.util.Log;

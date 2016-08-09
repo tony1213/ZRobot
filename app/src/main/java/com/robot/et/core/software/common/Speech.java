@@ -1,4 +1,4 @@
-package com.robot.et.core.software.base;
+package com.robot.et.core.software.common;
 
 /**
  * Created by houdeming on 2016/8/8.

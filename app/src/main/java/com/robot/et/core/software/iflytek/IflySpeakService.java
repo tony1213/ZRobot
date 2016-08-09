@@ -15,8 +15,8 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.base.BaseService;
-import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.core.software.common.SpeechService;
+import com.robot.et.core.software.common.SpeechImpl;
 import com.robot.et.core.software.script.ScriptHandler;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -25,7 +25,7 @@ import com.robot.et.util.MusicManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
-public class IflySpeakService extends BaseService {
+public class IflySpeakService extends SpeechService {
     // 语音合成对象
     private SpeechSynthesizer mTts;
     private int currentType;

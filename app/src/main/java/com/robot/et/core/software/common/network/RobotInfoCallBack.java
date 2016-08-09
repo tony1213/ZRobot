@@ -1,4 +1,4 @@
-package com.robot.et.core.software.window.network;
+package com.robot.et.core.software.common.network;
 
 import com.robot.et.entity.RobotInfo;
 

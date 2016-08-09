@@ -20,7 +20,7 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.core.software.common.SpeechImpl;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 import com.robot.et.util.Utilities;

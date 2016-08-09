@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.base.BaseService;
-import com.robot.et.core.software.base.SpeechImpl;
+import com.robot.et.core.software.common.SpeechService;
+import com.robot.et.core.software.common.SpeechImpl;
 import com.turing.androidsdk.InitListener;
 import com.turing.androidsdk.SDKInit;
 import com.turing.androidsdk.SDKInitBuilder;
@@ -20,7 +20,7 @@ import turing.os.http.core.ErrorMessage;
 import turing.os.http.core.HttpConnectionListener;
 import turing.os.http.core.RequestResult;
 
-public class TuRingService extends BaseService {
+public class TuRingService extends SpeechService {
 
     private TuringApiManager mTuringApiManager;
 

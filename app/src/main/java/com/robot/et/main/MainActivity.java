@@ -15,7 +15,7 @@ import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
 import com.robot.et.core.software.netty.NettyService;
 import com.robot.et.core.software.system.music.MusicPlayerService;
 import com.robot.et.core.software.turing.TuRingService;
-import com.robot.et.core.software.window.MsgReceiverService;
+import com.robot.et.core.software.common.MsgReceiverService;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeMainExecutor;
