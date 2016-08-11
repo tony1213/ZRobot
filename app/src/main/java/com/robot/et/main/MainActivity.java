@@ -16,6 +16,8 @@ import com.robot.et.core.software.netty.NettyService;
 import com.robot.et.core.software.system.music.MusicPlayerService;
 import com.robot.et.core.software.turing.TuRingService;
 import com.robot.et.core.software.common.MsgReceiverService;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeMainExecutor;
@@ -34,6 +36,12 @@ public class MainActivity extends RosActivity {
         setContentView(R.layout.activity_main);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        //记录城市、区域位置
+        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+        share.putString(SharedPreferencesKeys.CITY_KEY, "上海市");
+        share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
+        share.commitValue();
 
     }
 

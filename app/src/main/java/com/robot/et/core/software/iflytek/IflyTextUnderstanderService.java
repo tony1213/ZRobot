@@ -16,17 +16,15 @@ import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.SceneServiceEnum;
-import com.robot.et.core.software.common.speech.SpeechService;
-import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.iflytek.util.PhoneManager;
-import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
+import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechService;
+import com.robot.et.core.software.iflytek.util.PhoneManager;
+import com.robot.et.core.software.iflytek.util.ResultParse;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.MusicManager;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
 
 import org.json.JSONObject;
 
@@ -35,8 +33,6 @@ public class IflyTextUnderstanderService extends SpeechService {
 
     private TextUnderstander mTextUnderstander;
     private String underStandContent;
-    private String city;
-    private String area;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -49,10 +45,6 @@ public class IflyTextUnderstanderService extends SpeechService {
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
         mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
         SpeechImpl.setService(this);
-
-        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-        city = share.getString(SharedPreferencesKeys.CITY_KEY, "");
-        area = share.getString(SharedPreferencesKeys.AREA_KEY, "");
 
     }
 
@@ -317,6 +309,7 @@ public class IflyTextUnderstanderService extends SpeechService {
     @Override
     public void understanderTextByIfly(String content) {
         super.understanderTextByIfly(content);
+        Log.i("ifly", "IflyTextUnderstanderService understanderTextByIfly===" + content);
         if (!TextUtils.isEmpty(content)) {
             underStandContent = content;
             textUnderstander(content);

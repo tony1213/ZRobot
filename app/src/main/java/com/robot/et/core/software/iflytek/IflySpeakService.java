@@ -15,22 +15,19 @@ import com.iflytek.cloud.SynthesizerListener;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.common.speech.SpeechService;
-import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechService;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;
 import com.robot.et.util.MusicManager;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
 
 public class IflySpeakService extends SpeechService {
     // 语音合成对象
     private SpeechSynthesizer mTts;
     private int currentType;
     private boolean isFirstSetParam;
-    private SharedPreferencesUtils share;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -45,13 +42,9 @@ public class IflySpeakService extends SpeechService {
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechImpl.setService(this);
 
-        //记录位置
-        share = SharedPreferencesUtils.getInstance();
-        share.putString(SharedPreferencesKeys.CITY_KEY, "台州市");
-        share.putString(SharedPreferencesKeys.AREA_KEY, "椒江区");
-        share.commitValue();
-
+        //入口，说欢迎语
         startSpeak(DataConfig.SPEAK_TYPE_WELCOME, getWelcomeContent());
+
     }
 
     @Override
@@ -171,7 +164,7 @@ public class IflySpeakService extends SpeechService {
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
-                String weatherContent = "今天" + share.getString(SharedPreferencesKeys.CITY_KEY, "") + share.getString(SharedPreferencesKeys.AREA_KEY, "") + "天气";
+                String weatherContent = "今天" + city + area + "的天气";
                 SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
                 break;
             case DataConfig.SPEAK_TYPE_SCRIPT://剧本对话

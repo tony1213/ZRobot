@@ -196,7 +196,7 @@ public class ResultParse {
 
     //获取天气
     public static String getWeatherData(JSONObject jObject, String city, String area) {
-        String json = "";
+        String content = "";
         try {
             JSONObject object1 = jObject.getJSONObject("semantic");
             JSONObject object2 = object1.getJSONObject("slots");
@@ -216,63 +216,55 @@ public class ResultParse {
 
             JSONObject jsonObject = jObject.getJSONObject("data");
             JSONArray dataArray = jsonObject.getJSONArray("result");
-            List<String> weathers = new ArrayList<String>();
-            List<String> weathersUnKnow = new ArrayList<String>();
-            for (int i = 0; i < dataArray.length(); i++) {
-                JSONObject object = dataArray.getJSONObject(i);
-                String airQuality = object.getString("airQuality");// 空气质量
-                String wind = object.getString("wind");// 风向以及风力
-                String weather = object.getString("weather");// 天气现象
-                String tempRange = object.getString("tempRange");// 气温范围25℃~19℃
-                String content = "";
-                if (city.contains(iflyCity)) {// 是当前城市
-                    if (!TextUtils.isEmpty(iflyArea)) {
-                        content = time + iflyCity + iflyArea;
-                    } else {
-                        content = time + iflyCity + area;
-                    }
-                } else {// 不是当前城市
-                    if (!TextUtils.isEmpty(iflyArea)) {
-                        content = time + iflyCity + iflyArea;
-                    } else {
-                        if (TextUtils.equals(iflyCity, "CURRENT_CITY")) {
-                            json = time;
-                            return json;
-                        } else {
-                            content = time + iflyCity;
-                        }
 
-                    }
-                }
-                content = content + "天气：" + weather + ",空气质量：" + airQuality + ",风力：" + wind + ",气温：" + tempRange + ",";
+            //天气返回的是json数组，默认使用第一个（提高解析效率）备注：第一条数据字段是最全面的。
+            JSONObject object = dataArray.getJSONObject(0);
+            String airQuality = "";
+            if (object.has("airQuality")) {
+                airQuality = object.getString("airQuality");// 空气质量
+            }
+            String wind = object.getString("wind");// 风向以及风力
+            String weather = object.getString("weather");// 天气现象
+            String tempRange = object.getString("tempRange");// 气温范围25℃~19℃
+            String pmValue = "";
+            if (object.has("pm25")) {
+                pmValue = object.getString("pm25");// 空气质量
+            }
 
-                if (!TextUtils.equals(airQuality, "未知")) {
-                    weathers.add(content);
+            if (city.contains(iflyCity)) {// 是当前城市
+                if (!TextUtils.isEmpty(iflyArea)) {
+                    content = time + iflyCity + iflyArea;
                 } else {
-                    weathersUnKnow.add(content);
+                    content = time + iflyCity + area;
+                }
+            } else {// 不是当前城市
+                if (!TextUtils.isEmpty(iflyArea)) {
+                    content = time + iflyCity + iflyArea;
+                } else {
+                    if (TextUtils.equals(iflyCity, "CURRENT_CITY")) {
+                        content = time;
+                        return content;
+                    } else {
+                        content = time + iflyCity;
+                    }
+
                 }
             }
 
-            int size = weathers.size();
-            if (weathers != null && size > 0) {
-                Random random = new Random();
-                int randNum = random.nextInt(size);
-                json = weathers.get(randNum);
-            } else if (weathersUnKnow != null && weathersUnKnow.size() > 0) {
-                int sizes = weathersUnKnow.size();
-                for (int i = 0; i < sizes; i++) {
-                    Random random = new Random();
-                    int randNum = random.nextInt(sizes);
-                    json = weathersUnKnow.get(randNum);
-                }
+            if (TextUtils.isEmpty(airQuality)) {
+                content = content + "天气：" + weather + ",风力：" + wind + ",气温：" + tempRange;
             } else {
-                json = "";
+                content = content + "天气：" + weather + ",空气质量：" + airQuality + ",风力：" + wind + ",气温：" + tempRange;
+            }
+
+            if (!TextUtils.isEmpty(pmValue)) {
+                content = content + ",pm值：" + pmValue;
             }
 
         } catch (JSONException e) {
             Log.i(TAG, "getWeatherData  JSONException");
         }
-        return json;
+        return content;
     }
 
     //获取打电话
@@ -296,7 +288,7 @@ public class ResultParse {
 
     //获取空气质量
     public static String getPm25Data(JSONObject jObject, String city, String area) {
-        String json = "";
+        String content = "";
         try {
             JSONObject json1 = jObject.getJSONObject("semantic");
             JSONObject json2 = json1.getJSONObject("slots");
@@ -309,46 +301,33 @@ public class ResultParse {
 
             JSONObject jsonObject = jObject.getJSONObject("data");
             JSONArray dataArray = jsonObject.getJSONArray("result");
-            List<String> weathers = new ArrayList<String>();
 
-            for (int i = 0; i < dataArray.length(); i++) {
-                JSONObject object = dataArray.getJSONObject(i);
-                String pmValue = object.getString("pm25");// pm值
-                String weather = object.getString("quality");// 空气质量
-                String aqi = object.getString("aqi");// 空气质量指数
+            //空气质量返回的是json数组，默认使用第一个（提高解析效率）备注：第一条数据比较准确。
+            JSONObject object = dataArray.getJSONObject(0);
+            String pmValue = object.getString("pm25");// pm值
+            String weather = object.getString("quality");// 空气质量
+            String aqi = object.getString("aqi");// 空气质量指数
 
-                String content = "";
-
-                if (city.contains(iflyCity)) {// 是当前城市
-                    if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
-                        content = iflyCity + iflyArea;
-                    } else {// 没有返回区
-                        content = iflyCity + area;
-                    }
-                } else {// 不是当前城市
-                    if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
-                        content = iflyCity + iflyArea;
-                    } else {// 没有返回区
-                        content = iflyCity;
-                    }
+            if (city.contains(iflyCity)) {// 是当前城市
+                if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
+                    content = iflyCity + iflyArea;
+                } else {// 没有返回区
+                    content = iflyCity + area;
                 }
-
-                content = content + "pm值：" + pmValue + ",空气质量指数：" + aqi + ",空气质量：" + weather;
-                weathers.add(content);
+            } else {// 不是当前城市
+                if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
+                    content = iflyCity + iflyArea;
+                } else {// 没有返回区
+                    content = iflyCity;
+                }
             }
 
-            int size = weathers.size();
-            if (weathers != null && size > 0) {
-                Random random = new Random();
-                int randNum = random.nextInt(size);
-                json = weathers.get(randNum);
-            } else {
-                json = "";
-            }
+            content = content + "pm值：" + pmValue + ",空气质量：" + weather + ",空气质量指数：" + aqi;
+
         } catch (JSONException e) {
             Log.i(TAG, "getPm25Data  JSONException");
         }
-        return json;
+        return content;
     }
 
 }
