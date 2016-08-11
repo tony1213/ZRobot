@@ -57,12 +57,6 @@ public class ResultParse {
                 JSONArray items = words.getJSONObject(i).getJSONArray("cw");
                 JSONObject obj = items.getJSONObject(0);
                 ret.append(obj.getString("w"));
-                // 如果需要多候选结果，解析数组其他字段
-                // for(int j = 0; j < items.length(); j++)
-                // {
-                // JSONObject obj = items.getJSONObject(j);
-                // ret.append(obj.getString("w"));
-                // }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,36 +100,24 @@ public class ResultParse {
 
     //获取菜谱
     public static String getCookBookData(JSONObject jObject) {
-        String json = "";
+        String content = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("data");
             JSONArray cookArray = jsonObject.getJSONArray("result");
-            List<String> cooks = new ArrayList<String>();
-            for (int i = 0; i < cookArray.length(); i++) {
-                JSONObject object = cookArray.getJSONObject(i);
-                String ingredient = object.getString("ingredient");// 主要材料
-                String accessory = object.getString("accessory");// 辅助材料
-                String content = "";
-                if (!TextUtils.isEmpty(ingredient) && TextUtils.isEmpty(accessory)) {
-                    content = "主料：" + ingredient;
-                } else if (TextUtils.isEmpty(ingredient) && !TextUtils.isEmpty(accessory)) {
-                    content = "辅料：" + accessory;
-                } else if (!TextUtils.isEmpty(ingredient) && !TextUtils.isEmpty(accessory)) {
-                    content = "主料：" + ingredient + "辅料：" + accessory;
-                }
-                cooks.add(content);
+            //菜谱返回的是json数组，默认使用第一个（提高解析效率）备注：第一条数据比较准确。
+            JSONObject object = cookArray.getJSONObject(0);
+            String ingredient = object.getString("ingredient");// 主要材料
+            String accessory = object.getString("accessory");// 辅助材料
+
+            content = "主料：" + ingredient;
+            if (!TextUtils.isEmpty(accessory)) {
+                content = content + "，辅料：" + accessory;
             }
 
-            int size = cooks.size();
-            if (cooks != null && size > 0) {
-                Random random = new Random();
-                int randNum = random.nextInt(size);
-                json = cooks.get(randNum);
-            }
         } catch (JSONException e) {
             Log.i(TAG, "getCookBookData  JSONException");
         }
-        return json;
+        return content;
     }
 
     //获取音乐
