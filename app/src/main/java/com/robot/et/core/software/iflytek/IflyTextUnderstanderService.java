@@ -232,7 +232,9 @@ public class IflyTextUnderstanderService extends SpeechService {
                                             speakContent(question, answer);
 
                                         } else {
-                                            String weatherContent = answer + city + area + "的天气";
+                                            StringBuffer buffer = new StringBuffer(1024);
+                                            buffer.append(answer).append(city).append(area).append("的天气");
+                                            String weatherContent = buffer.toString();
                                             textUnderstander(weatherContent);
                                         }
                                     } else {

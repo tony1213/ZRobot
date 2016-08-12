@@ -109,10 +109,12 @@ public class ResultParse {
             String ingredient = object.getString("ingredient");// 主要材料
             String accessory = object.getString("accessory");// 辅助材料
 
-            content = "主料：" + ingredient;
+            StringBuffer buffer = new StringBuffer(1024);
+            buffer.append("主料：").append(ingredient);
             if (!TextUtils.isEmpty(accessory)) {
-                content = content + "，辅料：" + accessory;
+                buffer.append("，辅料：").append(accessory);
             }
+            content = buffer.toString();
 
         } catch (JSONException e) {
             Log.i(TAG, "getCookBookData  JSONException");
@@ -139,8 +141,10 @@ public class ResultParse {
                     musicName = object.getString("name");//歌曲
                 }
                 if (!TextUtils.isEmpty(url)) {
+                    StringBuffer buffer = new StringBuffer(1024);
+                    buffer.append(singer).append(musicSplit).append(musicName).append(musicSplit).append(url);
                     //歌手+歌名 + 歌曲src
-                    musics.add(singer + musicSplit + musicName + musicSplit + url);
+                    musics.add(buffer.toString());
                 }
             }
 
@@ -167,8 +171,10 @@ public class ResultParse {
             String time = dataObject.getString("time");// 时间
             String date = dataObject.getString("date");// 日期
 
+            StringBuffer buffer = new StringBuffer(1024);
             // 日期 + 时间 + 做什么事
-            json = date + scheduleSplit + time + scheduleSplit + content;
+            buffer.append(date).append(scheduleSplit).append(time).append(scheduleSplit).append(content);
+            json = buffer.toString();
 
         } catch (JSONException e) {
             Log.i(TAG, "getRemindData  JSONException");
@@ -213,36 +219,38 @@ public class ResultParse {
                 pmValue = object.getString("pm25");// 空气质量
             }
 
+            StringBuffer buffer = new StringBuffer(1024);
             if (city.contains(iflyCity)) {// 是当前城市
                 if (!TextUtils.isEmpty(iflyArea)) {
-                    content = time + iflyCity + iflyArea;
+                    buffer.append(time).append(iflyCity).append(iflyArea);
                 } else {
-                    content = time + iflyCity + area;
+                    buffer.append(time).append(iflyCity).append(area);
                 }
             } else {// 不是当前城市
                 if (!TextUtils.isEmpty(iflyArea)) {
-                    content = time + iflyCity + iflyArea;
+                    buffer.append(time).append(iflyCity).append(iflyArea);
                 } else {
                     if (TextUtils.equals(iflyCity, "CURRENT_CITY")) {
-                        content = time;
+                        content = buffer.append(time).toString();
                         return content;
                     } else {
-                        content = time + iflyCity;
+                        buffer.append(time).append(iflyCity);
                     }
 
                 }
             }
 
             if (TextUtils.isEmpty(airQuality)) {
-                content = content + "天气：" + weather + ",风力：" + wind + ",气温：" + tempRange;
+                buffer.append("天气：").append(weather).append(",风力：").append(wind).append(",气温：").append(tempRange);
             } else {
-                content = content + "天气：" + weather + ",空气质量：" + airQuality + ",风力：" + wind + ",气温：" + tempRange;
+                buffer.append("天气：").append(weather).append(",空气质量：").append(airQuality).append(",风力：").append(wind).append(",气温：").append(tempRange);
             }
 
             if (!TextUtils.isEmpty(pmValue)) {
-                content = content + ",pm值：" + pmValue;
+                buffer.append(",pm值：").append(pmValue);
             }
 
+            content = buffer.toString();
         } catch (JSONException e) {
             Log.i(TAG, "getWeatherData  JSONException");
         }
@@ -290,21 +298,23 @@ public class ResultParse {
             String weather = object.getString("quality");// 空气质量
             String aqi = object.getString("aqi");// 空气质量指数
 
+            StringBuffer buffer = new StringBuffer(1024);
             if (city.contains(iflyCity)) {// 是当前城市
                 if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
-                    content = iflyCity + iflyArea;
+                    buffer.append(iflyCity).append(iflyArea);
                 } else {// 没有返回区
-                    content = iflyCity + area;
+                    buffer.append(iflyCity).append(area);
                 }
             } else {// 不是当前城市
                 if (!TextUtils.isEmpty(iflyArea)) {// 有返回区
-                    content = iflyCity + iflyArea;
+                    buffer.append(iflyCity).append(iflyArea);
                 } else {// 没有返回区
-                    content = iflyCity;
+                    buffer.append(iflyCity);
                 }
             }
 
-            content = content + "pm值：" + pmValue + ",空气质量：" + weather + ",空气质量指数：" + aqi;
+            buffer.append("pm值：").append(pmValue).append(",空气质量：").append(weather).append(",空气质量指数：").append(aqi);
+            content = buffer.toString();
 
         } catch (JSONException e) {
             Log.i(TAG, "getPm25Data  JSONException");

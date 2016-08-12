@@ -320,8 +320,9 @@ public class FaceDetectorActivity extends Activity {
     //脸部识别后的处理
     private void handleFace(byte[] mImageData, List<FaceInfo> faceInfos) {
         if (null != mImageData && mImageData.length > 0) {
-            Log.i("face", "handleFace faceInfos.size()===" + faceInfos.size());
-            if (faceInfos != null && faceInfos.size() > 0) {
+            int size = faceInfos.size();
+            Log.i("face", "handleFace faceInfos.size()===" + size);
+            if (faceInfos != null && size > 0) {
                 FaceInfo info = faceInfos.get(0);
                 String auId = info.getAuthorId();
                 FaceManager.setAuthorName(info.getAuthorName());

@@ -21,7 +21,8 @@ public class AlarmRemindManager {
     public static void setAlarmClock(String date, String time) {
         Calendar calendar = DateTools.getCalendar(date, time);
         long currentMinute = System.currentTimeMillis();
-        String action = DateTools.getCurrentDate(currentMinute) + DataConfig.ACTION_REMIND_SIGN + DateTools.getCurrentTime(currentMinute);
+        StringBuffer buffer = new StringBuffer(1024);
+        String action = buffer.append(DateTools.getCurrentDate(currentMinute)).append(DataConfig.ACTION_REMIND_SIGN).append(DateTools.getCurrentTime(currentMinute)).toString();
         AlarmClock.getInstance().setOneAlarm(action, calendar);
     }
 
@@ -29,9 +30,7 @@ public class AlarmRemindManager {
     private static String setAlarmTimeFormat(String time) {
         String result = "";
         if (!TextUtils.isEmpty(time)) {
-            result = time.substring(0, time.length() - 2);
-            result = result + "00";
-            return result;
+            result = time.substring(0, time.length() - 2) + "00";
         }
         return result;
     }
@@ -115,7 +114,7 @@ public class AlarmRemindManager {
         String date = DateTools.getCurrentDate(minute);
         int currentHour = DateTools.getCurrentHour(minute);
         String minuteTwo = DateTools.get2DigitMinute(minute);
-        String time = currentHour + ":" + minuteTwo + ":" + "00";
+        String time = new StringBuffer(1024).append(currentHour).append(":").append(minuteTwo).append(":").append("00").toString();
         RobotDB mDao = RobotDB.getInstance(context);
         List<RemindInfo> infos = null;
         try {
@@ -138,7 +137,7 @@ public class AlarmRemindManager {
         String date = DateTools.getCurrentDate(minute);
         int currentHour = DateTools.getCurrentHour(minute);
         String currentMinute = DateTools.get2DigitMinute(minute);
-        String time = currentHour + ":" + currentMinute + ":" + "00";
+        String time = new StringBuffer(1024).append(currentHour).append(":").append(currentMinute).append(":").append("00").toString();
         RobotDB.getInstance(context).deleteRemindInfo(date, time, DataConfig.REMIND_NO_ID);
     }
 
@@ -186,9 +185,9 @@ public class AlarmRemindManager {
     public static String getMoreAlarmContent() {
         String content = "";
         List<String> datas = getAlarmDatas();
-        Log.i(TAG, "datas.size====" + datas.size());
-        if (datas != null && datas.size() > 0) {
-            int size = datas.size();
+        int size = datas.size();
+        Log.i(TAG, "datas.size====" + size);
+        if (datas != null && size > 0) {
             content = "主人您好，您设置的" + datas.get(size - 1) + "提醒时间到了，不要忘记哦。";
             datas.remove(size - 1);
             setAlarmDatas(datas);

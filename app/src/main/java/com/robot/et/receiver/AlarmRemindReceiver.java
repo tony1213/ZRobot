@@ -82,6 +82,7 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
             String remindMen = info.getRemindMen();
             String remindContent = info.getContent();
             String content = "";
+
             DataConfig.isAppPushRemind = false;
 
             if (!TextUtils.isEmpty(remindMen)) {
@@ -94,7 +95,10 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
                     AlarmRemindManager.setSpareType(info.getSpareType());
                     AlarmRemindManager.setSpareContent(info.getSpareContent());
                     AlarmRemindManager.setRemindMen(remindMen);
-                    content = remindContent + "：" + remindMen + ",请回答：" + AlarmRemindManager.getRequireAnswer();
+
+                    StringBuffer buffer = new StringBuffer(1024);
+                    content = buffer.append(remindContent).append("：").append(remindMen).append(",请回答：").append(AlarmRemindManager.getRequireAnswer()).toString();
+
                 } else {
                     content = remindContent;
                 }

@@ -98,7 +98,7 @@ public class ScriptHandler implements Script {
                     if (!TextUtils.isEmpty(requireAnswer)) {
                         DataConfig.isScriptQA = true;
                         ScriptManager.setScriptAnswer(requireAnswer);
-                        speakContent = content + "，请回答：" + requireAnswer;
+                        speakContent = new StringBuffer(1024).append(content).append("，请回答：").append(requireAnswer).toString();
                     } else {
                         speakContent = content;
                     }

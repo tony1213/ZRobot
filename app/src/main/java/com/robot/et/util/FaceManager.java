@@ -17,7 +17,8 @@ public class FaceManager {
     private static String authorName;
 
     public static void setNewFaceInfo(List<FaceInfo> faceInfos) {
-        if (faceInfos != null && faceInfos.size() > 0) {
+        int size = faceInfos.size();
+        if (faceInfos != null && size > 0) {
             faceInfos.remove(0);
             infos = faceInfos;
         } else {

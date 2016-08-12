@@ -164,7 +164,7 @@ public class IflySpeakService extends SpeechService {
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
-                String weatherContent = "今天" + city + area + "的天气";
+                String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
                 SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
                 break;
             case DataConfig.SPEAK_TYPE_SCRIPT://剧本对话

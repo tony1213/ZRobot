@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.common.speech.SpeechService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.speech.SpeechService;
 import com.turing.androidsdk.InitListener;
 import com.turing.androidsdk.SDKInit;
 import com.turing.androidsdk.SDKInitBuilder;
@@ -145,8 +145,9 @@ public class TuRingService extends SpeechService {
             String[] weathers = result.split(" ");
             // weathers[0]15-24° weathers[1]23° weathers[2]晴 weathers[3]北风微风
             if (weathers != null && weathers.length > 0) {
-                result = city + "市";
-                result = result + "天气：" + weathers[2] + ",气温：" + weathers[0] + ",风力：" + weathers[3];
+                StringBuffer buffer = new StringBuffer(1024);
+                buffer.append(city).append("市").append("天气：").append(weathers[2]).append(",气温：").append(weathers[0]).append(",风力：").append(weathers[3]);
+                result = buffer.toString();
             }
         }
         return result;
