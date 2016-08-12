@@ -35,10 +35,11 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
     private void remindTips(Context context) {
         long minute = System.currentTimeMillis();
         List<RemindInfo> infos = AlarmRemindManager.getRemindTips(context, minute);
-        Log.i("alarm", "infos.size()===" + infos.size());
-        if (infos != null && infos.size() > 0) {
+        int infoSize = infos.size();
+        Log.i("alarm", "infos.size()===" + infoSize);
+        if (infos != null && infoSize > 0) {
             List<String> datas = new ArrayList<String>();
-            for (int i = 0; i < infos.size(); i++) {
+            for (int i = 0; i < infoSize; i++) {
                 //更新已经提醒过的内容
                 RemindInfo info = infos.get(i);
                 Log.i("alarm", "info.getContent()===" + info.getContent());

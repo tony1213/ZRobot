@@ -129,7 +129,8 @@ public class ResultParse {
             JSONObject jsonObject = jObject.getJSONObject("data");
             JSONArray musicArray = jsonObject.getJSONArray("result");
             List<String> musics = new ArrayList<String>();
-            for (int i = 0; i < musicArray.length(); i++) {
+            int length = musicArray.length();
+            for (int i = 0; i < length; i++) {
                 JSONObject object = musicArray.getJSONObject(i);
                 String url = object.getString("downloadUrl");// 音乐地址
                 String singer = "";

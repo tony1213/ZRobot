@@ -240,8 +240,9 @@ public class CommandHandler {
     //是否是自定义问答
     public boolean isCustomDialogue(String result) {
         String[] questions = context.getResources().getStringArray(R.array.custom_question);
-        if (questions != null && questions.length > 0) {
-            for (int i = 0; i < questions.length; i++) {
+        int length = questions.length;
+        if (questions != null && length > 0) {
+            for (int i = 0; i < length; i++) {
                 String question = questions[i];
                 if (result.contains(question) || question.contains(result)) {
                     String[] answers = context.getResources().getStringArray(R.array.custom_answer);
