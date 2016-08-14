@@ -8,13 +8,13 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.common.script.ScriptHandler;
-import com.robot.et.core.software.common.script.TouchHandler;
-import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.NetResultParse;
 import com.robot.et.core.software.common.network.NettyClientCallBack;
+import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.script.TouchHandler;
+import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.JpushInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -118,7 +118,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                 case RequestConfig.JPUSH_VOLUME_ADJUST:// 播放器音量控制
                     Log.i("netty", "播放器音量控制");
                     if (!TextUtils.isEmpty(musicContent)) {
-                        MediaManager media = MediaManager.getInstance(context);
+                        MediaManager media = MediaManager.getInstance();
                         int currentValue = (int) (media.getMaxVolume() * Double.parseDouble(musicContent));
                         media.setCurrentVolume(currentValue);
                     }
@@ -152,27 +152,27 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_ALARM:// 闹铃
                     Log.i("netty", "闹铃");
-                    AlarmRemindManager.addAppAlarmClock(context, info);
+                    AlarmRemindManager.addAppAlarmClock(info);
 
                     break;
                 case RequestConfig.JPUSH_REMIND:// APP提醒
                     Log.i("netty", "APP提醒");
-                    AlarmRemindManager.addAppAlarmRemind(context, NetResultParse.parseAppRemind(musicContent));
+                    AlarmRemindManager.addAppAlarmRemind(NetResultParse.parseAppRemind(musicContent));
 
                     break;
                 case RequestConfig.JPUSH_ROBOT_LEARN:// 机器人问答库
                     Log.i("netty", "机器人问答库");
-                    RobotLearnManager.insertLeanInfo(context, info.getQuestion(), info.getAnswer(), "", DataConfig.LEARN_BY_ROBOT);
+                    RobotLearnManager.insertLeanInfo(info.getQuestion(), info.getAnswer(), "", DataConfig.LEARN_BY_ROBOT);
 
                     break;
                 case RequestConfig.JPUSH_ROBOT_SPEAK:// 机器人学习库，通过说话学习
                     Log.i("netty", "机器人问答库通过说话学习");
-                    RobotLearnManager.learnByAppSpeak(context, DataConfig.LEARN_BY_ROBOT, musicContent);
+                    RobotLearnManager.learnByAppSpeak(DataConfig.LEARN_BY_ROBOT, musicContent);
 
                     break;
                 case RequestConfig.JPUSH_PERSON_LEARN:// 个人问答库
                     Log.i("netty", "个人问答库");
-                    RobotLearnManager.insertLeanInfo(context, info.getQuestion(), info.getAnswer(), "", DataConfig.LEARN_BY_PERSON);
+                    RobotLearnManager.insertLeanInfo(info.getQuestion(), info.getAnswer(), "", DataConfig.LEARN_BY_PERSON);
 
                     break;
                 case RequestConfig.JPUSH_UPDATE_USERPHONE_INFO:// 更新用户联系方式
@@ -194,17 +194,17 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_RECORDING_ACTION:// 录制动作
                     Log.i("netty", "录制动作");
-                    ScriptHandler.addAppRecordAction(context, musicContent);
+                    ScriptHandler.addAppRecordAction(musicContent);
 
                     break;
                 case RequestConfig.JPUSH_DELETE_A_MESSAGE:// 删除留言
                     Log.i("netty", "删除留言");
-                    AlarmRemindManager.deleteAppRemindTips(context, musicContent);
+                    AlarmRemindManager.deleteAppRemindTips(musicContent);
 
                     break;
                 case RequestConfig.JPUSH_CHOREOGRAPHY_DANCE:// 为某首歌曲编排舞蹈
                     Log.i("netty", "为某首歌曲编排舞蹈");
-                    ScriptHandler.addAppRecordMusic(context, musicContent);
+                    ScriptHandler.addAppRecordMusic(musicContent);
 
                     break;
                 case RequestConfig.JPUSH_SCENE_INTERACTION:// 场景互动
@@ -218,7 +218,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     break;
                 case RequestConfig.JPUSH_GRAPHIC_EDITOR:// 图形编辑
                     Log.i("netty", "图形编辑");
-                    ScriptHandler.addAppGraphicEdit(context, musicContent);
+                    ScriptHandler.addAppGraphicEdit(musicContent);
 
                     break;
                 case RequestConfig.JPUSH_FROLIC:// 嬉闹

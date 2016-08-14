@@ -30,7 +30,7 @@ public class ScriptHandler implements Script {
     public static void playScript(Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
             BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
-            List<ScriptActionInfo> infos = getScriptActions(context, content);
+            List<ScriptActionInfo> infos = getScriptActions(content);
             Log.i("netty", "playScript() infos.size()====" + infos.size());
             if (infos != null && infos.size() > 0) {
                 DataConfig.isPlayScript = true;
@@ -235,7 +235,7 @@ public class ScriptHandler implements Script {
     }
 
     //插入本地剧本
-    public static void addLocalScript(final Context context, String scriptName) {
+    public static void addLocalScript(Context context, String scriptName) {
         String content = FileUtils.readFile(context, scriptName, "utf-8");
         ScriptParse.parseScript(content, new ScriptInfoCallBack() {
             @Override
@@ -243,7 +243,7 @@ public class ScriptHandler implements Script {
                 if (info != null) {
                     Log.i("netty", "addScript  size==" + infos.size());
                     if (infos != null && infos.size() > 0) {
-                        addScript(context, info, infos);
+                        addScript(info, infos);
                     }
                 }
             }
@@ -252,7 +252,7 @@ public class ScriptHandler implements Script {
     }
 
     //增加APP发来的图形编辑
-    public static void addAppGraphicEdit(final Context context, String content) {
+    public static void addAppGraphicEdit(String content) {
         if (!TextUtils.isEmpty(content)) {
             ScriptParse.parseScript(content, new ScriptInfoCallBack() {
                 @Override
@@ -260,7 +260,7 @@ public class ScriptHandler implements Script {
                     if (info != null) {
                         Log.i("netty", "addScript  size==" + infos.size());
                         if (infos != null && infos.size() > 0) {
-                            addScript(context, info, infos);
+                            addScript(info, infos);
                         }
                     }
                 }
@@ -269,7 +269,7 @@ public class ScriptHandler implements Script {
     }
 
     //增加APP发过来的录制动作
-    public static void addAppRecordAction(final Context context, String content) {
+    public static void addAppRecordAction(String content) {
         if (!TextUtils.isEmpty(content)) {
             ScriptParse.parseAppRecordAction(content, new ScriptInfoCallBack() {
                 @Override
@@ -277,7 +277,7 @@ public class ScriptHandler implements Script {
                     if (info != null) {
                         Log.i("netty", "addScript  size==" + infos.size());
                         if (infos != null && infos.size() > 0) {
-                            addScript(context, info, infos);
+                            addScript(info, infos);
                         }
                     }
                 }
@@ -286,7 +286,7 @@ public class ScriptHandler implements Script {
     }
 
     //增加APP发过来的音乐编舞
-    public static void addAppRecordMusic(final Context context, String content) {
+    public static void addAppRecordMusic(String content) {
         if (!TextUtils.isEmpty(content)) {
             ScriptParse.parseAppRecordMusic(content, new ScriptInfoCallBack() {
                 @Override
@@ -294,7 +294,7 @@ public class ScriptHandler implements Script {
                     if (info != null) {
                         Log.i("netty", "addScript  size==" + infos.size());
                         if (infos != null && infos.size() > 0) {
-                            addScript(context, info, infos);
+                            addScript(info, infos);
                         }
                     }
                 }
@@ -303,8 +303,8 @@ public class ScriptHandler implements Script {
     }
 
     //增加剧本
-    private static void addScript(Context context, ScriptInfo info, List<ScriptActionInfo> infos) {
-        RobotDB mDao = RobotDB.getInstance(context);
+    private static void addScript(ScriptInfo info, List<ScriptActionInfo> infos) {
+        RobotDB mDao = RobotDB.getInstance();
         String scriptName = info.getScriptContent();
         int scriptId = mDao.getScriptId(scriptName);
         Log.i("netty", "addScript temId===" + scriptId);
@@ -328,10 +328,10 @@ public class ScriptHandler implements Script {
     }
 
     //获取剧本执行的动作
-    private static List<ScriptActionInfo> getScriptActions(Context context, String scriptContent) {
+    private static List<ScriptActionInfo> getScriptActions(String scriptContent) {
         List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
         if (!TextUtils.isEmpty(scriptContent)) {
-            RobotDB mDao = RobotDB.getInstance(context);
+            RobotDB mDao = RobotDB.getInstance();
             int scriptId = mDao.getScriptId(scriptContent);
             Log.i("netty", "getScriptActions()  scriptId====" + scriptId);
             if (scriptId != -1) {

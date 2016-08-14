@@ -19,9 +19,13 @@ public class AlarmClock {
     private AlarmClock() {
     }
 
-    public synchronized static AlarmClock getInstance() {
+    public static AlarmClock getInstance() {
         if (instance == null) {
-            instance = new AlarmClock();
+            synchronized (AlarmClock.class) {
+                if (instance == null) {
+                    instance = new AlarmClock();
+                }
+            }
         }
         return instance;
     }

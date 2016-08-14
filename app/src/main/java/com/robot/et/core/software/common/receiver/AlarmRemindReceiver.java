@@ -26,15 +26,15 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
             if (action.contains(DataConfig.ACTION_REMIND_SIGN)) {
                 Log.i("alarm", "接受到提醒的广播");
                 AlarmClock.getInstance().cancelOneAlarm(action);
-                remindTips(context);
+                remindTips();
             }
         }
     }
 
     //闹铃提醒
-    private void remindTips(Context context) {
+    private void remindTips() {
         long minute = System.currentTimeMillis();
-        List<RemindInfo> infos = AlarmRemindManager.getRemindTips(context, minute);
+        List<RemindInfo> infos = AlarmRemindManager.getRemindTips(minute);
         int infoSize = infos.size();
         Log.i("alarm", "infos.size()===" + infoSize);
         if (infos != null && infoSize > 0) {
@@ -50,21 +50,21 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
                     if (!TextUtils.isEmpty(info.getRemindMen())) {
                         //app提醒
                         Log.i("alarm", "app提醒");
-                        AlarmRemindManager.deleteAppRemindTips(context, info.getOriginalAlarmTime());
+                        AlarmRemindManager.deleteAppRemindTips(info.getOriginalAlarmTime());
                     } else {
                         //APP设置的闹铃
                         Log.i("alarm", "APP设置的闹铃");
                         minute += 24 * 60 * 60 * 1000;
-                        AlarmRemindManager.updateRemindInfo(context, info, minute, DataConfig.alarmAllDay);
+                        AlarmRemindManager.updateRemindInfo(info, minute, DataConfig.alarmAllDay);
                         AlarmRemindManager.setMoreAlarm(minute);
                     }
 
                 } else {//不是每天
                     if (frequency == 1) {
-                        AlarmRemindManager.deleteCurrentRemindTips(context, minute);
+                        AlarmRemindManager.deleteCurrentRemindTips(minute);
                     } else {
                         minute += 24 * 60 * 60 * 1000;
-                        AlarmRemindManager.updateRemindInfo(context, info, minute, frequency - 1);
+                        AlarmRemindManager.updateRemindInfo(info, minute, frequency - 1);
                         AlarmRemindManager.setMoreAlarm(minute);
                     }
                 }

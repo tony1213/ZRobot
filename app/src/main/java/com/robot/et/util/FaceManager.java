@@ -1,7 +1,5 @@
 package com.robot.et.util;
 
-import android.content.Context;
-
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.FaceInfo;
 
@@ -30,11 +28,11 @@ public class FaceManager {
         return infos;
     }
 
-    public static void addFaceInfo(Context context, String faceName) {
+    public static void addFaceInfo(String faceName) {
         FaceInfo info = new FaceInfo();
         info.setAuthorId(getAuthorId());
         info.setAuthorName(faceName);
-        RobotDB.getInstance(context).addFaceInfo(info);
+        RobotDB.getInstance().addFaceInfo(info);
     }
 
     public static String getAuthorId() {

@@ -111,7 +111,7 @@ public class MsgReceiverService extends Service {
 
                 intent.setClass(MsgReceiverService.this, FaceDistinguishActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(MsgReceiverService.this).getFaceInfos());
+                intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance().getFaceInfos());
                 startActivity(intent);
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_NOTIFY_SOFTWARE)) {//接受到硬件反馈

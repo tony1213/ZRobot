@@ -13,11 +13,11 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
-import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.system.media.MediaManager;
-import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.ResponseAppRemindInfo;
 import com.robot.et.entity.ScriptActionInfo;
@@ -75,7 +75,7 @@ public class CommandHandler {
         Log.i("ifly", "sceneEnum=====" + sceneEnum);
         if (sceneEnum == null) {
             DataConfig.isFaceDetector = false;
-            LearnAnswerInfo info = RobotLearnManager.getRobotLearnInfo(context, result);
+            LearnAnswerInfo info = RobotLearnManager.getRobotLearnInfo(result);
             String content = info.getAnswer();//回答的话语
             boolean flag = false;
             if (!TextUtils.isEmpty(content)) {
@@ -89,43 +89,43 @@ public class CommandHandler {
         switch (sceneEnum) {
             case VOICE_BIGGEST_SCENE:// 声音最大
                 flag = true;
-                MediaManager.getInstance(context).setMaxVolume();
+                MediaManager.getInstance().setMaxVolume();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最大");
 
                 break;
             case VOICE_LITTEST_SCENE:// 声音最小
                 flag = true;
-                MediaManager.getInstance(context).setCurrentVolume(6);
+                MediaManager.getInstance().setCurrentVolume(6);
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量已经最小");
 
                 break;
             case VOICE_BIGGER_INDIRECT_SCENE:// 间接增加声音
                 flag = true;
-                MediaManager.getInstance(context).increaseVolume();
+                MediaManager.getInstance().increaseVolume();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
 
                 break;
             case VOICE_LITTER_INDIRECT_SCENE://间接降低声音
                 flag = true;
-                MediaManager.getInstance(context).reduceVolume();
+                MediaManager.getInstance().reduceVolume();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
 
                 break;
             case VOICE_BIGGER_SCENE:// 直接增加声音
                 flag = true;
-                MediaManager.getInstance(context).increaseVolume();
+                MediaManager.getInstance().increaseVolume();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量增加");
 
                 break;
             case VOICE_LITTER_SCENE://直接降低声音
                 flag = true;
-                MediaManager.getInstance(context).reduceVolume();
+                MediaManager.getInstance().reduceVolume();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "音量减小");
 
                 break;
             case QUESTION_ANSWER_SCENE:// 智能学习回答话语
                 flag = true;
-                String content = RobotLearnManager.learnBySpeak(context, DataConfig.LEARN_BY_ROBOT, result);
+                String content = RobotLearnManager.learnBySpeak(DataConfig.LEARN_BY_ROBOT, result);
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                 break;
@@ -192,7 +192,7 @@ public class CommandHandler {
                     Log.i("ifly", "faceName=====" + faceName);
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
-                        FaceManager.addFaceInfo(context, faceName);
+                        FaceManager.addFaceInfo(faceName);
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
 
                     } else {

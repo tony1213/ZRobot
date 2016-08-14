@@ -205,7 +205,7 @@ public class IflyTextUnderstanderService extends SpeechService {
                                     // 日期 + 时间 + 做什么事
                                     answer = ResultParse.getRemindData(jObject, DataConfig.SCHEDULE_SPLITE);
                                     if (!TextUtils.isEmpty(answer)) {
-                                        answer = AlarmRemindManager.getIflyRemindTips(IflyTextUnderstanderService.this, answer);
+                                        answer = AlarmRemindManager.getIflyRemindTips(answer);
                                     }
                                     speakContent(question, answer);
 
