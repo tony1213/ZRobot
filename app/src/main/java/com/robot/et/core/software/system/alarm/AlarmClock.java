@@ -13,10 +13,12 @@ import java.util.Calendar;
 //聊天监听器  设置与取消的对象必须要保持一致，否则无法取消
 public class AlarmClock {
     public static AlarmClock instance = null;
+    private final Context context;
     private PendingIntent pendingIntent;
     private AlarmManager am;
 
     private AlarmClock() {
+        context = CustomApplication.getInstance().getApplicationContext();
     }
 
     public static AlarmClock getInstance() {
@@ -34,7 +36,6 @@ public class AlarmClock {
         Intent intent = new Intent();
         intent.setAction(action);
         intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
-        Context context = CustomApplication.getInstance().getApplicationContext();
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
@@ -64,7 +65,6 @@ public class AlarmClock {
     }
 
     private void getOneAlarmPendIntent(String action) {
-        Context context = CustomApplication.getInstance().getApplicationContext();
         Intent intent = new Intent(context, AlarmRemindReceiver.class);
         intent.setAction(action);
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);

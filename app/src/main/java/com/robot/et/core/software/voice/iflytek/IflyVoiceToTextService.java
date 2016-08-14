@@ -19,6 +19,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.common.speech.CommandHandler;
 import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.voice.iflytek.util.ResultParse;

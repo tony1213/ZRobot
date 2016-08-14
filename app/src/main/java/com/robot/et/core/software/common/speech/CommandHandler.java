@@ -1,4 +1,4 @@
-package com.robot.et.core.software.voice.iflytek;
+package com.robot.et.core.software.common.speech;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,6 @@ import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
-import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.ResponseAppRemindInfo;
