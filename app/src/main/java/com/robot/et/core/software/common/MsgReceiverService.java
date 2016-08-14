@@ -13,7 +13,7 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.face.detector.FaceDetectorActivity;
+import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.BroadcastEnclosure;
@@ -109,7 +109,7 @@ public class MsgReceiverService extends Service {
 
                 SpeechImpl.getInstance().cancelListen();
 
-                intent.setClass(MsgReceiverService.this, FaceDetectorActivity.class);
+                intent.setClass(MsgReceiverService.this, FaceDistinguishActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance(MsgReceiverService.this).getFaceInfos());
                 startActivity(intent);

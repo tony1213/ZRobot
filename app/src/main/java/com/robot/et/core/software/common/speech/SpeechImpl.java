@@ -1,9 +1,9 @@
 package com.robot.et.core.software.common.speech;
 
-import com.robot.et.core.software.iflytek.IflySpeakService;
-import com.robot.et.core.software.iflytek.IflyTextUnderstanderService;
-import com.robot.et.core.software.iflytek.IflyVoiceToTextService;
-import com.robot.et.core.software.turing.TuRingService;
+import com.robot.et.core.software.voice.iflytek.IflySpeakService;
+import com.robot.et.core.software.voice.iflytek.IflyTextUnderstanderService;
+import com.robot.et.core.software.voice.iflytek.IflyVoiceToTextService;
+import com.robot.et.core.software.voice.turing.TuRingService;
 
 /**
  * Created by houdeming on 2016/8/8.
