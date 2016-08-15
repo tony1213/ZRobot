@@ -8,7 +8,7 @@ import android.view.WindowManager;
 import com.robot.et.R;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.common.MsgReceiverService;
+import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;

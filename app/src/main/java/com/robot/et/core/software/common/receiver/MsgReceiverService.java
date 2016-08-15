@@ -1,4 +1,4 @@
-package com.robot.et.core.software.common;
+package com.robot.et.core.software.common.receiver;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
