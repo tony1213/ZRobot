@@ -21,6 +21,8 @@ public class BroadcastAction {
     public static String ACTION_MOVE_TO_SERIALPORT ="action.control.robot.serialport";
     //唤醒,打断或者转向的广播
     public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
+    //唤醒后转身
+    public static String ACTION_WAKE_UP_TURN_BY_DEGREE = "action.wake.up.turn.by.degree";
     //重置语音板的广播
     public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
     //开始播放音乐
