@@ -12,10 +12,10 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
-import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.BroadcastEnclosure;
 
@@ -57,11 +57,6 @@ public class MsgReceiverService extends Service {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT)) {//唤醒中断
                 Log.i("accept", "MsgReceiverService 接受到唤醒中断的广播");
-                //正在人脸识别
-                if (DataConfig.isFaceRecogniseIng) {
-                    return;
-                }
-
                 DataConfig.isSleep = false;
                 responseAwaken();
 

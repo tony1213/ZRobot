@@ -81,12 +81,13 @@ public class WakeUpServices extends Service {
                             Log.i("wakeup", "degree:" + degree);
                             WakeUp.setGainDirection(0);// 设置麦克0为主麦
 
-                            //软件做业务
-                            interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
-                            sendBroadcast(interruptIntent);
+                            //当在人脸检测的时候不发送广播
+                            if (!DataConfig.isFaceRecogniseIng) {
+                                //软件做业务
+                                interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
+                                sendBroadcast(interruptIntent);
 
-                            //硬件去转身
-                            if (!DataConfig.isFaceRecogniseIng) {//当在人脸检测的时候不发送转身的广播
+                                //硬件去转身
                                 turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
                                 turnIntent.putExtra("degree", degree);
                                 sendBroadcast(turnIntent);
