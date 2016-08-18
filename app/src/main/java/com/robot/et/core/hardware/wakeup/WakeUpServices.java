@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.ShellUtils;
 
@@ -19,6 +20,7 @@ public class WakeUpServices extends Service {
 
     private int voiceFd;
     private int faceFd;
+    private Intent interruptIntent, turnIntent;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,6 +33,9 @@ public class WakeUpServices extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_RESET);
         registerReceiver(receiver, filter);
+
+        interruptIntent = new Intent();
+        turnIntent = new Intent();
 
         faceFd = WakeUp.faceWakeUpInit();
         Log.i("wakeup", "face faceFd==" + faceFd);
@@ -75,10 +80,17 @@ public class WakeUpServices extends Service {
                             int degree = WakeUp.getWakeUpDegree();
                             Log.i("wakeup", "degree:" + degree);
                             WakeUp.setGainDirection(0);// 设置麦克0为主麦
-                            Intent intent = new Intent();
-                            intent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
-                            intent.putExtra("degree", degree);
-                            sendBroadcast(intent);
+
+                            //软件做业务
+                            interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
+                            sendBroadcast(interruptIntent);
+
+                            //硬件去转身
+                            if (!DataConfig.isFaceRecogniseIng) {//当在人脸检测的时候不发送转身的广播
+                                turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+                                turnIntent.putExtra("degree", degree);
+                                sendBroadcast(turnIntent);
+                            }
                         } else {
 //						 Log.i("wakeup", "no wakeUp");
                         }
