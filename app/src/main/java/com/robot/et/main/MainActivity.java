@@ -4,12 +4,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.robot.et.R;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.push.netty.NettyService;
+import com.robot.et.core.software.common.receiver.MsgReceiverService;
+import com.robot.et.core.software.common.view.CustomTextView;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.iflytek.IflySpeakService;
@@ -26,8 +31,8 @@ import java.net.URI;
 
 public class MainActivity extends RosActivity {
 
-    public MainActivity(){
-        super("XRobot","Xrobot", URI.create("http://192.168.3.1:11311"));//本体的ROS IP和端口
+    public MainActivity() {
+        super("XRobot", "Xrobot", URI.create("http://192.168.3.1:11311"));//本体的ROS IP和端口
     }
 
     @Override
@@ -43,6 +48,22 @@ public class MainActivity extends RosActivity {
         share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
         share.commitValue();
 
+        initView();
+
+    }
+
+    private void initView() {
+        LinearLayout showText = (LinearLayout) findViewById(R.id.ll_show_text);
+        LinearLayout showEmotion = (LinearLayout) findViewById(R.id.ll_show_emotion);
+        CustomTextView tvText = (CustomTextView) findViewById(R.id.tv_text);
+        ImageView imgLeft = (ImageView) findViewById(R.id.img_left);
+        ImageView imgRight = (ImageView) findViewById(R.id.img_right);
+        TextManager.setTextView(tvText);
+        TextManager.setShowTextLl(showText);
+        EmotionManager.setImg(imgLeft, imgRight);
+        EmotionManager.setShowLinearLayout(showEmotion);
+
+        EmotionManager.showNormalEmotion(R.mipmap.emotion_normal);
     }
 
     @Override
@@ -83,7 +104,7 @@ public class MainActivity extends RosActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        
+
         destoryService();
     }
 

@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
@@ -20,8 +19,10 @@ import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
-import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.voice.iflytek.util.ResultParse;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
@@ -68,6 +69,9 @@ public class IflyVoiceToTextService extends SpeechService {
             isFirstListen = true;
             startTimer();
         }
+
+        EmotionManager.showEmotionLinearLayout(false);
+        TextManager.hideText();
 
         listen(DataConfig.DEFAULT_SPEAK_MEN);
     }
@@ -154,7 +158,6 @@ public class IflyVoiceToTextService extends SpeechService {
             // 有人说话
             String result = ResultParse.printResult(results, mIatResults);
             Log.i("ifly", "问题原版result====" + result);
-            Toast.makeText(IflyVoiceToTextService.this, "问题原版result====" + result, Toast.LENGTH_SHORT).show();
             if (isLast) {
                 Log.i("ifly", "onResult  isLast");
                 stopListen();
@@ -166,6 +169,8 @@ public class IflyVoiceToTextService extends SpeechService {
 
                     stopTimer();
                     isFirstListen = false;
+
+                    TextManager.showText(result);
 
                     if (commandHandler.isCustorm(result)) {
                         return;
