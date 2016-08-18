@@ -12,10 +12,13 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.ResponseAppRemindInfo;
@@ -61,6 +64,10 @@ public class CommandHandler {
             }
 
             if (isCustomDialogue(result)) {
+                return true;
+            }
+
+            if (isMatchEmotion(result)) {
                 return true;
             }
         }
@@ -142,11 +149,8 @@ public class CommandHandler {
                 break;
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
-                DataConfig.isSleep = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的,我去玩去了");
-                Intent intent = new Intent();
-                intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
-                context.sendBroadcast(intent);
+                sleep();
 
                 break;
             case DO_ACTION_SCENE:// 智能学习做动作
@@ -264,6 +268,23 @@ public class CommandHandler {
         return false;
     }
 
+    //是否是表情
+    public boolean isMatchEmotion(String result) {
+        EmotionEnum emotionEnum = EnumManager.getEmotionEnum(result);
+        if (emotionEnum != null) {
+            TextManager.showTextLinearLayout(false);
+            EmotionManager.showEmotionAnim(emotionEnum.getEmotionKey());
+            String answer = emotionEnum.getRequireAnswer();
+            if (!TextUtils.isEmpty(answer)) {
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
+            } else {
+                SpeechImpl.getInstance().startListen();
+            }
+            return true;
+        }
+        return false;
+    }
+
     //是否是APP发来的是剧本的问答
     public boolean isScriptQA(String result) {
         if (DataConfig.isScriptQA) {
@@ -292,6 +313,17 @@ public class CommandHandler {
                 }
             }, 15 * 1000);
         }
+    }
+
+    //让机器人睡觉
+    public void sleep() {
+        DataConfig.isSleep = true;
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
+        context.sendBroadcast(intent);
+
+        TextManager.showTextLinearLayout(false);
+        EmotionManager.showEmotion(R.mipmap.emotion_blink);
     }
 
     //机器人周围的小车的编号

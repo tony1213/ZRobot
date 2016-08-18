@@ -63,7 +63,7 @@ public class MainActivity extends RosActivity {
         EmotionManager.setImg(imgLeft, imgRight);
         EmotionManager.setShowLinearLayout(showEmotion);
 
-        EmotionManager.showNormalEmotion(R.mipmap.emotion_normal);
+        EmotionManager.showEmotion(R.mipmap.emotion_normal);
     }
 
     @Override

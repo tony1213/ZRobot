@@ -45,11 +45,11 @@ public class EmotionManager {
     }
 
     //显示正常表情
-    public static void showNormalEmotion(int resId) {
+    public static void showEmotion(int resId) {
         if (imgLeft != null && imgRight != null) {
             showEmotionLinearLayout(true);
-            setNormalEmotion(imgLeft, resId);
-            setNormalEmotion(imgRight, resId);
+            setEmotion(imgLeft, resId);
+            setEmotion(imgRight, resId);
         }
     }
 
@@ -64,7 +64,7 @@ public class EmotionManager {
         animationDrawable.start();
     }
 
-    private static void setNormalEmotion(ImageView img, int resId) {
+    private static void setEmotion(ImageView img, int resId) {
         img.setBackgroundResource(resId);
     }
 

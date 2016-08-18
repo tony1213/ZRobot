@@ -13,6 +13,7 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.db.RobotDB;
@@ -85,6 +86,7 @@ public class MsgReceiverService extends Service {
                     if (isVerifySuccess) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                     } else {
+                        EmotionManager.showEmotion(R.mipmap.emotion_normal);
                         SpeechImpl.getInstance().startListen();
                     }
                 } else {//处于唤醒状态

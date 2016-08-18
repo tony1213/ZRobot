@@ -70,7 +70,6 @@ public class IflyVoiceToTextService extends SpeechService {
             startTimer();
         }
 
-        EmotionManager.showEmotionLinearLayout(false);
         TextManager.hideText();
 
         listen(DataConfig.DEFAULT_SPEAK_MEN);
@@ -102,9 +101,9 @@ public class IflyVoiceToTextService extends SpeechService {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            DataConfig.isSleep = true;
             stopTimer();
             stopListen();
+            commandHandler.sleep();
         }
     };
 
@@ -170,6 +169,7 @@ public class IflyVoiceToTextService extends SpeechService {
                     stopTimer();
                     isFirstListen = false;
 
+                    EmotionManager.showEmotionLinearLayout(false);
                     TextManager.showText(result);
 
                     if (commandHandler.isCustorm(result)) {

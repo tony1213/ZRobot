@@ -12,11 +12,14 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechSynthesizer;
 import com.iflytek.cloud.SynthesizerListener;
+import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
@@ -124,6 +127,9 @@ public class IflySpeakService extends SpeechService {
         public void onCompleted(SpeechError error) {
             Log.i("ifly", "IflySpeakService  onCompleted()");
             BroadcastEnclosure.controlMouthLED(IflySpeakService.this, ScriptConfig.LED_OFF);
+            TextManager.showTextLinearLayout(false);
+            EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
             if (error == null) {
                 responseSpeakCompleted();
             } else {
@@ -153,6 +159,7 @@ public class IflySpeakService extends SpeechService {
                 BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
+                EmotionManager.showEmotion(R.mipmap.emotion_blink);//睡觉状态
                 //do nothing
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
