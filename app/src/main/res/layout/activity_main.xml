@@ -76,4 +76,17 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_show_music"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+
 </LinearLayout>

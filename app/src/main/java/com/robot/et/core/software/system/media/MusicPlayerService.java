@@ -8,16 +8,21 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.audiofx.Visualizer;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
-import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.SpectrumManager;
+import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;
 
@@ -28,6 +33,7 @@ public class MusicPlayerService extends Service {
     // 媒体播放器对象
     private MediaPlayer mediaPlayer;
     private Intent intent;
+    private Visualizer mVisualizer;//频谱器
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -39,6 +45,12 @@ public class MusicPlayerService extends Service {
         super.onCreate();
         Log.i("music", "MusicPlayerService onCreate()");
         mediaPlayer = new MediaPlayer();
+        //实例化Visualizer，参数SessionId可以通过MediaPlayer的对象获得
+        mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
+        //采样 - 参数内必须是2的位数 - 如64,128,256,512,1024
+        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+        SpectrumManager.setVisualizer(mVisualizer);
+
         intent = new Intent();
 
         //设置音乐播放完成时的监听器
@@ -54,6 +66,11 @@ public class MusicPlayerService extends Service {
                     playAppLower();
                     return;
                 }
+
+                SpectrumManager.hideSpectrum();
+                SpectrumManager.showSpectrumLinearLayout(false);
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
                 sendBroadcast(intent);
             }
@@ -138,6 +155,10 @@ public class MusicPlayerService extends Service {
         public void onPrepared(MediaPlayer mp) {
             Log.i("music", "音乐开始播放");
             DataConfig.isPlayMusic = true;
+            EmotionManager.showEmotionLinearLayout(false);
+            TextManager.showTextLinearLayout(false);
+            SpectrumManager.showSpectrum();
+
             mediaPlayer.start(); // 开始播放
 
             if (DataConfig.isJpushPlayMusic) {//来自app音乐
@@ -150,6 +171,7 @@ public class MusicPlayerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mVisualizer.release();
         if (mediaPlayer != null) {
             stopPlay();
             mediaPlayer.release();
