@@ -65,6 +65,7 @@
         <service android:name=".core.software.common.push.netty.NettyService"/>
         <service android:name=".core.hardware.move.ControlMoveService"/>
         <service android:name=".core.software.video.agora.AgoraService"/>
+        <service android:name=".core.hardware.serialport.SerialPortService"/>
 
         <receiver android:name=".core.software.common.receiver.AlarmRemindReceiver" />
 

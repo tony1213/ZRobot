@@ -3,6 +3,7 @@ package com.robot.et.main;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.LinearLayout;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.core.hardware.move.ControlMoveService;
+import com.robot.et.core.hardware.serialport.SerialPortService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
 import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
@@ -36,13 +38,14 @@ import org.ros.node.NodeMainExecutor;
 import java.net.URI;
 
 public class MainActivity extends RosActivity {
+    private static final String TAG_ROS = "ROS_MOVE";
 
 
     private MoveControler mover;//ROS运动控制
     private NodeConfiguration nodeConfiguration;//ROS节点
 
     public MainActivity() {
-        super("XRobot", "Xrobot", URI.create("http://192.168.3.1:11311"));//本体的ROS IP和端口
+        super("XRobot", "Xrobot", URI.create("http://192.168.2.105:11311"));//本体的ROS IP和端口
     }
 
     @Override
@@ -57,7 +60,11 @@ public class MainActivity extends RosActivity {
         share.putString(SharedPreferencesKeys.CITY_KEY, "上海市");
         share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
         share.commitValue();
-
+        IntentFilter filter=new IntentFilter();
+        filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
+        filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+        filter.addAction("com.robot.et.radar");
+        registerReceiver(mReceiver,filter);
         initView();
 
     }
@@ -104,6 +111,8 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, ControlMoveService.class));
         //agora
         startService(new Intent(this, AgoraService.class));
+        //serialport
+        startService(new Intent(this, SerialPortService.class));
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -112,10 +121,8 @@ public class MainActivity extends RosActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
                 //此部分代码暂时这样修改，待完善。（时间太赶）2016-07-16
-                String direction=intent.getStringExtra("direction");
-                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
-                String digit=intent.getStringExtra("digit");
-                Log.i("ROS_MOVE","语音控制时，得到的digit参数："+digit);
+                String direction=String.valueOf(intent.getIntExtra("direction",5));
+                Log.i(TAG_ROS,"语音控制时，得到的direction参数："+direction);
                 if (null==direction|| TextUtils.equals("", direction)) {
                     return;
                 }
@@ -134,20 +141,32 @@ public class MainActivity extends RosActivity {
                     doTrunAction(mover.getCurrentDegree(),90);
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
-                Log.i("ROS_WAKE_UP","语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
+                Log.i(TAG_ROS,"语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
                 int data=intent.getIntExtra("degree",0);//获取的Brocast传递的角度
-                Log.i("ROS_WAKE_UP_DEGREE","语音唤醒时，获取的角度："+data);
+                Log.i(TAG_ROS,"语音唤醒时，获取的角度："+data);
                 if (data == 0 || data == 360){
                     //原地不动
                     return;
                 }
                 doTrunAction(mover.getCurrentDegree(),Double.valueOf(data));
+            }else if (intent.getAction().equals("com.robot.et.radar")){
+                //获取到的结果只有两种状态，"0"：没有障碍物；"1"：有障碍物
+                String flag=intent.getStringExtra("radar");
+                Log.i(TAG_ROS,"获取的雷达数据分析结果:"+flag);
+                if (TextUtils.equals("",flag) || null==flag){
+                    return;
+                }else if (TextUtils.equals("0",flag)){
+                    doMoveAction("1");
+                }else if (TextUtils.equals("1",flag)){
+                    doMoveAction("5");
+                }
             }
         }
     };
 
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
+        Log.i(TAG_ROS, "init(NodeMainExecutor nodeMainExecutor)");
         mover = new MoveControler();
         mover.isPublishVelocity(false);
         nodeConfiguration = NodeConfiguration.newPublic(getRosHostname());
@@ -159,19 +178,19 @@ public class MainActivity extends RosActivity {
     private void doMoveAction(String message) {
         mover.isPublishVelocity(true);
         if (TextUtils.equals("1", message)) {
-            Log.i("ROS_MOVE", "机器人移动方向:向前");
+            Log.i(TAG_ROS, "机器人移动方向:向前");
             mover.execMoveForword();
         } else if (TextUtils.equals("2", message)) {
-            Log.i("ROS_MOVE", "机器人移动方向:向后");
+            Log.i(TAG_ROS, "机器人移动方向:向后");
             mover.execMoveBackForward();
         } else if (TextUtils.equals("3", message)) {
-            Log.i("ROS_MOVE", "机器人移动方向:向左");
+            Log.i(TAG_ROS, "机器人移动方向:向左");
             mover.execTurnLeft();
         } else if (TextUtils.equals("4", message)) {
-            Log.i("ROS_MOVE", "机器人移动方向:向右");
+            Log.i(TAG_ROS, "机器人移动方向:向右");
             mover.execTurnRight();
         } else if (TextUtils.equals("5", message)) {
-            Log.i("ROS_MOVE", "机器人移动方向:停止");
+            Log.i(TAG_ROS, "机器人移动方向:停止");
             mover.execStop();
         }
     }
@@ -195,6 +214,7 @@ public class MainActivity extends RosActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(mReceiver);
         destoryService();
     }
 
@@ -209,5 +229,6 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
+        stopService(new Intent(this,SerialPortService.class));
     }
 }

@@ -18,14 +18,14 @@ public class SerialPortUtil {
 	private OutputStream mOutputStream;
 	private InputStream mInputStream;
 	private ReadThread mReadThread;
-	private String path = "/dev/ttyAMA2";
+	private String path = "/dev/ttyAMA3";
 	private int baudrate = 115200;
 	private static SerialPortUtil portUtil;
 	private OnDataReceiveListener onDataReceiveListener = null;
 	private boolean isStop = false;
 
 	public interface OnDataReceiveListener {   
-		public void onDataReceive(byte[] buffer, int size);
+		 void onDataReceive(byte[] buffer, int size);
 	}
 
 	public void setOnDataReceiveListener(
@@ -102,30 +102,26 @@ public class SerialPortUtil {
 	}
 
 	private class ReadThread extends Thread {
-
 		@Override
 		public void run() {
-
 			super.run();
 			while (!isStop && !isInterrupted()) {
-
 				int size;
 				try {
 					if (mInputStream == null) {
 						return;
 					}
-					byte[] buffer = new byte[4096];
+					byte[] buffer = new byte[1024];
 					size = mInputStream.read(buffer);
 					if (size > 0) {
 						if (null != onDataReceiveListener) {
-//							Log.i("SerialPort", "RUN READ DATA:length is:"+ size + ",data is:"+ new String(buffer, 0, size));
+							Log.i("SerialPort", "RUN READ DATA:length is:"+ size + ",data is:"+ new String(buffer, 0, size));
 							onDataReceiveListener.onDataReceive(buffer, size);
 						} else {
 							Log.i("SerialPort", "null == onDataReceiveListener");
 						}
 					}
-					Thread.sleep(50);
-					
+					Thread.sleep(100);
 				} catch (Exception e) {    
 					e.printStackTrace();
 					return;
@@ -146,12 +142,4 @@ public class SerialPortUtil {
 			mSerialPort.close();
 		}
 	}
-
-	public byte[] byteMerger(byte[] first, byte[] second) {
-		byte[] content = new byte[first.length + second.length];
-		System.arraycopy(first, 0, content, 0, first.length);
-		System.arraycopy(second, 0, content, first.length, second.length);
-		return content;
-	}
-
 }
