@@ -196,7 +196,6 @@ public class ScriptHandler implements Script {
         SpeechImpl.getInstance().cancelSpeak();
         SpeechImpl.getInstance().cancelListen();
         BroadcastEnclosure.stopMusic(context);
-        BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_OFF);
     }
 
     //剧本执行完毕
@@ -205,7 +204,6 @@ public class ScriptHandler implements Script {
         DataConfig.isPlayScript = false;
         if (!DataConfig.isPlayMusic) {
             SystemClock.sleep(2000);
-            BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_OFF);
             BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
         }
         //重连netty

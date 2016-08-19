@@ -50,6 +50,8 @@
 
         <activity android:name=".core.software.face.iflytek.FaceDistinguishActivity"
             android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             ></activity>
 
         <activity

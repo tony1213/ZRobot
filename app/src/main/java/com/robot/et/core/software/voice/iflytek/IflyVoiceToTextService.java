@@ -17,14 +17,12 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.voice.iflytek.util.ResultParse;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
 
 import java.util.HashMap;
@@ -131,7 +129,6 @@ public class IflyVoiceToTextService extends SpeechService {
         public void onBeginOfSpeech() {
             // 此回调表示：sdk内部录音机已经准备好了，用户可以开始语音输入
             Log.i("ifly", "onBeginOfSpeech()");
-            BroadcastEnclosure.controlMouthLED(IflyVoiceToTextService.this, ScriptConfig.LED_ON);
         }
 
         @Override
@@ -147,7 +144,6 @@ public class IflyVoiceToTextService extends SpeechService {
         public void onEndOfSpeech() {
             // 此回调表示：检测到了语音的尾端点，已经进入识别过程，不再接受语音输入
             Log.i("ifly", "结束说话 ");
-            BroadcastEnclosure.controlMouthLED(IflyVoiceToTextService.this, ScriptConfig.LED_OFF);
         }
 
         @Override

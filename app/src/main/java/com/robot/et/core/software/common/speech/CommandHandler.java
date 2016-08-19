@@ -149,7 +149,7 @@ public class CommandHandler {
                 break;
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的,我去玩去了");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "那我休息了，拜拜");
                 sleep();
 
                 break;
@@ -196,7 +196,7 @@ public class CommandHandler {
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
                         FaceManager.addFaceInfo(faceName);
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，嘿嘿");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，您可以扫描我的二维码和我聊天哦");
 
                     } else {
                         flag = false;

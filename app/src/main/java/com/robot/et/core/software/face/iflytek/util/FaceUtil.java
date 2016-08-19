@@ -182,6 +182,22 @@ public class FaceUtil {
 		}
 	}
 
+	//获取检测的焦点中心X
+	public static float getRectCenterX(FaceRect face) {
+		Rect rect = face.bound;
+		int left = rect.left;
+		int right = rect.right;
+		return (right + left)/2;
+	}
+
+	//获取检测的焦点中心Y
+	public static float getRectCenterY(FaceRect face) {
+		Rect rect = face.bound;
+		int top = rect.top;
+		int bottom = rect.bottom;
+		return (bottom + top)/2;
+	}
+
 	/**
 	 * 将矩形随原图顺时针旋转90度
 	 * 

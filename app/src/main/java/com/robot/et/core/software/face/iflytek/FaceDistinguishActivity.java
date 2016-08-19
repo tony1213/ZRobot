@@ -2,6 +2,7 @@ package com.robot.et.core.software.face.iflytek;
 
 import android.Manifest.permission;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -25,8 +26,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 
 import com.iflytek.cloud.FaceDetector;
 import com.iflytek.cloud.FaceRequest;
@@ -37,10 +36,12 @@ import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.face.iflytek.util.FaceRect;
 import com.robot.et.core.software.face.iflytek.util.FaceUtil;
 import com.robot.et.core.software.face.iflytek.util.ParseResult;
 import com.robot.et.entity.FaceInfo;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FaceManager;
 
 import org.json.JSONException;
@@ -82,12 +83,21 @@ public class FaceDistinguishActivity extends Activity {
     private String auId;
     private int testCount;//脸部识别的次数
     private int noFaceCount;//没有检测到人脸的次数
+    private int screenCenterX;//屏幕中心X
+    private int screenCenterY;//屏幕中心Y
+    private boolean isSendAngle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_face_verify);
+
+        //灯亮
+        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_ON);
+
+        getScreenCenterPoint();
+
         initUI();
         nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
         buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
@@ -98,6 +108,17 @@ public class FaceDistinguishActivity extends Activity {
         DataConfig.isFaceRecogniseIng = true;
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
 
+    }
+
+    //获取屏幕中心点坐标
+    private void getScreenCenterPoint() {
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(dm);
+        screenCenterX = dm.widthPixels/2;
+        screenCenterY = dm.heightPixels/2;
+        Log.i("face", "screenCenterX===" + screenCenterX);
+        Log.i("face", "screenCenterY===" + screenCenterY);
     }
 
     private Callback mPreviewCallback = new Callback() {
@@ -123,10 +144,11 @@ public class FaceDistinguishActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         int width = metrics.widthPixels;
         int height = (int) (width * PREVIEW_WIDTH / (float) PREVIEW_HEIGHT);
-        LayoutParams params = new LayoutParams(width, height);
-        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        mPreviewSurface.setLayoutParams(params);
-        mFaceSurface.setLayoutParams(params);
+        //取消边距，设置全屏
+//        LayoutParams params = new LayoutParams(width, height);
+//        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+//        mPreviewSurface.setLayoutParams(params);
+//        mFaceSurface.setLayoutParams(params);
     }
 
     private void initUI() {
@@ -285,6 +307,24 @@ public class FaceDistinguishActivity extends Activity {
                         if (faces.length == 1) {
                             mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
                             noFaceCount = 0;
+                            //转身  多次检测的时候只转一次头
+                            if (!isSendAngle) {
+                                isSendAngle = true;
+                                FaceRect face = faces[0];
+                                //X中心点
+                                float pointX = FaceUtil.getRectCenterX(face);
+                                Log.i("face", "pointX===" + pointX);
+                                //Y中心点
+                                float pointY = FaceUtil.getRectCenterY(face);
+                                Log.i("face", "pointY===" + pointY);
+                                if (pointY < screenCenterX) {//向左转
+                                    Log.i("face", "向左转");
+                                } else {//向右转
+                                    Log.i("face", "向右转");
+                                }
+                            }
+
+                            //识别
                             handleFace(mImageData, faceInfos);
                         }
                     } else {
@@ -315,6 +355,9 @@ public class FaceDistinguishActivity extends Activity {
         // 销毁对象
         mFaceDetector.destroy();
         DataConfig.isFaceRecogniseIng = false;
+        //灯灭
+        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
+
     }
 
     //脸部识别后的处理
@@ -421,7 +464,7 @@ public class FaceDistinguishActivity extends Activity {
             Log.i("face", "注册成功");
             FaceManager.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
-            sendMsg("很高兴认识你，请问你怎么称呼呢？", true);
+            sendMsg("你好，我可以认识你吗？你叫什么名字啊？", true);
         } else {
             Log.i("face", "注册失败");
             sendMsg("让我再认识你一次吧", false);
@@ -438,7 +481,7 @@ public class FaceDistinguishActivity extends Activity {
         if ("success".equals(obj.get("rst"))) {
             if (obj.getBoolean("verf")) {
                 Log.i("face", "通过验证");
-                sendMsg("你好，" + FaceManager.getAuthorName() + ",我们又见面了。", true);
+                sendMsg("你好，" + FaceManager.getAuthorName() + ",很高兴又见面了。", true);
             } else {
                 Log.i("face", "验证不通过");
                 handleFace(mImageData, FaceManager.getFaceInfos());
