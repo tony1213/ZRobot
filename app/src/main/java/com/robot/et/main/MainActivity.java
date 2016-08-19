@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,7 +22,9 @@ import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.view.CustomTextView;
 import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.common.view.VisualizerView;
 import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;
@@ -43,6 +47,7 @@ public class MainActivity extends RosActivity {
 
     private MoveControler mover;//ROS运动控制
     private NodeConfiguration nodeConfiguration;//ROS节点
+    private final float VISUALIZER_HEIGHT_DIP = 150f;//频谱View高度
 
     public MainActivity() {
         super("XRobot", "Xrobot", URI.create("http://192.168.2.105:11311"));//本体的ROS IP和端口
@@ -75,12 +80,23 @@ public class MainActivity extends RosActivity {
         CustomTextView tvText = (CustomTextView) findViewById(R.id.tv_text);
         ImageView imgLeft = (ImageView) findViewById(R.id.img_left);
         ImageView imgRight = (ImageView) findViewById(R.id.img_right);
+        LinearLayout showMusicView = (LinearLayout) findViewById(R.id.ll_show_music);
         TextManager.setTextView(tvText);
         TextManager.setShowTextLl(showText);
         EmotionManager.setImg(imgLeft, imgRight);
         EmotionManager.setShowLinearLayout(showEmotion);
 
         EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
+        //对播放音乐频谱的初始设置
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);//设置音频流 - STREAM_MUSIC：音乐回放即媒体音量
+        VisualizerView visualizerView = new VisualizerView(this);
+        visualizerView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.FILL_PARENT,//宽度
+                (int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)//高度
+        ));
+        showMusicView.addView(visualizerView);
+        SpectrumManager.setView(showMusicView, visualizerView);
     }
 
     @Override
@@ -120,7 +136,6 @@ public class MainActivity extends RosActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
-                //此部分代码暂时这样修改，待完善。（时间太赶）2016-07-16
                 String direction=String.valueOf(intent.getIntExtra("direction",5));
                 Log.i(TAG_ROS,"语音控制时，得到的direction参数："+direction);
                 if (null==direction|| TextUtils.equals("", direction)) {
@@ -128,13 +143,6 @@ public class MainActivity extends RosActivity {
                 }
                 if (TextUtils.equals("1",direction)||TextUtils.equals("2",direction)){
                     doMoveAction(direction);
-                    try {
-                        Thread.sleep(1500);
-                    }catch (InterruptedException e){
-                        e.printStackTrace();
-                    }finally {
-                        doMoveAction("5");
-                    }
                 }else if (TextUtils.equals("3",direction)){
                     doTrunAction(mover.getCurrentDegree(),270);
                 }else if (TextUtils.equals("4",direction)){
