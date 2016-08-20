@@ -23,6 +23,7 @@ public class SerialPortUtil {
 	private static SerialPortUtil portUtil;
 	private OnDataReceiveListener onDataReceiveListener = null;
 	private boolean isStop = false;
+	private byte[] buffer;
 
 	public interface OnDataReceiveListener {   
 		 void onDataReceive(byte[] buffer, int size);
@@ -111,7 +112,10 @@ public class SerialPortUtil {
 					if (mInputStream == null) {
 						return;
 					}
-					byte[] buffer = new byte[1024];
+
+					buffer = null;
+					buffer = new byte[256];
+					buffer=new byte[0];
 					size = mInputStream.read(buffer);
 					if (size > 0) {
 						if (null != onDataReceiveListener) {
@@ -124,6 +128,7 @@ public class SerialPortUtil {
 					Thread.sleep(100);
 				} catch (Exception e) {    
 					e.printStackTrace();
+					Log.i("SerialPort", "ReadThread  Exception");
 					return;
 				}
 			}

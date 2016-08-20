@@ -58,6 +58,8 @@ public class DataConfig {
     public final static int SPEAK_TYPE_MUSIC_START = 2;
     //什么都不做
     public final static int SPEAK_TYPE_DO_NOTHINF = 3;
+    //显示二维码的图片
+    public final static int SPEAK_TYPE_SHOW_QRCODE = 4;
     //闹铃提醒
     public static final int SPEAK_TYPE_REMIND_TIPS = 5;
     //欢迎语

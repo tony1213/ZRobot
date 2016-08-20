@@ -68,7 +68,7 @@ public class IflyVoiceToTextService extends SpeechService {
             startTimer();
         }
 
-        TextManager.hideText();
+        TextManager.showTextLinearLayout(false);
 
         listen(DataConfig.DEFAULT_SPEAK_MEN);
     }

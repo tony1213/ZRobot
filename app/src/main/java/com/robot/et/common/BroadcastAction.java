@@ -67,5 +67,7 @@ public class BroadcastAction {
     public static String ACTION_CLOSE_AGORA = "action.close.agora";
     //监听电话挂断的广播
     public static String ACTION_PHONE_HANGUP = "com.robot.et.phone.hangup";
+    //雷达的广播
+    public static String ACTION_ROBOT_RANDAR = "com.robot.et.radar";
 
 }

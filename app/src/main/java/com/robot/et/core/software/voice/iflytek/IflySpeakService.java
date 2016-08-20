@@ -124,8 +124,6 @@ public class IflySpeakService extends SpeechService {
         @Override
         public void onCompleted(SpeechError error) {
             Log.i("ifly", "IflySpeakService  onCompleted()");
-            TextManager.showTextLinearLayout(false);
-            EmotionManager.showEmotion(R.mipmap.emotion_normal);
 
             if (error == null) {
                 responseSpeakCompleted();
@@ -150,16 +148,23 @@ public class IflySpeakService extends SpeechService {
     private void responseSpeakCompleted() {
         switch (currentType) {
             case DataConfig.SPEAK_TYPE_CHAT://对话
+                showNormalEmotion(true);
                 SpeechImpl.getInstance().startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
+                showNormalEmotion(true);
                 BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
+                showNormalEmotion(false);
                 EmotionManager.showEmotion(R.mipmap.emotion_blink);//睡觉状态
                 //do nothing
                 break;
+            case DataConfig.SPEAK_TYPE_SHOW_QRCODE://显示二维码的图片
+                SpeechImpl.getInstance().startListen();
+                break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
+                showNormalEmotion(true);
                 if (DataConfig.isAppPushRemind) {
                     SpeechImpl.getInstance().startListen();
                     return;
@@ -169,6 +174,7 @@ public class IflySpeakService extends SpeechService {
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
+                showNormalEmotion(true);
                 String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
                 SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
                 break;
@@ -181,16 +187,26 @@ public class IflySpeakService extends SpeechService {
 
                 break;
             case RequestConfig.JPUSH_CALL_CLOSE://视频或语音时电话挂断
+                showNormalEmotion(true);
                 // do nothing
                 break;
             case RequestConfig.JPUSH_CALL_VIDEO://视频通话
+                showNormalEmotion(true);
                 BroadcastEnclosure.connectAgora(this, RequestConfig.JPUSH_CALL_VIDEO);
                 break;
             case RequestConfig.JPUSH_CALL_VOICE://语音通话
+                showNormalEmotion(true);
                 BroadcastEnclosure.connectAgora(this, RequestConfig.JPUSH_CALL_VOICE);
                 break;
             default:
                 break;
+        }
+    }
+
+    private void showNormalEmotion(boolean isShow) {
+        TextManager.showTextLinearLayout(false);
+        if (isShow) {
+            EmotionManager.showEmotion(R.mipmap.emotion_normal);
         }
     }
 

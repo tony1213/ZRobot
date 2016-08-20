@@ -22,6 +22,7 @@ import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.view.CustomTextView;
 import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.VisualizerView;
@@ -97,6 +98,10 @@ public class MainActivity extends RosActivity {
         ));
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
+
+        LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
+        ImageView img = (ImageView) findViewById(R.id.img_one);
+        OneImgManager.setView(showOneImg, img);
     }
 
     @Override
@@ -149,15 +154,17 @@ public class MainActivity extends RosActivity {
                     doTrunAction(mover.getCurrentDegree(),90);
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
-                Log.i(TAG_ROS,"语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
                 int data=intent.getIntExtra("degree",0);//获取的Brocast传递的角度
                 Log.i(TAG_ROS,"语音唤醒时，获取的角度："+data);
                 if (data == 0 || data == 360){
                     //原地不动
                     return;
                 }
-                doTrunAction(mover.getCurrentDegree(),Double.valueOf(data));
-            }else if (intent.getAction().equals("com.robot.et.radar")){
+                if (mover != null) {
+                    Log.i(TAG_ROS,"语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
+                    doTrunAction(mover.getCurrentDegree(),Double.valueOf(data));
+                }
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RANDAR)){
                 //获取到的结果只有两种状态，"0"：没有障碍物；"1"：有障碍物
                 String flag=intent.getStringExtra("radar");
                 Log.i(TAG_ROS,"获取的雷达数据分析结果:"+flag);

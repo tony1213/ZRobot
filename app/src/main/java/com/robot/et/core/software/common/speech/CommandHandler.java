@@ -18,6 +18,7 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.LearnAnswerInfo;
@@ -196,7 +197,9 @@ public class CommandHandler {
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
                         FaceManager.addFaceInfo(faceName);
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我记住了，您可以扫描我的二维码和我聊天哦");
+                        TextManager.showTextLinearLayout(false);
+                        OneImgManager.showImg(R.mipmap.robot_qr_code);
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "我记住了，您可以扫描我的二维码和我聊天哦");
 
                     } else {
                         flag = false;
@@ -229,6 +232,7 @@ public class CommandHandler {
                 if (DataConfig.isControlToyCar) {//控制小车
                     DataConfig.controlNum = 0;
                     BroadcastEnclosure.controlToyCarMove(context, moveKey, getToyCarNum());
+                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
                     SpeechImpl.getInstance().startListen();
                 } else {//控制机器人
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());

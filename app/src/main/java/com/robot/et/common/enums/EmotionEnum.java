@@ -5,8 +5,6 @@ import com.robot.et.R;
 //控制表情的指令
 public enum EmotionEnum {
 
-	EMOTION_NORMAL(R.drawable.emotion_normal, "正常", ""),
-
 	EMOTION_SMILE(R.drawable.emotion_smile, "微笑", "嘻嘻"),
 	EMOTION_SMILE2(R.drawable.emotion_smile, "笑一个", "嘻嘻"),
 	EMOTION_SMILE3(R.drawable.emotion_smile, "笑一笑", "嘻嘻"),
