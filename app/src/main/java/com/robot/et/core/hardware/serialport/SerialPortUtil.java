@@ -23,7 +23,6 @@ public class SerialPortUtil {
 	private static SerialPortUtil portUtil;
 	private OnDataReceiveListener onDataReceiveListener = null;
 	private boolean isStop = false;
-	private byte[] buffer;
 
 	public interface OnDataReceiveListener {   
 		 void onDataReceive(byte[] buffer, int size);
@@ -113,9 +112,7 @@ public class SerialPortUtil {
 						return;
 					}
 
-					buffer = null;
-					buffer = new byte[256];
-					buffer=new byte[0];
+					byte[] buffer = new byte[1024];
 					size = mInputStream.read(buffer);
 					if (size > 0) {
 						if (null != onDataReceiveListener) {
