@@ -317,11 +317,19 @@ public class FaceDistinguishActivity extends Activity {
                                 //Y中心点
                                 float pointY = FaceUtil.getRectCenterY(face);
                                 Log.i("face", "pointY===" + pointY);
+                                Intent intent = new Intent();
+                                int directionValue;
                                 if (pointY < screenCenterX) {//向左转
                                     Log.i("face", "向左转");
+                                    directionValue = DataConfig.TURN_HEAD_LEFT;
                                 } else {//向右转
                                     Log.i("face", "向右转");
+                                    directionValue = DataConfig.TURN_HEAD_RIGHT;
                                 }
+                                intent.putExtra("direction", directionValue);
+                                intent.putExtra("angle", 0);
+                                intent.setAction(BroadcastAction.ACTION_ROBOT_TURN_HEAD);
+                                sendBroadcast(intent);
                             }
 
                             //识别

@@ -235,6 +235,7 @@ public class CommandHandler {
                     EmotionManager.showEmotion(R.mipmap.emotion_normal);
                     SpeechImpl.getInstance().startListen();
                 } else {//控制机器人
+                    DataConfig.isControlRobotMove = true;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
                     sendMoveAction(moveKey);
                 }

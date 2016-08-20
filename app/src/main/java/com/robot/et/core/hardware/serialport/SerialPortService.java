@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
 import com.robot.et.entity.RadarInfo;
 
@@ -59,10 +60,13 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
             Log.i("SerialPort", "result==" + result);
             RadarInfo radarInfo = new Gson().fromJson(result, RadarInfo.class);
             int stopValue = 20;//距离多少时停止
-            if (radarInfo.getLeft() < stopValue || radarInfo.getMiddle() < stopValue || radarInfo.getRight() < stopValue) {
-                Intent intent = new Intent();
-                intent.setAction(BroadcastAction.ACTION_ROBOT_RANDAR);
-                sendBroadcast(intent);
+            if (DataConfig.isControlRobotMove) {
+                if (radarInfo.getLeft() < stopValue || radarInfo.getMiddle() < stopValue || radarInfo.getRight() < stopValue) {
+                    DataConfig.isControlRobotMove = false;
+                    Intent intent = new Intent();
+                    intent.setAction(BroadcastAction.ACTION_ROBOT_RANDAR);
+                    sendBroadcast(intent);
+                }
             }
 
         }

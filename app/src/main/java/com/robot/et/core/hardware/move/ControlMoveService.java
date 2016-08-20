@@ -33,6 +33,7 @@ public class ControlMoveService extends Service {
         filter.addAction(BroadcastAction.ACTION_CONTROL_WAVING);
         filter.addAction(BroadcastAction.ACTION_CONTROL_MOUTH_LED);
         filter.addAction(BroadcastAction.ACTION_CONTROL_TOYCAR_AWAYS);
+        filter.addAction(BroadcastAction.ACTION_ROBOT_TURN_HEAD);
         registerReceiver(receiver, filter);
     }
 
@@ -100,7 +101,16 @@ public class ControlMoveService extends Service {
                     BroadcastEnclosure.controlToyCarMove(ControlMoveService.this, direction, toyCarNum);
                 }
 
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_TURN_HEAD)) {//控制头转
+                Log.i("Move", "控制头转");
+                int directionValue = intent.getIntExtra("direction", 0);
+                int angleValue = intent.getIntExtra("angle", 0);
+                if (angleValue > 0) {
+                    controlHeadTurn(directionValue, angleValue);
+                }
+
             }
+
 
         }
     };
@@ -179,6 +189,11 @@ public class ControlMoveService extends Service {
         }
         String json = JSON.toJSONString(action);
         sendMoveAction(json);
+    }
+
+    //控制头转向
+    private void controlHeadTurn(int directionValue, int angleValue) {
+
     }
 
     private void sendMoveAction(String result) {

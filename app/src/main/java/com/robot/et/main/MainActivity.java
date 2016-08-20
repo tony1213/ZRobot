@@ -45,7 +45,6 @@ import java.net.URI;
 public class MainActivity extends RosActivity {
     private static final String TAG_ROS = "ROS_MOVE";
 
-
     private MoveControler mover;//ROS运动控制
     private NodeConfiguration nodeConfiguration;//ROS节点
     private final float VISUALIZER_HEIGHT_DIP = 150f;//频谱View高度
@@ -163,17 +162,9 @@ public class MainActivity extends RosActivity {
                     Log.i(TAG_ROS,"语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
                     doTrunAction(mover.getCurrentDegree(),Double.valueOf(data));
                 }
-            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RANDAR)){
-                //获取到的结果只有两种状态，"0"：没有障碍物；"1"：有障碍物
-                String flag=intent.getStringExtra("radar");
-                Log.i(TAG_ROS,"获取的雷达数据分析结果:"+flag);
-                if (TextUtils.equals("",flag) || null==flag){
-                    return;
-                }else if (TextUtils.equals("0",flag)){
-                    doMoveAction("1");
-                }else if (TextUtils.equals("1",flag)){
-                    doMoveAction("5");
-                }
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RANDAR)){//接收到雷达停止的数据
+                Log.i(TAG_ROS, "接收到雷达停止的数据");
+                doMoveAction("5");
             }
         }
     };

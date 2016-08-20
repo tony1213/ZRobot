@@ -125,4 +125,11 @@ public class DataConfig {
     //是否正在人脸识别
     public static boolean isFaceRecogniseIng  = false;
 
+    //是否控制机器人移动
+    public static boolean isControlRobotMove  = false;
+
+    //控制头转向的方向  0:向左  1:向右
+    public final static int TURN_HEAD_LEFT = 0;
+    public final static int TURN_HEAD_RIGHT = 1;
+
 }
