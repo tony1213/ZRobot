@@ -13,13 +13,10 @@ public class EmotionManager {
     private static ImageView imgRight;
     private static LinearLayout showLinearLayout;
 
-    public static void setImg(ImageView imgLeft, ImageView imgRight) {
+    public static void setView(LinearLayout showLinearLayout, ImageView imgLeft, ImageView imgRight) {
+        EmotionManager.showLinearLayout = showLinearLayout;
         EmotionManager.imgLeft = imgLeft;
         EmotionManager.imgRight = imgRight;
-    }
-
-    public static void setShowLinearLayout(LinearLayout showLinearLayout) {
-        EmotionManager.showLinearLayout = showLinearLayout;
     }
 
     //显示表情

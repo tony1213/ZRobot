@@ -69,7 +69,7 @@ public class MainActivity extends RosActivity {
         IntentFilter filter=new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-        filter.addAction("com.robot.et.radar");
+        filter.addAction(BroadcastAction.ACTION_ROBOT_RANDAR);
         registerReceiver(mReceiver,filter);
         initView();
 
@@ -82,10 +82,11 @@ public class MainActivity extends RosActivity {
         ImageView imgLeft = (ImageView) findViewById(R.id.img_left);
         ImageView imgRight = (ImageView) findViewById(R.id.img_right);
         LinearLayout showMusicView = (LinearLayout) findViewById(R.id.ll_show_music);
-        TextManager.setTextView(tvText);
-        TextManager.setShowTextLl(showText);
-        EmotionManager.setImg(imgLeft, imgRight);
-        EmotionManager.setShowLinearLayout(showEmotion);
+        LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
+        ImageView imageView = (ImageView) findViewById(R.id.img_one);
+
+        TextManager.setView(showText, tvText);
+        EmotionManager.setView(showEmotion, imgLeft, imgRight);
 
         EmotionManager.showEmotion(R.mipmap.emotion_normal);
 
@@ -99,9 +100,7 @@ public class MainActivity extends RosActivity {
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
 
-        LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
-        ImageView img = (ImageView) findViewById(R.id.img_one);
-        OneImgManager.setView(showOneImg, img);
+        OneImgManager.setView(showOneImg, imageView);
     }
 
     @Override

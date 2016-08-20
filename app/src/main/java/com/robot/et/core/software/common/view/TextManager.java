@@ -11,12 +11,9 @@ public class TextManager {
     private static CustomTextView textView;
     private static LinearLayout showTextLl;
 
-    public static void setTextView(CustomTextView textView) {
-        TextManager.textView = textView;
-    }
-
-    public static void setShowTextLl(LinearLayout showTextLl) {
+    public static void setView(LinearLayout showTextLl, CustomTextView textView) {
         TextManager.showTextLl = showTextLl;
+        TextManager.textView = textView;
     }
 
     //显示文本内容
