@@ -6,17 +6,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
-import com.robot.et.entity.RadarInfo;
 
 public class SerialPortService extends Service implements OnDataReceiveListener {
 
     private static SerialPortUtil instance;
+    private final int STOP_VALUE = 20;//距离多少时停止
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -58,19 +58,48 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
         if (buffer != null && buffer.length > 0 && size > 0) {
             String result = new String(buffer, 0, size);
             Log.i("SerialPort", "result==" + result);
-            RadarInfo radarInfo = new Gson().fromJson(result, RadarInfo.class);
-            int stopValue = 20;//距离多少时停止
-            if (DataConfig.isControlRobotMove) {
-                if (radarInfo.getLeft() < stopValue || radarInfo.getMiddle() < stopValue || radarInfo.getRight() < stopValue) {
-                    DataConfig.isControlRobotMove = false;
-                    Intent intent = new Intent();
-                    intent.setAction(BroadcastAction.ACTION_ROBOT_RANDAR);
-                    sendBroadcast(intent);
+            //result=={"category":"radar","left":54,"middle":8,"right":47}
+            if (!TextUtils.isEmpty(result)) {
+                String[] datas = result.split(",");
+                int leftValue = getData(datas[1]);
+                int middleValue = getData(datas[2]);
+                int rightValue = getData(datas[3]);
+                Log.i("SerialPort", "leftValue==" + leftValue + "---middleValue===" + middleValue + "---rightValue===" + rightValue);
+                if (DataConfig.isControlRobotMove) {
+                    if (leftValue < STOP_VALUE || middleValue < STOP_VALUE || rightValue < STOP_VALUE) {
+                        DataConfig.isControlRobotMove = false;
+                        Intent intent = new Intent();
+                        intent.setAction(BroadcastAction.ACTION_ROBOT_RANDAR);
+                        sendBroadcast(intent);
+                    }
                 }
             }
-
         }
 
+    }
+
+    private int getData(String result) {
+        int value = 0;
+        String splitSign = ":";
+        if (!TextUtils.isEmpty(result)) {
+            if (result.contains(splitSign)) {
+                String[] datas = result.split(splitSign);
+                String content = datas[1];
+                if (!TextUtils.isEmpty(content)) {
+                    if (TextUtils.isDigitsOnly(content)) {
+                        value = Integer.parseInt(content);
+                    } else {//content=47}
+                        if (content.contains("}")) {
+                            String temp = content.substring(0, content.length() - 1);
+                            if (TextUtils.isDigitsOnly(temp)) {
+                                value = Integer.parseInt(temp);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return value;
     }
 
     @Override

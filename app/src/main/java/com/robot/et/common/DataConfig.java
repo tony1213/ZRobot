@@ -128,8 +128,8 @@ public class DataConfig {
     //是否控制机器人移动
     public static boolean isControlRobotMove  = false;
 
-    //控制头转向的方向  0:向左  1:向右
-    public final static int TURN_HEAD_LEFT = 0;
-    public final static int TURN_HEAD_RIGHT = 1;
+    //控制头转向的方向  0:左右  1:上下
+    public final static int TURN_HEAD_ABOUT = 0;
+    public final static int TURN_HEAD_UP_DOWN = 1;
 
 }

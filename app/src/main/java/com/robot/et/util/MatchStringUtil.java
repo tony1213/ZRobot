@@ -25,7 +25,7 @@ public class MatchStringUtil {
     //免打扰关
     public static String disturbCloseRegex = "^" + baseRegex + "*(((免打扰)+" + baseRegex + "*关+)|(关+" + baseRegex + "*(免打扰)+))" + baseRegex + "*$";
     //闭嘴
-    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息|(睡觉))+))" + baseRegex + "*$";
+    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息)|(睡觉)+))" + baseRegex + "*$";
     //做动作
     public static String doActionRegex = "^" + baseRegex + "*我+" + baseRegex + "*((问)|(说))+" + baseRegex + "*你+" + baseRegex + "+(萌|(卖个萌))+" + baseRegex + "*$";
     //控制机器人周围的玩具车走
@@ -42,6 +42,10 @@ public class MatchStringUtil {
     public static String faceTestRegex = "^" + baseRegex + "*(我是谁)+" + baseRegex + "*$";
     // 识别问名字
     public static String faceNameRegex = "^" + baseRegex + "*我+" + baseRegex + "*(叫|是)+" + baseRegex + "+$";
+    // 拍照
+    public static String photographRegex = "^" + baseRegex + "*((拍+" + baseRegex + "*照+)|(照+" + baseRegex + "*相+))" + baseRegex + "*$";
+    // 视觉学习
+    public static String visionLearnRegex = "^" + baseRegex + "*(这是)+" + baseRegex + "+$";
 
 
     //匹配场景字符串
@@ -141,6 +145,22 @@ public class MatchStringUtil {
             } else if (str.contains("叫")) {
                 int lastIndes = str.lastIndexOf("叫");
                 content = str.substring(lastIndes + 1, str.length());
+            }
+        }
+        return content;
+    }
+
+    //获取视觉学习的答案
+    public static String getVisionLearnAnswer(String str) {
+        String content = "";
+        if (!TextUtils.isEmpty(str)) {
+            if (str.contains("什么")) {
+                content = "";
+            } else {
+                if (str.contains("这是")) {
+                    int start = str.indexOf("是");
+                    content = str.substring(start + 1, str.length());
+                }
             }
         }
         return content;

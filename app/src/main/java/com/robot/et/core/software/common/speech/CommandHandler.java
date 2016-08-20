@@ -215,6 +215,37 @@ public class CommandHandler {
                 BroadcastEnclosure.openFaceRecognise(context, true);
 
                 break;
+            case PHOTOGRAPH_SCENE:// 拍照
+                flag = true;
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+
+                break;
+            case VISION_LEARN_SCENE:// 视觉学习
+                flag = true;
+                String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
+                Log.i("ifly", "visionContent=====" + visionContent);
+                String speakContent = "";
+                if (TextUtils.isEmpty(visionContent)) {//问题：这是什么？
+                    //从底层视觉学习库中查找答案
+                    // do thing
+                    String learnAnswer = "";
+
+
+                    if (TextUtils.isEmpty(learnAnswer)) {
+                        speakContent = "不知道，您能告诉我吗？";
+                    } else {
+                        speakContent = "这是" + learnAnswer;
+                    }
+                } else {//告诉答案：例如：这是玩具车
+                    //告诉底层视觉学习的答案
+                    // do thing
+
+
+                    speakContent = "好的，我记住了";
+                }
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, speakContent);
+
+                break;
 
             default:
                 break;

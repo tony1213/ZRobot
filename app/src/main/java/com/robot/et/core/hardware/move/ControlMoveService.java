@@ -12,10 +12,10 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.entity.RobotAction;
+import com.robot.et.util.BroadcastEnclosure;
 
 public class ControlMoveService extends Service {
     private int i;
@@ -103,12 +103,9 @@ public class ControlMoveService extends Service {
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_TURN_HEAD)) {//控制头转
                 Log.i("Move", "控制头转");
-                int directionValue = intent.getIntExtra("direction", 0);
+                int directionValue = intent.getIntExtra("direction", DataConfig.TURN_HEAD_ABOUT);
                 int angleValue = intent.getIntExtra("angle", 0);
-                if (angleValue > 0) {
-                    controlHeadTurn(directionValue, angleValue);
-                }
-
+                controlHeadTurn(directionValue, angleValue);
             }
 
 
@@ -193,7 +190,16 @@ public class ControlMoveService extends Service {
 
     //控制头转向
     private void controlHeadTurn(int directionValue, int angleValue) {
-
+        RobotAction action = new RobotAction();
+        action.setCategory("head");
+        if (directionValue == DataConfig.TURN_HEAD_ABOUT) {
+            action.setAction("Horizontal");
+        } else if (directionValue == DataConfig.TURN_HEAD_UP_DOWN) {
+            action.setAction("Vertical");
+        }
+        action.setAngle(angleValue);
+        String json = JSON.toJSONString(action);
+        sendMoveAction(json);
     }
 
     private void sendMoveAction(String result) {

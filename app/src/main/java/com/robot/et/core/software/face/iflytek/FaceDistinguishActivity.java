@@ -319,15 +319,19 @@ public class FaceDistinguishActivity extends Activity {
                                 Log.i("face", "pointY===" + pointY);
                                 Intent intent = new Intent();
                                 int directionValue;
+                                /* 横向转头：0-180  正中间 90，  向左转90-0   向右 90-180
+                                   越靠近90度的，距离正中间的位置越近
+                                   上下抬头：0-60
+                                 */
                                 if (pointY < screenCenterX) {//向左转
                                     Log.i("face", "向左转");
-                                    directionValue = DataConfig.TURN_HEAD_LEFT;
+                                    directionValue = 80;
                                 } else {//向右转
                                     Log.i("face", "向右转");
-                                    directionValue = DataConfig.TURN_HEAD_RIGHT;
+                                    directionValue = 100;
                                 }
-                                intent.putExtra("direction", directionValue);
-                                intent.putExtra("angle", 0);
+                                intent.putExtra("direction", DataConfig.TURN_HEAD_ABOUT);
+                                intent.putExtra("angle", directionValue);
                                 intent.setAction(BroadcastAction.ACTION_ROBOT_TURN_HEAD);
                                 sendBroadcast(intent);
                             }
