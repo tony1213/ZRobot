@@ -68,7 +68,7 @@ public class BroadcastAction {
     //监听电话挂断的广播
     public static String ACTION_PHONE_HANGUP = "com.robot.et.phone.hangup";
     //雷达的广播
-    public static String ACTION_ROBOT_RANDAR = "com.robot.et.radar";
+    public static String ACTION_ROBOT_RADAR = "com.robot.et.radar";
     //转头的广播
     public static String ACTION_ROBOT_TURN_HEAD = "com.robot.et.turn.head";
 

@@ -268,7 +268,7 @@ public class CommandHandler {
                 } else {//控制机器人
                     DataConfig.isControlRobotMove = true;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
-                    sendMoveAction(moveKey);
+                    BroadcastEnclosure.controlRobotMove(context, moveKey);
                 }
                 return true;
             }
@@ -391,14 +391,6 @@ public class CommandHandler {
         String[] randomDatas = new String[]{"好的", "收到"};
         int randNum = new Random().nextInt(randomDatas.length);
         return randomDatas[randNum];
-    }
-
-    //控制走的广播
-    private void sendMoveAction(int direction) {
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
-        intent.putExtra("direction", direction);
-        context.sendBroadcast(intent);
     }
 
     //APP发来的提醒需求处理

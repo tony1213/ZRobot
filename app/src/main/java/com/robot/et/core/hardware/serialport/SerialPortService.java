@@ -5,18 +5,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
+import com.robot.et.util.BroadcastEnclosure;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SerialPortService extends Service implements OnDataReceiveListener {
 
     private static SerialPortUtil instance;
     private final int STOP_VALUE = 20;//距离多少时停止
+    private Timer timer;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -70,15 +78,42 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
                 if (DataConfig.isControlRobotMove) {
                     if (leftValue < STOP_VALUE || middleValue < STOP_VALUE || rightValue < STOP_VALUE) {
                         DataConfig.isControlRobotMove = false;
-                        Intent intent = new Intent();
-                        intent.setAction(BroadcastAction.ACTION_ROBOT_RANDAR);
-                        sendBroadcast(intent);
+                        BroadcastEnclosure.sendRadar(SerialPortService.this);
+
+                        //向后退
+                        int moveKey = ControlMoveEnum.BACKWARD.getMoveKey();
+                        BroadcastEnclosure.controlRobotMove(SerialPortService.this, moveKey);
+
+                        if (timer == null) {
+                            timer = new Timer();
+                        }
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                handler.sendEmptyMessage(1);
+                            }
+                        }, 1 * 1000);//向后走1秒后停止
+
                     }
                 }
             }
         }
 
     }
+
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                BroadcastEnclosure.sendRadar(SerialPortService.this);
+                if (timer != null) {
+                    timer.cancel();
+                    timer = null;
+                }
+            }
+        }
+    };
 
     //获取距离的数据
     private int getData(String result) {

@@ -68,7 +68,7 @@ public class MainActivity extends RosActivity {
         IntentFilter filter=new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-        filter.addAction(BroadcastAction.ACTION_ROBOT_RANDAR);
+        filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(mReceiver,filter);
         initView();
 
@@ -162,7 +162,7 @@ public class MainActivity extends RosActivity {
                     Log.i(TAG_ROS,"语音唤醒时，当前机器人的角度："+mover.getCurrentDegree());
                     doTrunAction(mover.getCurrentDegree(),Double.valueOf(data));
                 }
-            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RANDAR)){//接收到雷达停止的数据
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){//接收到雷达停止的数据
                 Log.i(TAG_ROS, "接收到雷达停止的数据");
                 doMoveAction("5");
             }
