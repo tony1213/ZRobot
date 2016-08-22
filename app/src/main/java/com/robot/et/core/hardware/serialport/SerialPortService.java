@@ -60,6 +60,8 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
             Log.i("SerialPort", "result==" + result);
             //result=={"category":"radar","left":54,"middle":8,"right":47}
             if (!TextUtils.isEmpty(result)) {
+                if (!isJsonString(result)) return;
+
                 String[] datas = result.split(",");
                 int leftValue = getData(datas[1]);
                 int middleValue = getData(datas[2]);
@@ -78,6 +80,7 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
 
     }
 
+    //获取距离的数据
     private int getData(String result) {
         int value = 0;
         String splitSign = ":";
@@ -100,6 +103,21 @@ public class SerialPortService extends Service implements OnDataReceiveListener 
             }
         }
         return value;
+    }
+
+    //是否是json字符串
+    private boolean isJsonString(String result) {
+        if (!TextUtils.isEmpty(result)) {
+            if (result.contains("{") && result.contains("}")) {
+                int begin = result.lastIndexOf("{");
+                int end = result.lastIndexOf("}");
+                if (begin == 0 && end == result.length() - 1) {
+                    return true;
+                }
+
+            }
+        }
+        return false;
     }
 
     @Override
