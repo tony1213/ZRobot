@@ -15,7 +15,7 @@ import java.util.TimerTask;
 
 import geometry_msgs.Twist;
 
-public class MoveControler extends AbstractNodeMain {
+public class MoveControler extends AbstractNodeMain implements MessageListener<nav_msgs.Odometry> {
     // We need a Publisher -- this will only accept data of type Twist,
     // using the <Generic> type mechanism. (Twists are a type of built-in
     // ROS message which can contain movement commands).
@@ -64,8 +64,8 @@ public class MoveControler extends AbstractNodeMain {
         publisher = connectedNode.newPublisher("/cmd_vel_mux/input/teleop", Twist._TYPE);
         // Create a Twist message using the Publisher
         currentVelocityCommand = publisher.newMessage();
-//        subscriber = connectedNode.newSubscriber("odom", nav_msgs.Odometry._TYPE);
-//        subscriber.addMessageListener(this);
+        subscriber = connectedNode.newSubscriber("odom", nav_msgs.Odometry._TYPE);
+        subscriber.addMessageListener(this);
         publisherTimer = new Timer();
         publisherTimer.schedule(new TimerTask() {
             @Override
@@ -73,10 +73,10 @@ public class MoveControler extends AbstractNodeMain {
                 if (publishVelocity) {
                     if (isForward){
                         Log.i("ROS_MOVE","前进");
-                        publishVelocity(1,0,0);
+                        publishVelocity(0.2,0,0);
                     }else if (isBackWard){
                         Log.i("ROS_MOVE","后退");
-                        publishVelocity(-1,0,0);
+                        publishVelocity(-0.2,0,0);
                     }else if (isTurnLeft){
                         Log.i("ROS_MOVE","向左");
                         publishVelocity(0,0,1);
@@ -93,21 +93,21 @@ public class MoveControler extends AbstractNodeMain {
         }, 0, 80);
     }
 
-//    @Override
-//    public void onNewMessage(final nav_msgs.Odometry message) {
-//        double w = message.getPose().getPose().getOrientation().getW();
-//        double x = message.getPose().getPose().getOrientation().getX();
-//        double y = message.getPose().getPose().getOrientation().getZ();
-//        double z = message.getPose().getPose().getOrientation().getY();
-//        heading = Math.atan2(2 * y * w - 2 * x * z, x * x - y * y - z * z + w * w) * 180 / Math.PI;
-//        currentOrientation = (float) -heading;
-//        //第一种计算方案
-//        if (Math.abs(currentOrientation-degree)<20){
-//            publishVelocity=false;
-//            Log.i("ROS_STOP_DEGREE","ROS_STOP_DEGREE:"+currentOrientation);
-//        }
-//
-//    }
+    @Override
+    public void onNewMessage(final nav_msgs.Odometry message) {
+        double w = message.getPose().getPose().getOrientation().getW();
+        double x = message.getPose().getPose().getOrientation().getX();
+        double y = message.getPose().getPose().getOrientation().getZ();
+        double z = message.getPose().getPose().getOrientation().getY();
+        heading = Math.atan2(2 * y * w - 2 * x * z, x * x - y * y - z * z + w * w) * 180 / Math.PI;
+        currentOrientation = (float) -heading;
+        //第一种计算方案
+        if (Math.abs(currentOrientation-degree)<20){
+            publishVelocity=false;
+            Log.i("ROS_STOP_DEGREE","ROS_STOP_DEGREE:"+currentOrientation);
+        }
+
+    }
     /**
      * Publish the velocity as a ROS Twist message.
      *
