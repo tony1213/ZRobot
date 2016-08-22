@@ -95,6 +95,16 @@ public enum MatchSceneEnum {
 			return MatchStringUtil.matchString(str, MatchStringUtil.visionLearnRegex);
 		}
 	},
+	ENVIRONMENT_LEARN_SCENE {// 认识环境学习
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.environmentLearnRegex);
+		}
+	},
+	GO_WHERE_SCENE {// 去哪里的指令
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.goWhereRegex);
+		}
+	},
 	OPEN_HOUSEHOLD_SCENE {// 打开家电
 		public boolean isScene(String str) {
 			return MatchStringUtil.matchString(str, MatchStringUtil.openHouseholdRegex);

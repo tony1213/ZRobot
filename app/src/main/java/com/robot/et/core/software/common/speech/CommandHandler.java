@@ -246,6 +246,30 @@ public class CommandHandler {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, speakContent);
 
                 break;
+            case ENVIRONMENT_LEARN_SCENE:// 环境认识学习
+                String environmentContent = MatchStringUtil.getEnvironmentLearnAnswer(result);
+                Log.i("ifly", "environmentContent=====" + environmentContent);
+                if (!TextUtils.isEmpty(environmentContent)) {
+                    flag = true;
+                    //通知视觉学习记住内容 获取物体坐标
+                    // do  thing
+
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了");
+                }
+
+                break;
+            case GO_WHERE_SCENE:// 去哪里的指令
+                String whereContent = MatchStringUtil.getGoWhereAnswer(result);
+                Log.i("ifly", "whereContent=====" + whereContent);
+                if (!TextUtils.isEmpty(whereContent)) {
+                    flag = true;
+                    //通知机器人去哪里
+                    // do  thing
+
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                }
+
+                break;
 
             default:
                 break;

@@ -46,6 +46,10 @@ public class MatchStringUtil {
     public static String photographRegex = "^" + baseRegex + "*((拍+" + baseRegex + "*照+)|(照+" + baseRegex + "*相+))" + baseRegex + "*$";
     // 视觉学习
     public static String visionLearnRegex = "^" + baseRegex + "*(这是)+" + baseRegex + "+$";
+    // 认识环境学习
+    public static String environmentLearnRegex = "^" + baseRegex + "*(这里是)+" + baseRegex + "+$";
+    // 去哪里
+    public static String goWhereRegex = "^" + baseRegex + "*去+" + baseRegex + "+$";
 
 
     //匹配场景字符串
@@ -159,6 +163,34 @@ public class MatchStringUtil {
             } else {
                 if (str.contains("这是")) {
                     int start = str.indexOf("是");
+                    content = str.substring(start + 1, str.length());
+                }
+            }
+        }
+        return content;
+    }
+
+    //获取环境学习的答案
+    public static String getEnvironmentLearnAnswer(String str) {
+        String content = "";
+        if (!TextUtils.isEmpty(str)) {
+            if (str.contains("这里是")) {
+                int start = str.indexOf("是");
+                content = str.substring(start + 1, str.length());
+            }
+        }
+        return content;
+    }
+
+    //获取到哪里的指令
+    public static String getGoWhereAnswer(String str) {
+        String content = "";
+        if (!TextUtils.isEmpty(str)) {
+            if (str.contains("去")) {
+                if (str.contains("哪") || str.contains("那")) {
+                    content = "";
+                } else {
+                    int start = str.indexOf("去");
                     content = str.substring(start + 1, str.length());
                 }
             }
