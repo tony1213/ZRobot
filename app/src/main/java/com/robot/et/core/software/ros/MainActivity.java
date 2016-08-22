@@ -326,6 +326,7 @@ public class MainActivity extends RosActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(receiver);
         stopService(new Intent(this, MasterChooserService.class));
     }
 }
