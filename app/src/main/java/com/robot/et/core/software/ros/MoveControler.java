@@ -1,6 +1,7 @@
 package com.robot.et.core.software.ros;
 
 import android.util.Log;
+import android.widget.Switch;
 
 import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
@@ -44,6 +45,14 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
     private volatile boolean isTurnLeft =false;
     //是否右转
     private volatile boolean isTurnRight =false;
+    //前进速度
+    private double forwardSpeed = 0.2;
+    //后退速度
+    private double backwardSpeed = 0.2;
+    //左转速度
+    private double turnLeftSpeed = 0.5;
+    //右转速度
+    private double turnRightSpeed = 0.5;
 
     public double degree;
 
@@ -73,16 +82,16 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
                 if (publishVelocity) {
                     if (isForward){
                         Log.i("ROS_MOVE","前进");
-                        publishVelocity(0.2,0,0);
+                        publishVelocity(forwardSpeed,0,0);
                     }else if (isBackWard){
                         Log.i("ROS_MOVE","后退");
-                        publishVelocity(-0.2,0,0);
+                        publishVelocity(-backwardSpeed,0,0);
                     }else if (isTurnLeft){
                         Log.i("ROS_MOVE","向左");
-                        publishVelocity(0,0,1);
+                        publishVelocity(0,0,turnLeftSpeed);
                     }else if (isTurnRight){
                         Log.i("ROS_MOVE","向右");
-                        publishVelocity(0,0,-1);
+                        publishVelocity(0,0,-turnRightSpeed);
                     }else {
                         Log.i("ROS_MOVE","停止");
                         publishVelocity(0,0,0);
@@ -102,11 +111,15 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
         heading = Math.atan2(2 * y * w - 2 * x * z, x * x - y * y - z * z + w * w) * 180 / Math.PI;
         currentOrientation = (float) -heading;
         //第一种计算方案
-        if (Math.abs(currentOrientation-degree)<20){
+        if (Math.abs(currentOrientation-degree) < 40){
+            this.turnRightSpeed=this.turnLeftSpeed=0.3;
+        }else if (Math.abs(currentOrientation-degree) < 20){
+            this.turnRightSpeed=this.turnLeftSpeed=0.2;
+        }else if (Math.abs(currentOrientation-degree) < 10){
+            this.turnRightSpeed=this.turnLeftSpeed=0.1;
+        }else if (Math.abs(currentOrientation-degree) < 5){
             publishVelocity=false;
-            Log.i("ROS_STOP_DEGREE","ROS_STOP_DEGREE:"+currentOrientation);
         }
-
     }
     /**
      * Publish the velocity as a ROS Twist message.
@@ -166,6 +179,22 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
 
     public void setDegree(double degree){
         this.degree=degree;
+    }
+
+    public void setForwardSpeed(double speed){
+        this.forwardSpeed=speed;
+    }
+
+    public void setBackwardSpeed(double speed){
+        this.backwardSpeed=speed;
+    }
+
+    public void setTurnLeftSpeed(double speed){
+        this.turnLeftSpeed=speed;
+    }
+
+    public void setTurnRightSpeed(double speed){
+        this.turnRightSpeed=speed;
     }
 
     @Override
