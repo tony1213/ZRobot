@@ -493,7 +493,12 @@ public class FaceDistinguishActivity extends Activity {
         if ("success".equals(obj.get("rst"))) {
             if (obj.getBoolean("verf")) {
                 Log.i("face", "通过验证");
-                sendMsg("你好，" + FaceManager.getAuthorName() + ",很高兴又见面了。", true);
+                if (DataConfig.isVoiceFaceRecognise) {//语音开启人脸识别
+                    DataConfig.isVoiceFaceRecognise = false;
+                    sendMsg("你是" + FaceManager.getAuthorName(), true);
+                } else {//人体感应开启人脸识别
+                    sendMsg("你好，" + FaceManager.getAuthorName() + ",很高兴又见面了。", true);
+                }
             } else {
                 Log.i("face", "验证不通过");
                 handleFace(mImageData, FaceManager.getFaceInfos());

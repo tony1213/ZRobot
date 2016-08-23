@@ -21,15 +21,19 @@ import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.system.media.MediaManager;
+import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.entity.ResponseAppRemindInfo;
 import com.robot.et.entity.ScriptActionInfo;
+import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.FaceManager;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.RobotLearnManager;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,18 +204,13 @@ public class CommandHandler {
                         TextManager.showTextLinearLayout(false);
                         OneImgManager.showImg(R.mipmap.robot_qr_code);
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "我记住了，您可以扫描我的二维码和我聊天哦");
-
-                    } else {
-                        flag = false;
                     }
-                } else {
-                    flag = false;
                 }
 
                 break;
-            case FACE_TEST_SCENE:// 脸部识别
+            case FACE_TEST_SCENE:// 开启脸部识别
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "让我看看你");
+                DataConfig.isVoiceFaceRecognise = true;
                 BroadcastEnclosure.openFaceRecognise(context, true);
 
                 break;
@@ -247,12 +246,14 @@ public class CommandHandler {
 
                 break;
             case ENVIRONMENT_LEARN_SCENE:// 环境认识学习
+                //这里是xxx
                 String environmentContent = MatchStringUtil.getEnvironmentLearnAnswer(result);
                 Log.i("ifly", "environmentContent=====" + environmentContent);
                 if (!TextUtils.isEmpty(environmentContent)) {
                     flag = true;
                     //通知视觉学习记住内容 获取物体坐标
                     // do  thing
+                    addVisionRecogniseInfo(environmentContent, "", "");
 
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了");
                 }
@@ -262,11 +263,56 @@ public class CommandHandler {
                 String whereContent = MatchStringUtil.getGoWhereAnswer(result);
                 Log.i("ifly", "whereContent=====" + whereContent);
                 if (!TextUtils.isEmpty(whereContent)) {
-                    flag = true;
                     //通知机器人去哪里
                     // do  thing
+                    flag = true;
+                    VisionRecogniseEnvironmentInfo info = RobotDB.getInstance().getVisionRecogniseEnvironmentInfo(whereContent);
+                    if (info != null) {
 
+                    }
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                }
+
+                break;
+            case VISION_LEARN_SIGN_SCENE:// 进入视觉学习的标志
+                flag = true;
+                String knowContent = "";
+                if (!DataConfig.isIntoKnowEnvironment) {
+                    DataConfig.isIntoKnowEnvironment = true;
+                    DataConfig.isStartRoam = true;
+                    DataConfig.isRecogniseComplected = true;
+                    knowContent = "我会的可多了，但是这是个新环境，我可以走一圈认识一下吗？";
+                } else {
+                    DataConfig.isIntoKnowEnvironment = false;
+                    DataConfig.isStartRoam = false;
+                    DataConfig.isRecogniseComplected = false;
+                    knowContent = "我会记住我见过的所有东西，你想考考我吗？";
+                }
+
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, knowContent);
+
+                break;
+            case START_RECOGNISE_ENVIRONMENT_SCENE:// 进入识别环境的标志
+                if (DataConfig.isStartRoam) {
+                    DataConfig.isStartRoam = false;
+                    flag = true;
+                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                    SpeechImpl.getInstance().startListen();
+                    Log.i("ifly", "通知本体开始漫游并识别物体");
+                    //通知本体开始漫游并识别物体
+                    //do thing
+                }
+
+                break;
+            case RECOGNISE_COMPLECTED_SCENE:// 识别环境完成
+                if (DataConfig.isRecogniseComplected) {
+                    DataConfig.isRecogniseComplected = false;
+                    flag = true;
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我认识好了，你可以叫我去厨房、客厅，我就会去那儿");
+                    //通知本体回到原位
+                    //do thing
+
+
                 }
 
                 break;
@@ -338,6 +384,7 @@ public class CommandHandler {
             if (!TextUtils.isEmpty(answer)) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
             } else {
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 SpeechImpl.getInstance().startListen();
             }
             return true;
@@ -404,6 +451,7 @@ public class CommandHandler {
             num++;
             if (num == 150) {
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 SpeechImpl.getInstance().startListen();
                 return;
             }
@@ -454,8 +502,27 @@ public class CommandHandler {
             DataConfig.isPlayScript = false;
             ScriptHandler.doScriptAction(context, infos);
         } else {
+            EmotionManager.showEmotion(R.mipmap.emotion_normal);
             SpeechImpl.getInstance().startListen();
         }
     }
+
+    //增加视觉环境学习到数据库
+    private void addVisionRecogniseInfo(String positionName, String positionX, String positionY) {
+        RobotDB mDb = RobotDB.getInstance();
+        VisionRecogniseEnvironmentInfo info = mDb.getVisionRecogniseEnvironmentInfo(positionName);
+        if (info != null) {//已经存在
+            mDb.updateVisionPositionXY(positionName, positionX, positionY);
+        } else {//不存在
+            VisionRecogniseEnvironmentInfo mInfo = new VisionRecogniseEnvironmentInfo();
+            String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
+            mInfo.setRobotNum(robotNum);
+            mInfo.setPositionName(positionName);
+            mInfo.setPositionX(positionX);
+            mInfo.setPositionY(positionY);
+            mDb.addVisionRecogniseEnvironment(mInfo);
+        }
+    }
+
 
 }

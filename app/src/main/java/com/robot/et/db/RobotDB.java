@@ -9,6 +9,7 @@ import com.robot.et.entity.LearnQuestionInfo;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
+import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
 import com.robot.et.main.CustomApplication;
 
 import java.util.ArrayList;
@@ -292,6 +293,46 @@ public class RobotDB {
         String sql = "delete from scriptAction where scriptId=?";
         SQLiteDatabase db = helper.getWritableDatabase();
         db.execSQL(sql, new String[]{String.valueOf(scriptId)});
+        db.close();
+    }
+
+    //增加视觉认识环境
+    public void addVisionRecogniseEnvironment(VisionRecogniseEnvironmentInfo info) {
+        String sql = "insert into visionRecogniseEnvironment(robotNum,familyName,positionName,positionX,positionY,spareType,spareContent,spareContent2,spareContent3) values(?,?,?,?,?,?,?,?,?)";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{info.getRobotNum(), info.getFamilyName(), info.getPositionName(), info.getPositionX(),
+                info.getPositionY(), String.valueOf(info.getSpareType()),info.getSpareContent(), info.getSpareContent2(),info.getSpareContent3()});
+        db.close();
+    }
+
+    //根据环境认识的位置查信息
+    public VisionRecogniseEnvironmentInfo getVisionRecogniseEnvironmentInfo(String positionName) {
+        String sql = "select * from visionRecogniseEnvironment where positionName=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        Cursor c = db.rawQuery(sql, new String[]{positionName});
+        VisionRecogniseEnvironmentInfo info = null;
+        if (c.moveToNext()) {
+            info = new VisionRecogniseEnvironmentInfo();
+            info.setRobotNum(c.getString(c.getColumnIndex("robotNum")));
+            info.setFamilyName(c.getString(c.getColumnIndex("familyName")));
+            info.setPositionName(c.getString(c.getColumnIndex("positionName")));
+            info.setPositionX(c.getString(c.getColumnIndex("positionX")));
+            info.setPositionY(c.getString(c.getColumnIndex("positionY")));
+            info.setSpareType(c.getInt(c.getColumnIndex("spareType")));
+            info.setSpareContent(c.getString(c.getColumnIndex("spareContent")));
+            info.setSpareContent2(c.getString(c.getColumnIndex("spareContent2")));
+            info.setSpareContent3(c.getString(c.getColumnIndex("spareContent3")));
+        }
+        c.close();
+        db.close();
+        return info;
+    }
+
+    //更新环境认识的位置
+    public void updateVisionPositionXY(String positionName, String positionX, String positionY) {
+        String sql = "update visionRecogniseEnvironment set positionX=?,positionY=? where positionName=?";
+        SQLiteDatabase db = helper.getWritableDatabase();
+        db.execSQL(sql, new String[]{positionX, positionY, positionName});
         db.close();
     }
 

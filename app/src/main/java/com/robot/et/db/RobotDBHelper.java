@@ -60,6 +60,13 @@ public class RobotDBHelper extends SQLiteOpenHelper {
 				"spareContent3 varchar(500),spareType integer"+
 				")";
 
+		//视觉认识环境表
+		String visionRecogniseEnvironment = "create table visionRecogniseEnvironment"+
+				"("+
+				"id integer primary key autoincrement,robotNum varchar(30),familyName varchar(50),positionName varchar(50),positionX varchar(50),positionY varchar(50)," +
+				"spareType integer,spareContent varchar(500),spareContent2 varchar(500),spareContent3 varchar(500)" +
+				")";
+
 
 		db.execSQL(faces);
 		db.execSQL(question);
@@ -67,6 +74,7 @@ public class RobotDBHelper extends SQLiteOpenHelper {
 		db.execSQL(reminds);
 		db.execSQL(script);
 		db.execSQL(scriptAction);
+		db.execSQL(visionRecogniseEnvironment);
 	}
 
 	@Override

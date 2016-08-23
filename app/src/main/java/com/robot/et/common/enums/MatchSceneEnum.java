@@ -105,6 +105,21 @@ public enum MatchSceneEnum {
 			return MatchStringUtil.matchString(str, MatchStringUtil.goWhereRegex);
 		}
 	},
+	VISION_LEARN_SIGN_SCENE {// 进入视觉学习的标志
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.visionLearnSignRegex);
+		}
+	},
+	START_RECOGNISE_ENVIRONMENT_SCENE {// 开始识别环境的标志
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.startRecogniseEnvRegex);
+		}
+	},
+	RECOGNISE_COMPLECTED_SCENE {// 识别环境完成
+		public boolean isScene(String str) {
+			return MatchStringUtil.matchString(str, MatchStringUtil.recogniseComplectedEnvRegex);
+		}
+	},
 	OPEN_HOUSEHOLD_SCENE {// 打开家电
 		public boolean isScene(String str) {
 			return MatchStringUtil.matchString(str, MatchStringUtil.openHouseholdRegex);

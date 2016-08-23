@@ -50,7 +50,12 @@ public class MatchStringUtil {
     public static String environmentLearnRegex = "^" + baseRegex + "*(这里是)+" + baseRegex + "+$";
     // 去哪里
     public static String goWhereRegex = "^" + baseRegex + "*去+" + baseRegex + "+$";
-
+    // 进入视觉学习的标志
+    public static String visionLearnSignRegex = "^" + baseRegex + "*你+" + baseRegex + "*(做什么)+" + baseRegex + "*$";
+    //开始识别环境
+    public static String startRecogniseEnvRegex = "^" + baseRegex + "*((可以)|(好的))+" + baseRegex + "*$";
+    //识别环境完成
+    public static String recogniseComplectedEnvRegex = "^" + baseRegex + "*((识别)|(认识)|(学习))+" + baseRegex + "*(完了)+" + baseRegex + "*$";
 
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {
