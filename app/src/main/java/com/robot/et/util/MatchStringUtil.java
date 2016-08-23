@@ -39,7 +39,7 @@ public class MatchStringUtil {
     // 关闭家电
     public static String closeHouseholdRegex = "^" + baseRegex + "*关+" + baseRegex + "*(灯|(插座))+" + baseRegex + "*$";
     // 脸检测
-    public static String faceTestRegex = "^" + baseRegex + "*(我是谁)+" + baseRegex + "*$";
+    public static String faceTestRegex = "^" + baseRegex + "*((我是谁)|(认识我))+" + baseRegex + "*$";
     // 识别问名字
     public static String faceNameRegex = "^" + baseRegex + "*我+" + baseRegex + "*(叫|是)+" + baseRegex + "+$";
     // 拍照
