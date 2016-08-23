@@ -175,8 +175,10 @@ public class IflySpeakService extends SpeechService {
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
                 showNormalEmotion(true);
-                String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
-                SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
+//                String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
+//                SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
+                SpeechImpl.getInstance().startListen();
+
                 break;
             case DataConfig.SPEAK_TYPE_SCRIPT://剧本对话
                 if (DataConfig.isScriptQA) {
