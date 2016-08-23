@@ -101,6 +101,7 @@ public class MainActivity extends RosActivity {
         share.commitValue();
         initView();
 
+        initService();
 
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.robot.et.rocon");
@@ -114,13 +115,6 @@ public class MainActivity extends RosActivity {
     public void startMasterChooser() {
         Log.e(TAG,"开始执行MasterChooserService");
 //        startService(new Intent(this, MasterChooserService.class));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("main", "onResume()");
-        initService();
     }
 
     private void initView() {

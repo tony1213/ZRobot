@@ -367,6 +367,7 @@ public class FaceDistinguishActivity extends Activity {
         // 销毁对象
         mFaceDetector.destroy();
         DataConfig.isFaceRecogniseIng = false;
+        DataConfig.isVoiceFaceRecognise = false;
         //灯灭
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
 
@@ -494,7 +495,6 @@ public class FaceDistinguishActivity extends Activity {
             if (obj.getBoolean("verf")) {
                 Log.i("face", "通过验证");
                 if (DataConfig.isVoiceFaceRecognise) {//语音开启人脸识别
-                    DataConfig.isVoiceFaceRecognise = false;
                     sendMsg("你是" + FaceManager.getAuthorName(), true);
                 } else {//人体感应开启人脸识别
                     sendMsg("你好，" + FaceManager.getAuthorName() + ",很高兴又见面了。", true);
