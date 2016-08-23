@@ -71,5 +71,7 @@ public class BroadcastAction {
     public static String ACTION_ROBOT_RADAR = "com.robot.et.radar";
     //转头的广播
     public static String ACTION_ROBOT_TURN_HEAD = "com.robot.et.turn.head";
+    //ROS服务广播
+    public static String ACTION_ROS_SERVICE = "com.robot.et.ros";
 
 }

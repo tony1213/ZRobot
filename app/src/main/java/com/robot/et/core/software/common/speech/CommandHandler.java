@@ -55,6 +55,9 @@ public class CommandHandler {
             if (isAppPushRemind(result)) {
                 return true;
             }
+            if (isRosService(result)) {
+                return true;
+            }
 
             if (isScriptQA(result)) {
                 return true;
@@ -374,6 +377,19 @@ public class CommandHandler {
         return false;
     }
 
+    //是否ros服务
+    public boolean isRosService(String result) {
+        if (!TextUtils.isEmpty(result)) {
+            String rosKey = EnumManager.getRosServiceKey(result);
+            Log.i("ros", "rosKey===" + rosKey);
+            if (!TextUtils.isEmpty(rosKey)) {
+                sendRos(rosKey);
+                return  true;
+            }
+        }
+        return false;
+    }
+
     //是否是表情
     public boolean isMatchEmotion(String result) {
         EmotionEnum emotionEnum = EnumManager.getEmotionEnum(result);
@@ -505,6 +521,14 @@ public class CommandHandler {
             EmotionManager.showEmotion(R.mipmap.emotion_normal);
             SpeechImpl.getInstance().startListen();
         }
+    }
+
+    //ros的广播
+    private void sendRos(String rosKey) {
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        context.sendBroadcast(intent);
     }
 
     //增加视觉环境学习到数据库
