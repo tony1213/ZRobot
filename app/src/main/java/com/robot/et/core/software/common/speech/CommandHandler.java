@@ -222,7 +222,7 @@ public class CommandHandler {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
 
                 break;
-            case VISION_LEARN_SCENE:// 视觉学习
+            /*case VISION_LEARN_SCENE:// 视觉学习
                 flag = true;
                 String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
                 Log.i("ifly", "visionContent=====" + visionContent);
@@ -261,7 +261,7 @@ public class CommandHandler {
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了");
                 }
 
-                break;
+                break;*/
             case GO_WHERE_SCENE:// 去哪里的指令
                 String whereContent = MatchStringUtil.getGoWhereAnswer(result);
                 Log.i("ifly", "whereContent=====" + whereContent);
@@ -379,12 +379,22 @@ public class CommandHandler {
 
     //是否ros服务
     public boolean isRosService(String result) {
+        String content = "";
         if (!TextUtils.isEmpty(result)) {
-            String rosKey = EnumManager.getRosServiceKey(result);
-            Log.i("ros", "rosKey===" + rosKey);
-            if (!TextUtils.isEmpty(rosKey)) {
-                sendRos(rosKey);
-                return  true;
+            SpeechImpl.getInstance().startListen();
+            EmotionManager.showEmotion(R.mipmap.emotion_normal);
+            if (result.contains("这是")) {
+                int start = result.indexOf("是");
+                content = result.substring(start + 1, result.length());
+                sendRos("VisualLearn",content);
+                return true;
+            }else {
+                String rosKey = EnumManager.getRosServiceKey(result);
+                    Log.i("ros", "rosKey===" + rosKey);
+                    if (!TextUtils.isEmpty(rosKey)) {
+                        sendRos(rosKey,"");
+                        return true;
+                    }
             }
         }
         return false;
@@ -524,10 +534,11 @@ public class CommandHandler {
     }
 
     //ros的广播
-    private void sendRos(String rosKey) {
+    private void sendRos(String rosKey,String name) {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
         intent.putExtra("rosKey", rosKey);
+        intent.putExtra("name",name);
         context.sendBroadcast(intent);
     }
 

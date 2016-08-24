@@ -24,10 +24,12 @@ import com.github.rosjava.android_remocons.common_tools.system.WifiChecker;
 import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.push.netty.NettyService;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.CustomTextView;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -38,6 +40,7 @@ import com.robot.et.core.software.ros.MasterChooserService;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
+import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.iflytek.IflySpeakService;
@@ -77,6 +80,7 @@ public class MainActivity extends RosActivity {
     private PairSubscriber pairSubscriber;
     private boolean validatedConcert;
     private Client client;
+    private VisualClient visualClient;
     private NodeConfiguration nodeConfiguration;
 
     public MainActivity(){
@@ -106,14 +110,15 @@ public class MainActivity extends RosActivity {
         filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
+        filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(receiver, filter);
-//        prepareAppManager();
+        prepareAppManager();
     }
 
     @Override
     public void startMasterChooser() {
         Log.e(TAG,"开始执行MasterChooserService");
-//        startService(new Intent(this, MasterChooserService.class));
+        startService(new Intent(this, MasterChooserService.class));
     }
 
     @Override
@@ -341,7 +346,7 @@ public class MainActivity extends RosActivity {
 
     private void initService() {
         //netty
-        startService(new Intent(this, NettyService.class));
+//        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, IflyVoiceToTextService.class));
         //文本理解
@@ -385,8 +390,6 @@ public class MainActivity extends RosActivity {
                 // If we come back from an app, it should be already initialized, so call execute again would crash
                 nodeMainExecutorService.execute(pairSubscriber, nodeConfiguration.setNodeName(pairSubscriber.NODE_NAME));
             }
-            client=new Client();
-//            nodeMainExecutor.execute(client,nodeConfiguration);
         } catch (IOException e) {
             // Socket problem
         }
@@ -400,8 +403,9 @@ public class MainActivity extends RosActivity {
                 roconDescription=(RoconDescription)intent.getSerializableExtra("RoconDescription");
                 init2(roconDescription);
             }else if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)){
-                Log.e(TAG,"接收到ROS数据");
+                Log.e(TAG,"接收到ROS服务数据");
                 String flag=intent.getStringExtra("rosKey");
+                String name=intent.getStringExtra("name");
                 if (TextUtils.equals("Roaming",flag)){
                     new AsyncTask<Void, Void, Void>() {
                         @Override
@@ -413,14 +417,28 @@ public class MainActivity extends RosActivity {
                 }else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
                 }else if (TextUtils.equals("AddTWO",flag)){
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
-                            return null;
-                        }
-                    }.execute();
+                    Log.e("AddTWO","Start AddTWO");
+                    client=new Client();
+                    nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
+                }else if (TextUtils.equals("VisualInit",flag)){
+                    Log.e("VisualInit","Start VisualInit");
+                    visualClient=new VisualClient(0,"");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
+                }else if (TextUtils.equals("VisualLearn",flag)){
+                    Log.e("VisualLearn","Start VisualLearn");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，请不同角度展示物体");
+                    if (TextUtils.equals("",name)){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取物体名称为空");
+                    }
+                    visualClient=new VisualClient(1,name);
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
+                }else if (TextUtils.equals("VisualRec",flag)){
+                    Log.e("VisualRec","Start VisualRec");
+                    visualClient=new VisualClient(2,"");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
                 }
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
+
             }
         }
     };
@@ -464,7 +482,7 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, MusicPlayerService.class));
         stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
-        stopService(new Intent(this, NettyService.class));
+//        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
 

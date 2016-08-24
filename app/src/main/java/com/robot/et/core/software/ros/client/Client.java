@@ -38,9 +38,6 @@ import rosjava_test_msgs.AddTwoIntsResponse;
  */
 public class Client extends AbstractNodeMain {
 
-
-
-
   @Override
   public GraphName getDefaultNodeName() {
     return GraphName.of("rosjava_tutorial_services/client");

@@ -72,6 +72,15 @@
         <service android:name=".core.software.video.agora.AgoraService"/>
         <service android:name=".core.hardware.serialport.SerialPortService"/>
 
+        <!--ROS service dont modify-->
+        <service android:name=".core.software.ros.MasterChooserService"/>
+
+        <service android:name="org.ros.android.NodeMainExecutorService">
+            <intent-filter>
+                <action android:name="org.ros.android.NodeMainExecutorService" />
+            </intent-filter>
+        </service>
+
         <receiver android:name=".core.software.common.receiver.AlarmRemindReceiver" />
 
         <receiver android:name=".core.software.common.receiver.SystemReceiver">
