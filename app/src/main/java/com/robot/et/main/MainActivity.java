@@ -37,6 +37,7 @@ import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.VisualizerView;
 import com.robot.et.core.software.ros.MasterChooserService;
+import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
@@ -82,6 +83,7 @@ public class MainActivity extends RosActivity {
     private Client client;
     private VisualClient visualClient;
     private NodeConfiguration nodeConfiguration;
+    private MoveControler mover;
 
     public MainActivity(){
         super("XRobot","Xrobot");//本体的ROS IP和端口
@@ -113,13 +115,13 @@ public class MainActivity extends RosActivity {
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(receiver, filter);
-        prepareAppManager();
+//        prepareAppManager();
     }
 
     @Override
     public void startMasterChooser() {
         Log.e(TAG,"开始执行MasterChooserService");
-        startService(new Intent(this, MasterChooserService.class));
+//        startService(new Intent(this, MasterChooserService.class));
     }
 
     private void initView() {
@@ -369,7 +371,8 @@ public class MainActivity extends RosActivity {
             java.net.InetAddress local_network_address = socket.getLocalAddress();
             socket.close();
             nodeConfiguration = NodeConfiguration.newPublic(local_network_address.getHostAddress(), getMasterUri());
-            interactionsManager.init(roconDescription.getInteractionsNamespace());
+            mover=new MoveControler();
+            /*interactionsManager.init(roconDescription.getInteractionsNamespace());
             interactionsManager.getAppsForRole(roconDescription.getMasterId(), roconDescription.getCurrentRole());
             interactionsManager.setRemoconName(statusPublisher.REMOCON_FULL_NAME);
             //execution of publisher
@@ -383,7 +386,7 @@ public class MainActivity extends RosActivity {
             if (! pairSubscriber.isInitialized()) {
                 // If we come back from an app, it should be already initialized, so call execute again would crash
                 nodeMainExecutorService.execute(pairSubscriber, nodeConfiguration.setNodeName(pairSubscriber.NODE_NAME));
-            }
+            }*/
         } catch (IOException e) {
             // Socket problem
         }
@@ -433,9 +436,45 @@ public class MainActivity extends RosActivity {
                 }
             }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
 
+            }else  if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
+                //此部分代码暂时这样修改，待完善。（时间太赶）2016-07-16
+                String direction=intent.getStringExtra("direction");
+                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
+                String digit=intent.getStringExtra("digit");
+                Log.i("ROS_MOVE","语音控制时，得到的digit参数："+digit);
+                if (null==direction|| TextUtils.equals("", direction)) {
+                    return;
+                }
+                if (TextUtils.equals("1",direction)||TextUtils.equals("2",direction)){
+                    doRobotMoveAction(direction);
+                }else if (TextUtils.equals("3",direction)){
+//                    doTrunAction(mover.getCurrentDegree(),270);
+                }else if (TextUtils.equals("4",direction)){
+//                    doTrunAction(mover.getCurrentDegree(),90);
+                }
             }
         }
     };
+
+    private void doRobotMoveAction(String message) {
+        mover.isPublishVelocity(true);
+        if (TextUtils.equals("1", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向前");
+            mover.execMoveForword();
+        } else if (TextUtils.equals("2", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向后");
+            mover.execMoveBackForward();
+        } else if (TextUtils.equals("3", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向左");
+            mover.execTurnLeft();
+        } else if (TextUtils.equals("4", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向右");
+            mover.execTurnRight();
+        } else if (TextUtils.equals("5", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:停止");
+            mover.execStop();
+        }
+    }
 
     protected void doMoveAction(final ArrayList<Interaction> apps, final String role,final String displayName){
         selectedInteraction = null;
