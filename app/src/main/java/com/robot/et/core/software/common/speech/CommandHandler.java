@@ -157,7 +157,7 @@ public class CommandHandler {
                 break;
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "那我休息了，拜拜");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "那我休息了，白白");
                 sleep();
 
                 break;
