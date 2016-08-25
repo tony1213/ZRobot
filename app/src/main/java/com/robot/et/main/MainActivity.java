@@ -420,37 +420,41 @@ public class MainActivity extends RosActivity {
 //                        }
 //                    }.execute();
                 }else if (TextUtils.equals("SaveAMap",flag)){
+                    Log.e("ROS_Client","Start SaveAMap");
                     rmapClient=new RmapClient("robotai");
                     nodeMainExecutorService.execute(rmapClient,nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation",flag)){
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"World Navigation");
                 }else if (TextUtils.equals("Make A Map",flag)){
 //                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
-                } else if (TextUtils.equals("Stop",flag)){
+                }else if (TextUtils.equals("",flag)){
+                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
+                }
+                else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
                 }else if (TextUtils.equals("AddTWO",flag)){
                     Log.e("AddTWO","Start AddTWO");
                     client=new Client();
                     nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
-                }else if (TextUtils.equals("VisualInit",flag)){
-                    Log.e("VisualInit","Start VisualInit");
+                }else if (TextUtils.equals("DeepLearnInit",flag)){
+                    Log.e("DeepLearnInit","Start VisualInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                     visualClient=new VisualClient(1,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualLearn",flag)){
-                    Log.e("VisualLearn","Start VisualLearn");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearn",flag)){
+                    Log.e("DeepLearn","Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
                     SpeechImpl.getInstance().cancelListen();
                     visualClient=new VisualClient(2,name);
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualRec",flag)){
-                    Log.e("VisualRec","Start VisualRec");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearnRec",flag)){
+                    Log.e("DeepLearnRec","Start DeepLearnRec");
                     visualClient=new VisualClient(3,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualClose",flag)){
-                    Log.e("VisualClose","Start VisualClose");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearnClose",flag)){
+                    Log.e("DeepLearnClose","Start DeepLearnClose");
                     visualClient=new VisualClient(4,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 }
             }else  if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
                 /*String direction=String.valueOf(intent.getIntExtra("direction",5));

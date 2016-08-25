@@ -20,14 +20,16 @@ public enum RosServiceEnum {
 
 	STARTADDSERVICE("AddTWO","开启服务"),
 
-	VISUALINITSERVICE("VisualInit","开启视觉识别"),
+	DEEPLEARN("OpenDeepLearn","开启深度学习"),
 
-	VISUALLEARNSERVICE("VisualLearn","视觉学习"),
+	DEEPLEARNINIT("DeepLearnInit","深度学习初始化"),
 
-	VISUALRECSERVICE1("VisualRec","看看这是什么"),
-	VISUALRECSERVICE2("VisualRec","看看这是啥"),
+//	VISUALLEARNSERVICE("VisualLearn","视觉学习"),
 
-	VISUALCLOSE("VisualClose","关闭视觉识别"),
+	DEEPLEARNREC("DeepLearnRec","看看这是什么"),
+	DEEPLEARNREC2("DeepLearnRec","看看这是啥"),
+
+	DEEPLEARNCLOSE("DeepLearnClose","关闭深度学习"),
 
 	STOP("Stop","停下来");
 

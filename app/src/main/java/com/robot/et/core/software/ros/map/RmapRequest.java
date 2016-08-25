@@ -7,7 +7,7 @@ import org.ros.internal.message.Message;
  */
 public interface RmapRequest extends Message {
     String _TYPE = "com.robot.et.core.software.ros.map/RmapRequest";
-    String _DEFINITION = "string map_name\n";
+    String _DEFINITION = "# Service used to name the most recent saved map.\\n\\nstring map_name\\n";
 
     String getMapName();
 

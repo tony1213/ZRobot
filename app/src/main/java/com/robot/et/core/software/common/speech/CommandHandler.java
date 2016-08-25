@@ -386,7 +386,7 @@ public class CommandHandler {
             if (result.contains("这个是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
-                sendRos("VisualLearn",content);
+                sendRos("DeepLearn",content);
                 return true;
             }else {
                 String rosKey = EnumManager.getRosServiceKey(result);
