@@ -10,12 +10,13 @@ public enum RosServiceEnum {
 	SAVEAMAP("SaveAMap","保存地图"),
 	SAVEAMAP2("SaveAMap","地图保存"),
 
-	WORLDNAVIGATION("WorldNavigation","世界地图导航"),
+	WORLDNAVIGATION("World Navigation","世界地图导航"),
+
+	FORWARDONEMETER("ForwardOneMeter","走一米"),
 
 	MAKEAMAP("MakeAMap","创建地图"),
 
 	FOLLOWER("Follower","跟我走"),
-
 	FOLLOWER2("Follower","跟我来"),
 
 	STARTADDSERVICE("AddTWO","开启服务"),

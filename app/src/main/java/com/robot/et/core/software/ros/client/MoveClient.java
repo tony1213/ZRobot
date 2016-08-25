@@ -60,14 +60,15 @@ public class MoveClient extends AbstractNodeMain {
             throw new RosRuntimeException(e);
         }
         final MoveRequest request = serviceClient.newMessage();
-        request.setFrame("");
+        request.setFrame(frame);
         request.setX(x);
         request.setY(y);
         request.setAngle(angle);
         serviceClient.call(request, new ServiceResponseListener<MoveResponse>() {
             @Override
             public void onSuccess(MoveResponse response) {
-                Log.e("ROS_Client", "onSuccess:Status:" + response.getStatus());
+                Log.e("ROS_Client", "onSuccess:ForwardOneMeter:" + response.getStatus());
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "运动成功");
             }
 
             @Override

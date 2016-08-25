@@ -41,6 +41,7 @@ import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
+import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.map.Rmap;
@@ -85,6 +86,7 @@ public class MainActivity extends RosActivity {
     private Client client;
     private VisualClient visualClient;
     private RmapClient rmapClient;
+    private MoveClient moveClient;
     private NodeConfiguration nodeConfiguration;
     private MoveControler mover;
 
@@ -419,24 +421,27 @@ public class MainActivity extends RosActivity {
 //                            return null;
 //                        }
 //                    }.execute();
-                }else if (TextUtils.equals("SaveAMap",flag)){
+                }else if (TextUtils.equals("Follower",flag)){
+                    Log.e("ROS_Client","Start Follower");
+                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Follower");
+                    SpeechImpl.getInstance().startListen();
+                } else if (TextUtils.equals("SaveAMap",flag)){
                     Log.e("ROS_Client","Start SaveAMap");
                     rmapClient=new RmapClient("robotai");
                     nodeMainExecutorService.execute(rmapClient,nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation",flag)){
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"World Navigation");
-                }else if (TextUtils.equals("Make A Map",flag)){
-//                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
-                }else if (TextUtils.equals("",flag)){
-                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
-                }
-                else if (TextUtils.equals("Stop",flag)){
+                } else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
                 }else if (TextUtils.equals("AddTWO",flag)){
                     Log.e("AddTWO","Start AddTWO");
                     client=new Client();
                     nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
-                }else if (TextUtils.equals("DeepLearnInit",flag)){
+                }else if (TextUtils.equals("ForwardOneMeter",flag)){
+                    Log.e("ForwardOneMeter","Start ForwardOneMeter");
+                    moveClient=new MoveClient("base_link",1,0,0);
+                    nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                } else if (TextUtils.equals("DeepLearnInit",flag)){
                     Log.e("DeepLearnInit","Start VisualInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                     visualClient=new VisualClient(1,"");

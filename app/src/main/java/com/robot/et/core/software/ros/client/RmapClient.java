@@ -2,6 +2,8 @@ package com.robot.et.core.software.ros.client;
 
 import android.util.Log;
 
+import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.ros.map.RmapRequest;
 import com.robot.et.core.software.ros.map.RmapResponse;
 
@@ -45,6 +47,7 @@ public class RmapClient extends AbstractNodeMain {
             @Override
             public void onSuccess(RmapResponse response) {
                 Log.e("ROS_Client","onSuccess:Save A Map");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "保存地图成功");
             }
 
             @Override

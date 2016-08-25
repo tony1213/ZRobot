@@ -383,6 +383,9 @@ public class CommandHandler {
         if (!TextUtils.isEmpty(result)) {
             SpeechImpl.getInstance().startListen();
             EmotionManager.showEmotion(R.mipmap.emotion_normal);
+//            if (result.contains("向前走")){
+//                sendRosMove("MoveNavigation","1","0","0");
+//            }else
             if (result.contains("这个是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
@@ -539,6 +542,16 @@ public class CommandHandler {
         intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
         intent.putExtra("rosKey", rosKey);
         intent.putExtra("name",name);
+        context.sendBroadcast(intent);
+    }
+
+    private void sendRosMove(String rosKey,String x,String y,String angle) {
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        intent.putExtra("dotX",x);
+        intent.putExtra("dotY",y);
+        intent.putExtra("angle",angle);
         context.sendBroadcast(intent);
     }
 
