@@ -54,6 +54,7 @@ public class VisualClient extends AbstractNodeMain {
         try {
             serviceClient = connectedNode.newServiceClient("learn_to_recognize_ros_server", com.robot.et.core.software.ros.visual.Visual._TYPE);
         } catch (ServiceNotFoundException e) {
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
             throw new RosRuntimeException(e);
         }
         final VisualRequest request = serviceClient.newMessage();
@@ -72,7 +73,9 @@ public class VisualClient extends AbstractNodeMain {
                     }
                 } else if (flag == 2) {
                     //视觉学习
-                    if (response.getResult()== 0){
+                    if (response.getResult()== -1){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
+                    }else if (response.getResult()== 0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，记住了");
                     }else if (response.getResult()==1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");
@@ -93,7 +96,9 @@ public class VisualClient extends AbstractNodeMain {
                     }
                 } else if (flag == 3) {
                     //视觉识别
-                    if (response.getResult()==0){
+                    if (response.getResult()== -1){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
+                    }else if (response.getResult()==0){
                         String result=response.getName();
                         if (TextUtils.equals("",result)){
                             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我不认识这个东西，让我学习一下吧！");

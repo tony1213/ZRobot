@@ -40,7 +40,7 @@ public class RmapClient extends AbstractNodeMain {
             throw new RosRuntimeException(e);
         }
         final RmapRequest request = serviceClient.newMessage();
-        request.setMap_name(mapName);
+        request.setMapName(mapName);
         serviceClient.call(request, new ServiceResponseListener<RmapResponse>() {
             @Override
             public void onSuccess(RmapResponse response) {
