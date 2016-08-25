@@ -383,7 +383,6 @@ public class CommandHandler {
         if (!TextUtils.isEmpty(result)) {
             SpeechImpl.getInstance().startListen();
             EmotionManager.showEmotion(R.mipmap.emotion_normal);
-            if (result.contains("这是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
                 sendRos("VisualLearn",content);

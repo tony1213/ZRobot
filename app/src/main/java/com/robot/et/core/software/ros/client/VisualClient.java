@@ -16,7 +16,6 @@
 
 package com.robot.et.core.software.ros.client;
 
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -64,21 +63,35 @@ public class VisualClient extends AbstractNodeMain {
             @Override
             public void onSuccess(VisualResponse response) {
                 Log.e("ROS_Client", "onSuccess:Result:" + response.getResult() + ",Name:" + response.getName());
-                if (flag == 0) {
-                    //视觉初始化
+                if (flag == 1) {
+                    //打开视觉
                     if (response.getResult() == 0) {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化成功");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉已启动");
                     } else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化失败");
-                    }
-                } else if (flag == 1) {
-                    //视觉学习
-                    if (response.getResult()!=0){
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近或者太远，请重新开始");
-                    }else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，记住了");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉启动失败");
                     }
                 } else if (flag == 2) {
+                    //视觉学习
+                    if (response.getResult()== 0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，记住了");
+                    }else if (response.getResult()==1){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");
+                    }else if (response.getResult()==2){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太远了");
+                    }else if (response.getResult()==10){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太低了");
+                    }else if (response.getResult()==11){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太高了");
+                    }else if (response.getResult()==12){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠左了");
+                    }else if (response.getResult()==13){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠右了");
+                    }else if (response.getResult()==20){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "没看见有东西");
+                    }else if (response.getResult()==21){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
+                    }
+                } else if (flag == 3) {
                     //视觉识别
                     if (response.getResult()==0){
                         String result=response.getName();
@@ -87,8 +100,29 @@ public class VisualClient extends AbstractNodeMain {
                         }else {
                             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这是一个："+response.getName());
                         }
+                    }else if (response.getResult()==1){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");
+                    }else if (response.getResult()==2){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太远了");
+                    }else if (response.getResult()==10){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太低了");
+                    }else if (response.getResult()==11){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太高了");
+                    }else if (response.getResult()==12){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠左了");
+                    }else if (response.getResult()==13){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠右了");
+                    }else if (response.getResult()==20){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "没看见有东西");
+                    }else if (response.getResult()==21){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
+                    }
+                }else if (flag == 4){
+                    //视觉识别
+                    if (response.getResult()==0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉识别模块");
                     }else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近或者太远");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉识别模块失败");
                     }
                 }
             }
@@ -96,6 +130,7 @@ public class VisualClient extends AbstractNodeMain {
             @Override
             public void onFailure(RemoteException e) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
+                SpeechImpl.getInstance().startListen();
                 Log.e("ROS_Client", "onFailure");
                 throw new RosRuntimeException(e);
             }
