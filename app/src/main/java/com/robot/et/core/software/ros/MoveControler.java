@@ -46,13 +46,13 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
     //是否右转
     private volatile boolean isTurnRight =false;
     //前进速度
-    private double forwardSpeed = 0.2;
+    private double forwardSpeed = 0.1;
     //后退速度
-    private double backwardSpeed = 0.2;
+    private double backwardSpeed = 0.1;
     //左转速度
-    private double turnLeftSpeed = 0.5;
+    private double turnLeftSpeed = 0.3;
     //右转速度
-    private double turnRightSpeed = 0.5;
+    private double turnRightSpeed = 0.3;
 
     public double degree;
 

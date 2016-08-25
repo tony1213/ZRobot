@@ -67,7 +67,7 @@ public class MoveClient extends AbstractNodeMain {
         serviceClient.call(request, new ServiceResponseListener<MoveResponse>() {
             @Override
             public void onSuccess(MoveResponse response) {
-                Log.e("ROS_Client", "onSuccess:Status:" + response.gettatus());
+                Log.e("ROS_Client", "onSuccess:Status:" + response.getStatus());
             }
 
             @Override

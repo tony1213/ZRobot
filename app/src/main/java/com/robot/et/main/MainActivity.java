@@ -41,7 +41,9 @@ import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
+import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
+import com.robot.et.core.software.ros.map.Rmap;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.iflytek.IflySpeakService;
@@ -82,6 +84,7 @@ public class MainActivity extends RosActivity {
     private boolean validatedConcert;
     private Client client;
     private VisualClient visualClient;
+    private RmapClient rmapClient;
     private NodeConfiguration nodeConfiguration;
     private MoveControler mover;
 
@@ -115,13 +118,15 @@ public class MainActivity extends RosActivity {
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(receiver, filter);
-//        prepareAppManager();
+        prepareAppManager();
     }
 
     @Override
     public void startMasterChooser() {
         Log.e(TAG,"开始执行MasterChooserService");
-//        startService(new Intent(this, MasterChooserService.class));
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "机器人初始化中，请等待。");
+        SpeechImpl.getInstance().cancelListen();
+        startService(new Intent(this, MasterChooserService.class));
     }
 
     private void initView() {
@@ -366,13 +371,14 @@ public class MainActivity extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         Log.e(TAG,"init(NodeMainExecutor nodeMainExecutor)");
+        SpeechImpl.getInstance().startListen();
+        mover=new MoveControler();
         try {
             java.net.Socket socket = new java.net.Socket(getMasterUri().getHost(), getMasterUri().getPort());
             java.net.InetAddress local_network_address = socket.getLocalAddress();
             socket.close();
             nodeConfiguration = NodeConfiguration.newPublic(local_network_address.getHostAddress(), getMasterUri());
-            mover=new MoveControler();
-            /*interactionsManager.init(roconDescription.getInteractionsNamespace());
+            interactionsManager.init(roconDescription.getInteractionsNamespace());
             interactionsManager.getAppsForRole(roconDescription.getMasterId(), roconDescription.getCurrentRole());
             interactionsManager.setRemoconName(statusPublisher.REMOCON_FULL_NAME);
             //execution of publisher
@@ -386,7 +392,8 @@ public class MainActivity extends RosActivity {
             if (! pairSubscriber.isInitialized()) {
                 // If we come back from an app, it should be already initialized, so call execute again would crash
                 nodeMainExecutorService.execute(pairSubscriber, nodeConfiguration.setNodeName(pairSubscriber.NODE_NAME));
-            }*/
+            }
+            nodeMainExecutorService.execute(mover, nodeConfiguration.setNodeName("mover"));
         } catch (IOException e) {
             // Socket problem
         }
@@ -404,14 +411,22 @@ public class MainActivity extends RosActivity {
                 String flag=intent.getStringExtra("rosKey");
                 String name=intent.getStringExtra("name");
                 if (TextUtils.equals("Roaming",flag)){
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... params) {
-                            doMoveAction(availableAppsCache,roconDescription.getCurrentRole(),"Roaming");
-                            return null;
-                        }
-                    }.execute();
-                }else if (TextUtils.equals("Stop",flag)){
+//                    new AsyncTask<Void, Void, Void>() {
+//                        @Override
+//                        protected Void doInBackground(Void... params) {
+                            doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Roaming");
+                            SpeechImpl.getInstance().startListen();
+//                            return null;
+//                        }
+//                    }.execute();
+                }else if (TextUtils.equals("SaveAMap",flag)){
+                    rmapClient=new RmapClient("robotai");
+                    nodeMainExecutorService.execute(rmapClient,nodeConfiguration.setNodeName("RmapClient"));
+                } else if (TextUtils.equals("World Navigation",flag)){
+                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"World Navigation");
+                }else if (TextUtils.equals("Make A Map",flag)){
+//                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
+                } else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
                 }else if (TextUtils.equals("AddTWO",flag)){
                     Log.e("AddTWO","Start AddTWO");
@@ -419,44 +434,46 @@ public class MainActivity extends RosActivity {
                     nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
                 }else if (TextUtils.equals("VisualInit",flag)){
                     Log.e("VisualInit","Start VisualInit");
-                    visualClient=new VisualClient(0,"");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                    visualClient=new VisualClient(1,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
                 }else if (TextUtils.equals("VisualLearn",flag)){
                     Log.e("VisualLearn","Start VisualLearn");
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，请不同角度展示物体");
-                    if (TextUtils.equals("",name)){
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取物体名称为空");
-                    }
-                    visualClient=new VisualClient(1,name);
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
+                    SpeechImpl.getInstance().cancelListen();
+                    visualClient=new VisualClient(2,name);
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
                 }else if (TextUtils.equals("VisualRec",flag)){
                     Log.e("VisualRec","Start VisualRec");
-                    visualClient=new VisualClient(2,"");
+                    visualClient=new VisualClient(3,"");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
+                }else if (TextUtils.equals("VisualClose",flag)){
+                    Log.e("VisualClose","Start VisualClose");
+                    visualClient=new VisualClient(4,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
                 }
-            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
-
             }else  if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
-                //此部分代码暂时这样修改，待完善。（时间太赶）2016-07-16
-                String direction=intent.getStringExtra("direction");
+                /*String direction=String.valueOf(intent.getIntExtra("direction",5));
                 Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
-                String digit=intent.getStringExtra("digit");
-                Log.i("ROS_MOVE","语音控制时，得到的digit参数："+digit);
                 if (null==direction|| TextUtils.equals("", direction)) {
                     return;
                 }
                 if (TextUtils.equals("1",direction)||TextUtils.equals("2",direction)){
-                    doRobotMoveAction(direction);
+                    doMoveAction(direction);
                 }else if (TextUtils.equals("3",direction)){
-//                    doTrunAction(mover.getCurrentDegree(),270);
+                    doTrunAction(mover.getCurrentDegree(),270);
                 }else if (TextUtils.equals("4",direction)){
-//                    doTrunAction(mover.getCurrentDegree(),90);
-                }
+                    doTrunAction(mover.getCurrentDegree(),90);
+                }else if (TextUtils.equals("5",direction)){
+                    doMoveAction(direction);
+                }*/
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
+
             }
         }
     };
 
-    private void doRobotMoveAction(String message) {
+    private void doMoveAction(String message) {
         mover.isPublishVelocity(true);
         if (TextUtils.equals("1", message)) {
             Log.i("ROS_MOVE", "机器人移动方向:向前");
@@ -476,7 +493,24 @@ public class MainActivity extends RosActivity {
         }
     }
 
-    protected void doMoveAction(final ArrayList<Interaction> apps, final String role,final String displayName){
+    public void doTrunAction(double currentDegree,double degree){
+        mover.isPublishVelocity(true);
+        double temp;
+        if (currentDegree+degree<=180){
+            temp=currentDegree+degree;
+        }else {
+            temp=currentDegree+degree-360;
+        }
+        if ((degree > 0 && degree < 180)){
+            mover.execTurnRight();
+            mover.setDegree(temp);
+        }else{
+            mover.execTurnLeft();
+            mover.setDegree(temp);
+        }
+    }
+
+    protected void doRappControlerAction(final ArrayList<Interaction> apps, final String role,final String displayName){
         selectedInteraction = null;
         for (int i=0;i<apps.size();i++){
             Log.e(TAG, "InteractionDisplayName:"+apps.get(i).getDisplayName());
