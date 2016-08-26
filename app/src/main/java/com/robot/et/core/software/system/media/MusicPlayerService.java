@@ -21,7 +21,7 @@ import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
-import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.util.MusicManager;
 
 import java.io.IOException;
@@ -60,12 +60,15 @@ public class MusicPlayerService extends Service {
                 DataConfig.isPlayMusic = false;
                 //播放的是APP推送来的歌曲，继续播放下一首
                 if (DataConfig.isJpushPlayMusic) {
-                    playAppLower();
+                    String musicName = MusicManager.getCurrentPlayName();
+                    if (!TextUtils.isEmpty(musicName)) {
+                        playAppLower(musicName);
+                    }
                     return;
                 }
 
                 SpectrumManager.hideSpectrum();
-                SpectrumManager.showSpectrumLinearLayout(false);
+                ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
 
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
@@ -94,12 +97,15 @@ public class MusicPlayerService extends Service {
     };
 
     //播放APP推送来的下一首
-    private void playAppLower() {
-        String musicSrc = MusicManager.getLowerMusicSrc(MusicManager.getCurrentMediaType(), MusicManager.getCurrentPlayName() + ".mp3");
-        Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
-        MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
-        HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", MusicManager.getCurrentPlayName(), new NettyClientHandler(this));
-        play(musicSrc);
+    private void playAppLower(String musicName) {
+        int currentType = MusicManager.getCurrentMediaType();
+        if (currentType != 0 && !TextUtils.isEmpty(musicName)) {
+            String musicSrc = MusicManager.getLowerMusicSrc(currentType, musicName + ".mp3");
+            Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
+            MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
+            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new NettyClientHandler(this));
+            play(musicSrc);
+        }
     }
 
     @Override
@@ -150,8 +156,7 @@ public class MusicPlayerService extends Service {
         public void onPrepared(MediaPlayer mp) {
             Log.i("music", "音乐开始播放");
             DataConfig.isPlayMusic = true;
-            EmotionManager.showEmotionLinearLayout(false);
-            TextManager.showTextLinearLayout(false);
+            ViewCommon.initView();
             SpectrumManager.showSpectrum();
 
             mediaPlayer.start(); // 开始播放
