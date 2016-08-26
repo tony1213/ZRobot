@@ -16,6 +16,8 @@ public class BroadcastAction {
     //检测网络变化
     public static String ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED = "action.monitor.watch.network.traffic.speed";
 
+    //蓝牙数据接收
+    public static String ACTION_MOVE_TO_BLUTH ="action.control.robot.bluth";
 
     //串口数据接收
     public static String ACTION_MOVE_TO_SERIALPORT ="action.control.robot.serialport";
