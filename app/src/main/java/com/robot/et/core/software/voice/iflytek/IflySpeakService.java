@@ -157,6 +157,10 @@ public class IflySpeakService extends SpeechService {
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 showNormalEmotion(false);
+                //do nothing
+                break;
+            case DataConfig.SPEAK_TYPE_SLEEP://睡觉
+                showNormalEmotion(false);
                 EmotionManager.showEmotion(R.mipmap.emotion_blink);//睡觉状态
                 //do nothing
                 break;

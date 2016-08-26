@@ -66,6 +66,8 @@ public class DataConfig {
     public static final int SPEAK_TYPE_WELCOME = 6;
     //剧本问答对话
     public static final int SPEAK_TYPE_SCRIPT = 7;
+    //睡觉
+    public static final int SPEAK_TYPE_SLEEP = 8;
 
 
     //歌曲信息连接符

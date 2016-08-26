@@ -25,10 +25,10 @@ import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.hardware.move.ControlMoveService;
-import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.common.receiver.MsgReceiverService;
+import com.robot.et.core.hardware.move.BluthControlMoveService;
+import com.robot.et.core.software.bluetooth.BluetoothService;
 import com.robot.et.core.software.common.push.netty.NettyService;
+import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.CustomTextView;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -44,7 +44,6 @@ import com.robot.et.core.software.ros.client.Client;
 import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
-import com.robot.et.core.software.ros.map.Rmap;
 import com.robot.et.core.software.system.media.MusicPlayerService;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.iflytek.IflySpeakService;
@@ -351,7 +350,7 @@ public class MainActivity extends RosActivity {
 
     private void initService() {
         //netty
-//        startService(new Intent(this, NettyService.class));
+        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, IflyVoiceToTextService.class));
         //文本理解
@@ -361,15 +360,17 @@ public class MainActivity extends RosActivity {
         //音乐
         startService(new Intent(this, MusicPlayerService.class));
         //唤醒
-        startService(new Intent(this, WakeUpServices.class));
+//        startService(new Intent(this, WakeUpServices.class));
         //接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, IflySpeakService.class));
         //控制动
-        startService(new Intent(this, ControlMoveService.class));
+//        startService(new Intent(this, ControlMoveService.class));
         //agora
         startService(new Intent(this, AgoraService.class));
+        startService(new Intent(this, BluetoothService.class));
+        startService(new Intent(this, BluthControlMoveService.class));
     }
 
     @Override
@@ -584,11 +585,13 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
         stopService(new Intent(this, MusicPlayerService.class));
-        stopService(new Intent(this, WakeUpServices.class));
+//        stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
-//        stopService(new Intent(this, NettyService.class));
-        stopService(new Intent(this, ControlMoveService.class));
+        stopService(new Intent(this, NettyService.class));
+//        stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
+        stopService(new Intent(this, BluetoothService.class));
+        stopService(new Intent(this, BluthControlMoveService.class));
 
         stopService(new Intent(this, MasterChooserService.class));
     }

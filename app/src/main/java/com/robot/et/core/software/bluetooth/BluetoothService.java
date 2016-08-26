@@ -16,6 +16,7 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.entity.BluthReceiverInfo;
 import com.robot.et.util.BroadcastEnclosure;
 
@@ -27,9 +28,9 @@ import org.json.JSONTokener;
  * Created by houdeming on 2016/8/25.
  */
 public class BluetoothService extends Service {
-    //robot2    20:16:06:20:65:84
-    //autorobot3    98:D3:31:B0:C6:48
-    private final String BLUE_ADDRESS = "20:16:06:20:70:69";//20:16:06:20:70:69
+    //演示robot2  address20:16:06:20:65:84
+    //备用AIRobot address：20:16:06:20:70:69
+    private final String BLUE_ADDRESS = "20:16:06:20:70:69";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothChatService mChatService;
     private boolean isBreak;
@@ -146,6 +147,8 @@ public class BluetoothService extends Service {
                         isBreak = true;
                         stopChatService();
                         startChatService();
+                        SpeechImpl.getInstance().cancelListen();
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "蓝牙断开");
                     }
                     connectBluth();
                     break;
