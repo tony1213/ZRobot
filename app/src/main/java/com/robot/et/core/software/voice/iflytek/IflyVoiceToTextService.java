@@ -16,11 +16,13 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
+import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.voice.iflytek.util.ResultParse;
 import com.robot.et.util.FileUtils;
@@ -68,8 +70,8 @@ public class IflyVoiceToTextService extends SpeechService {
             startTimer();
         }
 
-        TextManager.showTextLinearLayout(false);
-
+        ViewCommon.initView();
+        EmotionManager.showEmotion(R.mipmap.emotion_normal);
         listen(DataConfig.DEFAULT_SPEAK_MEN);
     }
 
@@ -165,7 +167,7 @@ public class IflyVoiceToTextService extends SpeechService {
                     stopTimer();
                     isFirstListen = false;
 
-                    EmotionManager.showEmotionLinearLayout(false);
+                    ViewCommon.initView();
                     TextManager.showText(result);
 
                     if (commandHandler.isCustorm(result)) {

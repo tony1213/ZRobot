@@ -19,7 +19,7 @@ import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
-import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LearnAnswerInfo;
@@ -204,7 +204,7 @@ public class CommandHandler {
                     if (!TextUtils.isEmpty(faceName)) {
                         flag = true;
                         FaceManager.addFaceInfo(faceName);
-                        TextManager.showTextLinearLayout(false);
+                        ViewCommon.initView();
                         OneImgManager.showImg(R.mipmap.robot_qr_code);
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "我记住了，您可以扫描我的二维码和我聊天哦");
                     }
@@ -220,6 +220,8 @@ public class CommandHandler {
             case PHOTOGRAPH_SCENE:// 拍照
                 flag = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                DataConfig.isTakePicture = true;
+                BroadcastEnclosure.openFaceRecognise(context, true);
 
                 break;
             /*case VISION_LEARN_SCENE:// 视觉学习
@@ -397,18 +399,22 @@ public class CommandHandler {
     public boolean isRosService(String result) {
         String content = "";
         if (!TextUtils.isEmpty(result)) {
-            SpeechImpl.getInstance().startListen();
-            EmotionManager.showEmotion(R.mipmap.emotion_normal);
             if (result.contains("记住这个是")||result.contains("记住这是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
                 sendRos("DeepLearn",content);
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                SpeechImpl.getInstance().startListen();
                 return true;
             }else {
                 String rosKey = EnumManager.getRosServiceKey(result);
                     Log.i("ros", "rosKey===" + rosKey);
                     if (!TextUtils.isEmpty(rosKey)) {
                         sendRos(rosKey,"");
+                        ViewCommon.initView();
+                        EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                        SpeechImpl.getInstance().startListen();
                         return true;
                     }
             }
@@ -420,7 +426,7 @@ public class CommandHandler {
     public boolean isMatchEmotion(String result) {
         EmotionEnum emotionEnum = EnumManager.getEmotionEnum(result);
         if (emotionEnum != null) {
-            TextManager.showTextLinearLayout(false);
+            ViewCommon.initView();
             EmotionManager.showEmotionAnim(emotionEnum.getEmotionKey());
             String answer = emotionEnum.getRequireAnswer();
             if (!TextUtils.isEmpty(answer)) {
@@ -471,7 +477,7 @@ public class CommandHandler {
         intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
         context.sendBroadcast(intent);
 
-        TextManager.showTextLinearLayout(false);
+        ViewCommon.initView();
         EmotionManager.showEmotion(R.mipmap.emotion_blink);
     }
 
