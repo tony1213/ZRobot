@@ -41,6 +41,7 @@ import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
+import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.map.Rmap;
@@ -75,6 +76,8 @@ public class MainActivity extends RosActivity {
 
     private final float VISUALIZER_HEIGHT_DIP = 150f;//频谱View高度
 
+    private final float CIRCLE = 3.1415926535f; //圆周率
+
     private ArrayList<Interaction> availableAppsCache;
     private Interaction selectedInteraction;
     private RoconDescription roconDescription;
@@ -85,6 +88,7 @@ public class MainActivity extends RosActivity {
     private Client client;
     private VisualClient visualClient;
     private RmapClient rmapClient;
+    private MoveClient moveClient;
     private NodeConfiguration nodeConfiguration;
     private MoveControler mover;
 
@@ -419,38 +423,51 @@ public class MainActivity extends RosActivity {
 //                            return null;
 //                        }
 //                    }.execute();
-                }else if (TextUtils.equals("SaveAMap",flag)){
+                }else if (TextUtils.equals("Deep Learning",flag)){
+                    //视觉深度学习
+                    Log.e("ROS_Client","Start Deep Learning");
+                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Deep Learning");
+                    SpeechImpl.getInstance().startListen();
+                } else if (TextUtils.equals("Follower",flag)){
+                    Log.e("ROS_Client","Start Follower");
+                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Follower");
+                    SpeechImpl.getInstance().startListen();
+                } else if (TextUtils.equals("SaveAMap",flag)){
+                    Log.e("ROS_Client","Start SaveAMap");
                     rmapClient=new RmapClient("robotai");
                     nodeMainExecutorService.execute(rmapClient,nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation",flag)){
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"World Navigation");
-                }else if (TextUtils.equals("Make A Map",flag)){
-//                    doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Make A Map");
                 } else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
                 }else if (TextUtils.equals("AddTWO",flag)){
                     Log.e("AddTWO","Start AddTWO");
                     client=new Client();
                     nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
-                }else if (TextUtils.equals("VisualInit",flag)){
-                    Log.e("VisualInit","Start VisualInit");
+                }else if (TextUtils.equals("ForwardOneMeter",flag)){
+                    //基于WorldNavigation的语音控制运动
+                    Log.e("ForwardOneMeter","Start ForwardOneMeter");
+                    moveClient=new MoveClient("base_link",1,0,0);
+                    nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                } else if (TextUtils.equals("DeepLearnInit",flag)){
+                    Log.e("DeepLearnInit","Start VisualInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                     visualClient=new VisualClient(1,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualLearn",flag)){
-                    Log.e("VisualLearn","Start VisualLearn");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearn",flag)){
+                    Log.e("DeepLearn","Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
                     SpeechImpl.getInstance().cancelListen();
                     visualClient=new VisualClient(2,name);
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualRec",flag)){
-                    Log.e("VisualRec","Start VisualRec");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearnRec",flag)){
+                    Log.e("DeepLearnRec","Start DeepLearnRec");
                     visualClient=new VisualClient(3,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
-                }else if (TextUtils.equals("VisualClose",flag)){
-                    Log.e("VisualClose","Start VisualClose");
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
+                }else if (TextUtils.equals("DeepLearnClose",flag)){
+                    Log.e("DeepLearnClose","Start DeepLearnClose");
                     visualClient=new VisualClient(4,"");
-                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("visualClient"));
+                    nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 }
             }else  if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
                 /*String direction=String.valueOf(intent.getIntExtra("direction",5));
@@ -467,6 +484,26 @@ public class MainActivity extends RosActivity {
                 }else if (TextUtils.equals("5",direction)){
                     doMoveAction(direction);
                 }*/
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS)){
+                //基于WorldNavigation的语音控制运动
+                Log.e("WorldNavigation","Start WorldNavigation Control Move");
+                String direction = intent.getStringExtra("direction");
+                String digit = intent.getStringExtra("digit");
+                if (TextUtils.equals("",direction)||TextUtils.equals("",digit)){
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的语音指令不正确，请确认。");
+                    return;
+                }
+                float d = Float.valueOf(digit);
+                if (TextUtils.equals("1",direction)){
+                    moveClient=new MoveClient("base_link",Float.valueOf(digit),0,0);
+                }else if (TextUtils.equals("2",direction)){
+                    moveClient=new MoveClient("base_link",-Float.valueOf(digit),0,0);
+                }else if (TextUtils.equals("3",direction)){
+                    moveClient=new MoveClient("base_link",0,0,d*CIRCLE/180.0f);
+                }else if (TextUtils.equals("4",direction)){
+                    moveClient=new MoveClient("base_link",0,0,-d*CIRCLE/180.0f);
+                }
+                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
 
             }

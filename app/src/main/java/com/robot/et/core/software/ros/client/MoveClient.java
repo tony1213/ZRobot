@@ -16,6 +16,7 @@
 
 package com.robot.et.core.software.ros.client;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
@@ -60,20 +61,25 @@ public class MoveClient extends AbstractNodeMain {
             throw new RosRuntimeException(e);
         }
         final MoveRequest request = serviceClient.newMessage();
-        request.setFrame("");
+        request.setFrame(frame);
         request.setX(x);
         request.setY(y);
         request.setAngle(angle);
         serviceClient.call(request, new ServiceResponseListener<MoveResponse>() {
             @Override
             public void onSuccess(MoveResponse response) {
-                Log.e("ROS_Client", "onSuccess:Status:" + response.getStatus());
+                Log.e("WorldNavigation", "response:" + response.getStatus());
+                if (TextUtils.equals("SUCCESS",response.getStatus())){
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "目标到达成功");
+                }else if (TextUtils.equals("FAILED",response.getStatus())){
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "目标不可到达");
+                }
             }
 
             @Override
             public void onFailure(RemoteException e) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "移动出现异常");
-                Log.e("ROS_Client", "onFailure");
+                Log.e("WorldNavigation", "onFailure");
                 throw new RosRuntimeException(e);
             }
         });

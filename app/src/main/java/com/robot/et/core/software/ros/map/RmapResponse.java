@@ -7,5 +7,6 @@ import org.ros.internal.message.Message;
  */
 public interface RmapResponse extends Message {
     String _TYPE = "com.robot.et.core.software.ros.map/RmapResponse";
+    String _DEFINITION = "";
 
 }
