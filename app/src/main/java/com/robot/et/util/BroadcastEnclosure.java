@@ -125,6 +125,14 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
+    //语音控制走小车的广播
+    public static void controlRobotMoveRos(Context context, int direction, String digit) {
+        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS);
+        intent.putExtra("direction", direction);
+        intent.putExtra("digit", digit);
+        context.sendBroadcast(intent);
+    }
+
     //发送雷达的广播
     public static void sendRadar(Context context) {
         intent.setAction(BroadcastAction.ACTION_ROBOT_RADAR);
