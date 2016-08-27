@@ -397,7 +397,30 @@ public class CommandHandler {
     public boolean isRosService(String result) {
         String content = "";
         if (!TextUtils.isEmpty(result)) {
-            if (result.contains("记住这个是")||result.contains("记住这是")) {
+            if (result.contains("导航到")){
+                //获取目的地
+                int start = result.indexOf("到");
+                content = result.substring(start + 1, result.length());
+                sendRos("DestinationName",content);
+                return true;
+            } else if (result.contains("这个地方是")||result.contains("这里是")){
+                //获取地图上面的位置坐标
+                int start = result.indexOf("是");
+                content = result.substring(start + 1, result.length());
+                sendRos("PositionName",content);
+                return true;
+            } else if (result.contains("记住这个是")||result.contains("记住这是")) {
+                int start = result.indexOf("是");
+                content = result.substring(start + 1, result.length());
+                sendRos("DeepLearn",content);
+                return true;
+            }else if (TextUtils.equals("跟着我",result)){
+                sendRos("WORLDFOLLOWER","1");
+                SpeechImpl.getInstance().startListen();
+            }else if (TextUtils.equals("不要跟着我",result)){
+                sendRos("WORLDFOLLOWER","0");
+                SpeechImpl.getInstance().startListen();
+            } else if (result.contains("记住这个是")||result.contains("记住这是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
                 sendRos("DeepLearn",content);

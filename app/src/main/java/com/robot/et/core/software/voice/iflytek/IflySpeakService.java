@@ -48,7 +48,7 @@ public class IflySpeakService extends SpeechService {
 
         DataConfig.isSleep = false;
         //入口，说欢迎语
-        startSpeak(DataConfig.SPEAK_TYPE_WELCOME, getWelcomeContent());
+//        startSpeak(DataConfig.SPEAK_TYPE_WELCOME, getWelcomeContent());
 
     }
 
