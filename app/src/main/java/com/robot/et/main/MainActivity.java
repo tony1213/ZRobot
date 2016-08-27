@@ -118,6 +118,7 @@ public class MainActivity extends RosActivity {
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
+        filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(receiver, filter);
@@ -505,7 +506,10 @@ public class MainActivity extends RosActivity {
                     moveClient=new MoveClient("base_link",0,0,-d*CIRCLE/180.0f);
                 }
                 nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
-            }else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
+            }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
+                int degree =intent.getIntExtra("degree",0);
+                doTrunAction(mover.getCurrentDegree(),degree);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
 
             }
         }
