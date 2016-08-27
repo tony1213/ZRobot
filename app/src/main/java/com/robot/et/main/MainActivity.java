@@ -377,7 +377,7 @@ public class MainActivity extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         Log.e(TAG,"init(NodeMainExecutor nodeMainExecutor)");
-        SpeechImpl.getInstance().startListen();
+//        SpeechImpl.getInstance().startListen();
         mover=new MoveControler();
         try {
             java.net.Socket socket = new java.net.Socket(getMasterUri().getHost(), getMasterUri().getPort());
