@@ -154,8 +154,12 @@ public class ScriptHandler implements Script {
                 case ScriptConfig.SCRIPT_HEAD://头
                     Log.i("netty", "doScriptAction() 头");
                     String angle = info.getSpareContent();
-                    turnHead(context, content, angle);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    boolean flag = turnHead(context, content, angle);
+                    long time = 2000;
+                    if (flag) {
+                        time = 3000;
+                    }
+                    handleNewScriptInfos(context, infos, true, getDealyTime(time));
 
                     break;
                 default:
@@ -170,7 +174,8 @@ public class ScriptHandler implements Script {
 
     //头部转向
     //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
-    private static void turnHead(final Context context, String content, String angle) {
+    private static boolean turnHead(final Context context, String content, String angle) {
+        boolean isHeadUp = false;
         String turnAngle = "";
         int headDirection = DataConfig.TURN_HEAD_ABOUT;
         boolean isSingle = true;
@@ -184,6 +189,7 @@ public class ScriptHandler implements Script {
             headDirection = DataConfig.TURN_HEAD_UP_DOWN;
             turnAngle = "-5";
             isSingle = false;
+            isHeadUp = true;
         } else if (TextUtils.equals(content, "左转")) {
             Log.i("netty", "doScriptAction() 头左转");
             headDirection = DataConfig.TURN_HEAD_ABOUT;
@@ -203,8 +209,9 @@ public class ScriptHandler implements Script {
                 public void run() {
                     BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_UP_DOWN, "5");
                 }
-            }, 1500);
+            }, 1000);
         }
+        return isHeadUp;
     }
 
     //获取头部左转右转角度
@@ -218,9 +225,9 @@ public class ScriptHandler implements Script {
             }
         } else {
             if (isLeft) {
-                angle = "5";
+                angle = "30";
             } else {
-                angle = "-5";
+                angle = "-30";
             }
         }
         return angle;

@@ -102,8 +102,11 @@ public class BluthControlMoveService extends Service {
                 Log.i("Move", "控制头转");
                 int directionValue = intent.getIntExtra("direction", DataConfig.TURN_HEAD_ABOUT);
                 String angleValue = intent.getStringExtra("angle");
+                Log.i("Move", "控制头转angleValue==" + angleValue);//-30
                 if (!TextUtils.isEmpty(angleValue)) {
-                    controlHeadTurn(directionValue, angleValue);
+                    if (angleValue.contains("-") || TextUtils.isDigitsOnly(angleValue)) {
+                        controlHeadTurn(directionValue, Integer.parseInt(angleValue));
+                    }
                 }
             }
 
@@ -188,7 +191,7 @@ public class BluthControlMoveService extends Service {
     }
 
     //控制头转向
-    private void controlHeadTurn(int directionValue, String angleValue) {
+    private void controlHeadTurn(int directionValue, int angleValue) {
         BluthSendInfo info = new BluthSendInfo();
         info.setcG("DIS");
         if (directionValue == DataConfig.TURN_HEAD_ABOUT) {

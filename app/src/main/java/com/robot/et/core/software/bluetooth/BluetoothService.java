@@ -28,9 +28,9 @@ import org.json.JSONTokener;
  * Created by houdeming on 2016/8/25.
  */
 public class BluetoothService extends Service {
-    //演示robot2  address20:16:06:20:65:84
+    //演示robot2  address：20:16:06:20:65:84
     //备用AIRobot address：20:16:06:20:70:69
-    private final String BLUE_ADDRESS = "20:16:06:20:70:69";
+    private final String BLUE_ADDRESS = "20:16:06:20:65:84";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothChatService mChatService;
     private boolean isBreak;

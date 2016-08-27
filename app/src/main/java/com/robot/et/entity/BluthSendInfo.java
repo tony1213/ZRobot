@@ -8,7 +8,7 @@ public class BluthSendInfo {
     private String cG;//category
     private String aT;//action
     private String DIS;//DigitalServoDriver
-    private String aG;//angle
+    private int aG;//angle
     private String VT;//Vertical
     private String HZ;//Horizontal
     private String DP;//display
@@ -38,11 +38,11 @@ public class BluthSendInfo {
         this.DIS = DIS;
     }
 
-    public String getaG() {
+    public int getaG() {
         return aG;
     }
 
-    public void setaG(String aG) {
+    public void setaG(int aG) {
         this.aG = aG;
     }
 

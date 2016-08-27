@@ -51,10 +51,13 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     doPushResult(info);
                     return;
                 }
-
+                boolean isStop = false;
                 Log.i("netty", "direction===" + direction);
                 if (TextUtils.isDigitsOnly(direction)) {
                     int moveKey = Integer.parseInt(direction);
+                    if (moveKey == 5) {
+                        isStop = true;
+                    }
                     if (moveKey < 10) {
                         Log.i("netty", "控制脚走");
                         BroadcastEnclosure.controlMoveByApp(context, moveKey);
@@ -86,6 +89,10 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                            default:
                                break;
                        }
+//                        while (!isStop) {
+//                            Log.i("netty", "控制头");
+//                            SystemClock.sleep(1000);
+//                        }
                         BroadcastEnclosure.controlHead(context, directionTurn, angle);
                     }
                 } else {

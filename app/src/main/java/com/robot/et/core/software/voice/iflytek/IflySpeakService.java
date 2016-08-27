@@ -44,6 +44,8 @@ public class IflySpeakService extends SpeechService {
         mTts = SpeechSynthesizer.createSynthesizer(this, mTtsInitListener);
         SpeechImpl.setService(this);
 
+        ScriptHandler.addLocalScript(this, "script2");
+
         DataConfig.isSleep = false;
         //入口，说欢迎语
         startSpeak(DataConfig.SPEAK_TYPE_WELCOME, getWelcomeContent());

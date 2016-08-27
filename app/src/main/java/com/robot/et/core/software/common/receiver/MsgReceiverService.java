@@ -133,6 +133,7 @@ public class MsgReceiverService extends Service {
                     ViewCommon.initView();
                     OneImgManager.showImg(bitmap);
                 }
+                SpeechImpl.getInstance().cancelListen();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "看我拍的怎么样呢，嘿嘿");
             }
         }
