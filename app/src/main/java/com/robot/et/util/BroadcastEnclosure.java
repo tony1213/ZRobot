@@ -98,12 +98,6 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
-    //硬件接受到信息通知软件的广播
-    public static void notifySoftware(Context context) {
-        intent.setAction(BroadcastAction.ACTION_NOTIFY_SOFTWARE);
-        context.sendBroadcast(intent);
-    }
-
     //连接agora
     public static void connectAgora(Context context, int type){
         intent.setAction(BroadcastAction.ACTION_CONNECT_AGORA);

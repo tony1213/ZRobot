@@ -1,5 +1,7 @@
 package com.robot.et.util;
 
+import android.graphics.Bitmap;
+
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.FaceInfo;
 
@@ -13,6 +15,7 @@ public class FaceManager {
     private static List<FaceInfo> infos = new ArrayList<FaceInfo>();
     private static String authorId;
     private static String authorName;
+    private static Bitmap bitmap;
 
     public static void setNewFaceInfo(List<FaceInfo> faceInfos) {
         int size = faceInfos.size();
@@ -51,4 +54,11 @@ public class FaceManager {
         FaceManager.authorName = authorName;
     }
 
+    public static Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public static void setBitmap(Bitmap bitmap) {
+        FaceManager.bitmap = bitmap;
+    }
 }

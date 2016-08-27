@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,13 +13,14 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
 import com.robot.et.db.RobotDB;
 import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.FaceManager;
 
 import java.util.Random;
 
@@ -45,10 +47,10 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
         filter.addAction(BroadcastAction.ACTION_SPEAK);
         filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
-        filter.addAction(BroadcastAction.ACTION_NOTIFY_SOFTWARE);
         filter.addAction(BroadcastAction.ACTION_PHONE_HANGUP);
         filter.addAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION);
+        filter.addAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
 
         registerReceiver(receiver, filter);
 
@@ -115,11 +117,6 @@ public class MsgReceiverService extends Service {
                 }
                 startActivity(intent);
 
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_NOTIFY_SOFTWARE)) {//接受到硬件反馈
-                Log.i("accept", "MsgReceiverService  接受到硬件反馈");
-                if (DataConfig.isPlayScript) {
-                    new ScriptHandler().scriptAction(MsgReceiverService.this);
-                }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PHONE_HANGUP)) {//查看时电话挂断
                 Log.i("accept", "MsgReceiverService  查看时电话挂断");
                 // do nothing
@@ -130,9 +127,14 @@ public class MsgReceiverService extends Service {
                     ViewCommon.initView();
                     EmotionManager.showEmotionAnim(emotionKey);
                 }
-                if (DataConfig.isPlayScript) {
-                    new ScriptHandler().scriptAction(MsgReceiverService.this);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED)) {//自动拍照完成
+                Log.i("accept", "MsgReceiverService  自动拍照完成");
+                Bitmap bitmap = FaceManager.getBitmap();
+                if (bitmap != null) {
+                    ViewCommon.initView();
+                    OneImgManager.showImg(bitmap);
                 }
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "看我拍的怎么样呢，嘿嘿");
             }
         }
     };

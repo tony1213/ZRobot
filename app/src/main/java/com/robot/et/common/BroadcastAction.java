@@ -61,8 +61,6 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_ROBOT_TURN ="action.control.robot.turn";
     //控制小车不停车的广播
     public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
-    //硬件接受到信息通知软件的广播
-    public static String ACTION_NOTIFY_SOFTWARE = "action.notify.software";
     //连接agora的广播
     public static String ACTION_CONNECT_AGORA = "action.connect.agora";
     //进入agora的广播
@@ -77,5 +75,7 @@ public class BroadcastAction {
     public static String ACTION_ROBOT_TURN_HEAD = "com.robot.et.turn.head";
     //ROS服务广播
     public static String ACTION_ROS_SERVICE = "com.robot.et.ros";
+    //自动拍照完毕广播
+    public static String ACTION_TAKE_PHOTO_COMPLECTED = "com.robot.et.take.photo.complected";
 
 }

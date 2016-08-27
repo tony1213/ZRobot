@@ -2,7 +2,6 @@ package com.robot.et.core.software.common.script;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -53,8 +52,8 @@ public class ScriptHandler implements Script {
                     Log.i("netty", "doScriptAction() 表情");
                     int emotionKey = EnumManager.getEmotionKey(content);
                     Log.i("netty", "doScriptAction() emotionKey====" + emotionKey);
-                    ScriptManager.setScriptActionInfos(infos);
                     BroadcastEnclosure.controlRobotEmotion(context, emotionKey);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
                 case ScriptConfig.SCRIPT_MUSIC://音乐
@@ -117,8 +116,8 @@ public class ScriptHandler implements Script {
                     String handDirection = ScriptManager.getHandDirection(info.getSpareContent());
                     String handCategory = ScriptManager.getHandCategory(content);
                     Log.i("netty", "doScriptAction() handDirection===" + handDirection);
-                    ScriptManager.setScriptActionInfos(infos);
                     BroadcastEnclosure.controlWaving(context, handDirection, handCategory, "1");
+                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
                 case ScriptConfig.SCRIPT_MOVE://走
@@ -127,7 +126,6 @@ public class ScriptHandler implements Script {
                     String spareContent = info.getSpareContent();
                     Log.i("netty", "spareContent==" + spareContent);
                     int num = 0;
-                    ScriptManager.setScriptActionInfos(infos);
                     if (!TextUtils.isEmpty(spareContent)) {
                         if (spareContent.contains("小车")) {
                             num = MatchStringUtil.getToyCarNum(spareContent);
@@ -137,17 +135,14 @@ public class ScriptHandler implements Script {
                         }
                     }
 
-                    new ScriptHandler().scriptAction(context);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
                 case ScriptConfig.SCRIPT_TURN://左转右转
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
-                    ScriptManager.setScriptActionInfos(infos);
                     BroadcastEnclosure.controlMoveByApp(context, turnDirection);
-
-
-                    new ScriptHandler().scriptAction(context);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
                 case ScriptConfig.SCRIPT_STOP://停止
@@ -232,7 +227,7 @@ public class ScriptHandler implements Script {
     }
 
     //更新剧本的内容
-    public static void handleNewScriptInfos(Context context, List<ScriptActionInfo> infos, boolean isResume, long delayTime) {
+    public static void handleNewScriptInfos(final Context context, final List<ScriptActionInfo> infos, boolean isResume, long delayTime) {
         if (DataConfig.isAppPushRemind) {
             DataConfig.isAppPushRemind = false;
             return;
@@ -241,11 +236,15 @@ public class ScriptHandler implements Script {
         if (infos != null && infos.size() > 0) {
             infos.remove(0);
             ScriptManager.setScriptActionInfos(infos);
-            SystemClock.sleep(delayTime);
 
             if (isResume) {
                 if (DataConfig.isPlayScript) {
-                    doScriptAction(context, infos);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            doScriptAction(context, infos);
+                        }
+                    }, delayTime);
                 } else {
                     Log.i("netty", "DataConfig.isPlayScript===false 剧本执行完毕");
                     playScriptEnd(context);
@@ -269,7 +268,6 @@ public class ScriptHandler implements Script {
         Log.i("netty", "playScriptEnd()");
         DataConfig.isPlayScript = false;
         if (!DataConfig.isPlayMusic) {
-            SystemClock.sleep(2000);
             BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
         }
         //重连netty
@@ -424,7 +422,6 @@ public class ScriptHandler implements Script {
 
     @Override
     public void scriptAction(Context context) {
-        handleNewScriptInfos(context, ScriptManager.getScriptActionInfos(), true, getDealyTime(2000));
     }
 
     @Override

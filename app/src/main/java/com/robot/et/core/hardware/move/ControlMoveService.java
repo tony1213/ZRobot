@@ -72,8 +72,6 @@ public class ControlMoveService extends Service {
                     }
                 }
 
-                BroadcastEnclosure.notifySoftware(ControlMoveService.this);
-
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_WAVING)) {//举手摆手
                 Log.i("Move", "举手摆手");
                 String handDirection = intent.getStringExtra("handDirection");
@@ -83,8 +81,6 @@ public class ControlMoveService extends Service {
                 if (!TextUtils.isEmpty(handDirection) && !TextUtils.isEmpty(handCategory)) {
                     handAction(handDirection, handCategory);
                 }
-
-                BroadcastEnclosure.notifySoftware(ControlMoveService.this);
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//嘴的LED灯
                 Log.i("Move", "嘴的LED灯");
