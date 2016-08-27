@@ -148,7 +148,6 @@ public class IflySpeakService extends SpeechService {
     private void responseSpeakCompleted() {
         switch (currentType) {
             case DataConfig.SPEAK_TYPE_CHAT://对话
-                showNormalEmotion(true);
                 SpeechImpl.getInstance().startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
@@ -178,7 +177,6 @@ public class IflySpeakService extends SpeechService {
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WELCOME://欢迎语
-                showNormalEmotion(true);
 //                String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
 //                SpeechImpl.getInstance().understanderTextByIfly(weatherContent);
                 SpeechImpl.getInstance().startListen();

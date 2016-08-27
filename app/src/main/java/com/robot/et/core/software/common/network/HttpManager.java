@@ -208,7 +208,7 @@ public class HttpManager {
 
     //上传文件
     public static void uploadFile(Bitmap bitmap) {
-        String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "80000082");
+        String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
         HttpEngine.Param[] params = new HttpEngine.Param[]{
                 new HttpEngine.Param("robotNumber", robotNum)
         };

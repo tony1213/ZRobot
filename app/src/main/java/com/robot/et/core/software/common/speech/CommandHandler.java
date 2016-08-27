@@ -299,9 +299,8 @@ public class CommandHandler {
                 break;
             case START_RECOGNISE_ENVIRONMENT_SCENE:// 进入识别环境的标志
                 if (DataConfig.isStartRoam) {
-                    DataConfig.isStartRoam = false;
                     flag = true;
-                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                    DataConfig.isStartRoam = false;
                     SpeechImpl.getInstance().startListen();
                     Log.i("ifly", "通知本体开始漫游并识别物体");
                     //通知本体开始漫游并识别物体
@@ -338,7 +337,6 @@ public class CommandHandler {
                 if (DataConfig.isControlToyCar) {//控制小车
                     DataConfig.controlNum = 0;
                     BroadcastEnclosure.controlToyCarMove(context, moveKey, getToyCarNum());
-                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
                     SpeechImpl.getInstance().startListen();
                 } else {//控制机器人
                     DataConfig.isControlRobotMove = true;
@@ -403,8 +401,6 @@ public class CommandHandler {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
                 sendRos("DeepLearn",content);
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 SpeechImpl.getInstance().startListen();
                 return true;
             }else {
@@ -412,8 +408,6 @@ public class CommandHandler {
                     Log.i("ros", "rosKey===" + rosKey);
                     if (!TextUtils.isEmpty(rosKey)) {
                         sendRos(rosKey,"");
-                        ViewCommon.initView();
-                        EmotionManager.showEmotion(R.mipmap.emotion_normal);
                         SpeechImpl.getInstance().startListen();
                         return true;
                     }
@@ -432,7 +426,6 @@ public class CommandHandler {
             if (!TextUtils.isEmpty(answer)) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
             } else {
-                EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 SpeechImpl.getInstance().startListen();
             }
             return true;
@@ -501,8 +494,6 @@ public class CommandHandler {
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
             }
         }, 1500);
-        ViewCommon.initView();
-        EmotionManager.showEmotion(R.mipmap.emotion_normal);
         SpeechImpl.getInstance().startListen();
     }
 
@@ -550,7 +541,6 @@ public class CommandHandler {
             DataConfig.isPlayScript = false;
             ScriptHandler.doScriptAction(context, infos);
         } else {
-            EmotionManager.showEmotion(R.mipmap.emotion_normal);
             SpeechImpl.getInstance().startListen();
         }
     }

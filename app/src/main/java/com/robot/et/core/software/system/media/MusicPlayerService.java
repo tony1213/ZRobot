@@ -13,13 +13,11 @@ import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
-import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.util.MusicManager;
@@ -59,6 +57,8 @@ public class MusicPlayerService extends Service {
                 Log.i("music", "音乐播放完成");
                 DataConfig.isPlayMusic = false;
                 //播放的是APP推送来的歌曲，继续播放下一首
+                SpectrumManager.hideSpectrum();
+
                 if (DataConfig.isJpushPlayMusic) {
                     String musicName = MusicManager.getCurrentPlayName();
                     if (!TextUtils.isEmpty(musicName)) {
@@ -66,10 +66,6 @@ public class MusicPlayerService extends Service {
                     }
                     return;
                 }
-
-                SpectrumManager.hideSpectrum();
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_normal);
 
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
                 sendBroadcast(intent);
