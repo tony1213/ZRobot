@@ -38,6 +38,7 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.face.iflytek.util.FaceRect;
 import com.robot.et.core.software.face.iflytek.util.FaceUtil;
 import com.robot.et.core.software.face.iflytek.util.ParseResult;
@@ -433,6 +434,7 @@ public class FaceDistinguishActivity extends Activity {
         FileUtils.writeToFile(mImageData, "photo.png");
         HttpManager.uploadFile(bitmap);
         finish();
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "看我拍的怎么样呢，嘿嘿");
     }
 
     //验证

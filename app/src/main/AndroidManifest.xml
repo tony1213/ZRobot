@@ -58,6 +58,12 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
+        <activity android:name=".core.software.face.iflytek.FaceDistinguishActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            />
+
         <service android:name=".core.software.voice.iflytek.IflySpeakService" />
         <service android:name=".core.software.voice.iflytek.IflyTextUnderstanderService" />
         <service android:name=".core.software.voice.iflytek.IflyVoiceToTextService" />

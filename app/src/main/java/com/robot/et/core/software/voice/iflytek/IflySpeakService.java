@@ -156,7 +156,7 @@ public class IflySpeakService extends SpeechService {
                 BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
-                showNormalEmotion(false);
+                showNormalEmotion(true);
                 //do nothing
                 break;
             case DataConfig.SPEAK_TYPE_SLEEP://睡觉

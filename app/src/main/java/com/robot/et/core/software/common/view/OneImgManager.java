@@ -1,5 +1,6 @@
 package com.robot.et.core.software.common.view;
 
+import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -21,6 +22,16 @@ public class OneImgManager {
         if (imageView != null) {
             showImgLinearLayout(true);
             imageView.setBackgroundResource(resId);
+        }
+    }
+
+    //显示图片
+    public static void showImg(Bitmap bitmap) {
+        if (imageView != null) {
+            showImgLinearLayout(true);
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap);
+            }
         }
     }
 

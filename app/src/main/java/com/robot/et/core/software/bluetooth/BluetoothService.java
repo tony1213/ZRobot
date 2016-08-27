@@ -102,7 +102,11 @@ public class BluetoothService extends Service {
                     switch (msg.arg1) {
                         case BluetoothChatService.STATE_CONNECTED:// 连接蓝牙
                             Log.i("bluth", "STATE_CONNECTED");
-                            isBreak = false;
+                            if (isBreak) {
+                                isBreak = false;
+                                SpeechImpl.getInstance().cancelListen();
+                                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "蓝牙已连接");
+                            }
                             break;
                         case BluetoothChatService.STATE_CONNECTING:// 正在连接
                             Log.i("bluth", "STATE_CONNECTING");
@@ -148,7 +152,7 @@ public class BluetoothService extends Service {
                         stopChatService();
                         startChatService();
                         SpeechImpl.getInstance().cancelListen();
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "蓝牙断开");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "蓝牙断开");
                     }
                     connectBluth();
                     break;
