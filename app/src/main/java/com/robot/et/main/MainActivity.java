@@ -412,6 +412,7 @@ public class MainActivity extends RosActivity {
             }
             nodeMainExecutorService.execute(mover, nodeConfiguration.setNodeName("mover"));
             nodeMainExecutorService.execute(positionControler, nodeConfiguration.setNodeName("positionControler"));
+//            nodeMainExecutor.execute(positionControler, nodeConfiguration);
         } catch (IOException e) {
             // Socket problem
         }
@@ -486,10 +487,20 @@ public class MainActivity extends RosActivity {
 //                        SpeechImpl.getInstance().cancelSpeak();
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "地图导航未开启，不能获取坐标");
 //                    }else {
+
+                    //关闭跟随，要不然导航不走，左左右右
+//                    followClient =new FollowClient((byte)0);
+//                    nodeMainExecutorService.execute(followClient,nodeConfiguration.setNodeName("FollowClient"));
+//                    try{
+//                        Thread.sleep(500);
+//                    }catch (InterruptedException e){
+//                        e.printStackTrace();
+//                    }
+
                         VisionRecogniseEnvironmentInfo info= RobotDB.getInstance().getVisionRecogniseEnvironmentInfo(name);
                         float x = Float.valueOf(info.getPositionX());
                         float y = Float.valueOf(info.getPositionY());
-                        moveClient=new MoveClient("base_link",x,y,0);
+                        moveClient=new MoveClient("map",x,y,0);
                         Log.e("navigation","导航目的地："+name+"，坐标X"+x+"坐标Y:"+y);
                         nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "导航开始");

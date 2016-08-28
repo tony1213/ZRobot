@@ -31,8 +31,10 @@ public enum RosServiceEnum {
 	* @description Call the Rapp's Follower
 	* Created by Tony
 	*/
-	FOLLOWER("Follower","跟我走"),//匹配Rapp中的Follower
+/*
+    FOLLOWER("Follower","跟我走"),//匹配Rapp中的Follower
 	FOLLOWER2("Follower","跟我来"),//匹配Rapp中的Follower
+*/
 
 	/*
 	* 跟随模块服务
