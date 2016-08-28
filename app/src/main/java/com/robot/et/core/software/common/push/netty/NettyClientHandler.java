@@ -8,6 +8,7 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.bluetooth.BluthHand;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.NetResultParse;
 import com.robot.et.core.software.common.network.NettyClientCallBack;
@@ -125,6 +126,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                         Log.i("netty", "datas[0]===" + datas[0]);
                         Log.i("netty", "datas[1]===" + datas[1]);
                         BroadcastEnclosure.controlToyCarMove(context, getIntNum(datas[1]), getIntNum(datas[0]));
+                    } else {
+                        BluthHand.handleJsonResult(context, direction);
                     }
                 }
             }
