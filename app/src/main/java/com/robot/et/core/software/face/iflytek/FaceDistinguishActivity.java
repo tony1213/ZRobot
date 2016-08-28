@@ -110,6 +110,10 @@ public class FaceDistinguishActivity extends Activity {
         DataConfig.isFaceRecogniseIng = true;
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
 
+        if (!DataConfig.isTakePicture) {
+            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_UP_DOWN, "10");
+        }
+
     }
 
     //获取屏幕中心点坐标
@@ -401,6 +405,10 @@ public class FaceDistinguishActivity extends Activity {
         mStopTrack = true;
         //灯灭
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
+
+        if (!DataConfig.isTakePicture) {
+            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_UP_DOWN, "0");
+        }
     }
 
     @Override
