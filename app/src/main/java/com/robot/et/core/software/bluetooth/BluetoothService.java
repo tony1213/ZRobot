@@ -35,6 +35,7 @@ public class BluetoothService extends Service {
     private BluetoothChatService mChatService;
     private boolean isBreak;
     private Intent interruptIntent, turnIntent;
+    private static int lastAngle = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -202,22 +203,16 @@ public class BluetoothService extends Service {
                         interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
                         sendBroadcast(interruptIntent);
 
-                        //0-60  头向右转  ： 300-360  头向左转
-                        //左右横向运动以正中为0度，向右10度即-10，向左10度即+10
-                        if (xFAngle > 0 && xFAngle <= 60) {//0-60  头向右转
-                            String angle = "-" + xFAngle;
-                            Log.i("wakeup", "angle===" + angle);
-                            BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, angle);
-                        } else if (xFAngle >= 300 && xFAngle <= 360) {//300-360  头向左转
-                            int temp = 360 - xFAngle;
-                            String angle = String.valueOf(temp);
-                            Log.i("wakeup", "angle===" + angle);
-                            BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, angle);
-                        } else {//硬件去转身
-                            turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                            turnIntent.putExtra("degree", xFAngle);
-                            sendBroadcast(turnIntent);
-                        }
+                        handleAngle(xFAngle);
+
+                        Log.i("wakeup", "headAngle===" + headAngle);
+                        Log.i("wakeup", "bodyAngle===" + bodyAngle);
+                        //头部去转
+                        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle));
+                        //身体去转
+                        turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+                        turnIntent.putExtra("degree", bodyAngle);
+                        sendBroadcast(turnIntent);
                     }
                 }
 
@@ -255,6 +250,31 @@ public class BluetoothService extends Service {
                 }
 
             }
+        }
+    }
+
+    private int headAngle;//头部角度
+    private int bodyAngle;//身体角度
+
+    //对角度处理
+    //0-60  头向右转  ： 300-360  头向左转
+    //左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+    private void handleAngle(int angle) {
+        lastAngle = (lastAngle + angle) % 360;
+
+        if (lastAngle >= 300 && lastAngle <= 360) {
+            headAngle = 360 - lastAngle;
+            bodyAngle = 0;
+
+        } else if (lastAngle >= 0 && lastAngle <= 60) {
+            headAngle = lastAngle - 60;
+            bodyAngle = 0;
+
+        } else {
+            headAngle = 0;
+            bodyAngle = lastAngle;
+            lastAngle = 0;
+
         }
     }
 
