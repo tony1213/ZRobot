@@ -3,9 +3,6 @@ package com.robot.et.common.enums;
 //ROS 服务
 public enum RosServiceEnum {
 
-	//测试RosClient
-	STARTADDSERVICE("AddTWO","开启服务"),
-
 	/*
 	* 随便走走模块服务
 	* @description Make A Map + Random Walk
@@ -24,7 +21,6 @@ public enum RosServiceEnum {
 
 	SAVEAMAP("SaveAMap","保存地图"),
 	SAVEAMAP2("SaveAMap","地图保存"),
-	FORWARDONEMETER("ForwardOneMeter","走一米"),
 
 	/*
 	* 跟随模块服务
