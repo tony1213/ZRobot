@@ -345,12 +345,11 @@ public class CommandHandler {
                     int digit = getIntNum(result);
                     Log.i("iflyresult", "result===" + result);
                     Log.i("iflyresult", "digit===" + digit);
-//                    if (digit != 0) {
-//                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
-//                    } else {
-//                        BroadcastEnclosure.controlRobotMove(context, moveKey);
-//                    }
-
+                    if (digit != 0) {
+                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
+                    } else {
+                        BroadcastEnclosure.controlRobotMove(context, moveKey);
+                    }
                 }
                 return true;
             }

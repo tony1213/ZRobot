@@ -427,19 +427,15 @@ public class MainActivity extends RosActivity {
                 roconDescription=(RoconDescription)intent.getSerializableExtra("RoconDescription");
                 init2(roconDescription);
             }else if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)){
-                Log.e(TAG,"接收到ROS服务数据");
                 String flag=intent.getStringExtra("rosKey");
                 String name=intent.getStringExtra("name");
+                Log.e(TAG,"下发ROS服务：Key"+flag+",name:"+name);
                 if (TextUtils.equals("Roaming",flag)){
-//                    new AsyncTask<Void, Void, Void>() {
-//                        @Override
-//                        protected Void doInBackground(Void... params) {
-                            doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Roaming");
-                            SpeechImpl.getInstance().startListen();
-//                            return null;
-//                        }
-//                    }.execute();
+                    //随便走走
+                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Roaming");
+                     SpeechImpl.getInstance().startListen();
                 } else if (TextUtils.equals("WORLDFOLLOWER",flag)){
+                    //跟随和不跟随
                     if (TextUtils.equals("0",name)){
                         followClient =new FollowClient((byte)0);
                     }else {
@@ -451,21 +447,27 @@ public class MainActivity extends RosActivity {
                     Log.e("ROS_Client","Start Deep Learning");
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Deep Learning");
                     SpeechImpl.getInstance().startListen();
-                } else if (TextUtils.equals("Follower",flag)){
+                } /*else if (TextUtils.equals("Follower",flag)){
                     Log.e("ROS_Client","Start Follower");
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"Follower");
                     SpeechImpl.getInstance().startListen();
-                } else if (TextUtils.equals("SaveAMap",flag)){
+                }*/ else if (TextUtils.equals("SaveAMap",flag)){
+                    //保存地图
                     Log.e("ROS_Client","Start SaveAMap");
                     rmapClient=new RmapClient("robotai");
                     nodeMainExecutorService.execute(rmapClient,nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation",flag)){
+                    //地图导航
+                    Log.e("ROS_Client","World Navigation");
                     doRappControlerAction(availableAppsCache,roconDescription.getCurrentRole(),"World Navigation");
                 }else if(TextUtils.equals("PositionName",flag)){
 //                    if (isWorldNavigationOpen == false){
 //                        SpeechImpl.getInstance().cancelSpeak();
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "地图导航未开启，不能获取坐标");
 //                    }else {
+
+                    //语音获取位置坐标
+                    Log.e("ROS_Client","PositionName");
                     double x =positionControler.getX();
                     Log.e("ROS_Client","X=="+x);
                     double y =positionControler.getY();
@@ -473,7 +475,7 @@ public class MainActivity extends RosActivity {
                     positionControler.setName(name);
                     Log.e("ROS_Client","Name=="+name);
                     SpeechImpl.getInstance().cancelSpeak();
-//                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取到"+name+"的当前X坐标为："+x+",Y坐标："+y);
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取到"+name+"的当前X坐标为："+x+",Y坐标："+y);
                     Log.e("ROS_Client","获取到"+name+"的当前X坐标为："+x+",Y坐标："+y);
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，"+name+"记住了");
                     VisionRecogniseEnvironmentInfo info =new VisionRecogniseEnvironmentInfo();
@@ -498,6 +500,8 @@ public class MainActivity extends RosActivity {
 //                        e.printStackTrace();
 //                    }
 
+                    //导航到目标
+
                         VisionRecogniseEnvironmentInfo info= RobotDB.getInstance().getVisionRecogniseEnvironmentInfo(name);
                         float x = Float.valueOf(info.getPositionX());
                         float y = Float.valueOf(info.getPositionY());
@@ -508,15 +512,6 @@ public class MainActivity extends RosActivity {
 //                    }
                 } else if (TextUtils.equals("Stop",flag)){
                     doStopAction();
-                }else if (TextUtils.equals("AddTWO",flag)){
-                    Log.e("AddTWO","Start AddTWO");
-                    client=new Client();
-                    nodeMainExecutorService.execute(client,nodeConfiguration.setNodeName("Client"));
-                }else if (TextUtils.equals("ForwardOneMeter",flag)){
-                    //基于WorldNavigation的语音控制运动
-                    Log.e("ForwardOneMeter","Start ForwardOneMeter");
-                    moveClient=new MoveClient("base_link",1,0,0);
-                    nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 } else if (TextUtils.equals("DeepLearnInit",flag)){
                     Log.e("DeepLearnInit","Start VisualInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
@@ -593,7 +588,7 @@ public class MainActivity extends RosActivity {
                 moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
                 nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
-                doMoveAction("5");
+//                doMoveAction("5");
             }
         }
     };
