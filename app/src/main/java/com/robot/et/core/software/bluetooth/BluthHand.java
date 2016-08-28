@@ -60,7 +60,7 @@ public class BluthHand {
                 int rightValue = info.getRdR();
                 Log.i("bluthresult", "leftValue==" + leftValue + "---middleValue===" + middleValue + "---rightValue===" + rightValue);
                 if (DataConfig.isControlRobotMove) {
-                    int stopValue = 20;
+                    int stopValue = 50;
                     if (leftValue < stopValue || middleValue < stopValue || rightValue < stopValue) {
                         DataConfig.isControlRobotMove = false;
                         Log.i("bluthresult", "雷达发送停止1");

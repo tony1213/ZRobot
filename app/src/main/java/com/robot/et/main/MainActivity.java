@@ -590,11 +590,12 @@ public class MainActivity extends RosActivity {
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
                 Log.e("ROS_Client","Service：Get WakeUp Degree");
                 float d =intent.getIntExtra("degree",0);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
+//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
                 moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
                 nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
-//                doMoveAction("5");
+                moveClient=new MoveClient("base_link",0,0,0);
+                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             }
         }
     };
