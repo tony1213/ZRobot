@@ -10,7 +10,7 @@ public class ViewCommon {
         EmotionManager.showEmotionLinearLayout(false);
         OneImgManager.showImgLinearLayout(false);
         TextManager.showTextLinearLayout(false);
-        SpectrumManager.showSpectrumLinearLayout(false);
+//        SpectrumManager.showSpectrumLinearLayout(false);
     }
 
 }

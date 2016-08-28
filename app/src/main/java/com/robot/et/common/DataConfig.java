@@ -146,4 +146,11 @@ public class DataConfig {
     public final static int TURN_HEAD_ABOUT = 0;
     public final static int TURN_HEAD_UP_DOWN = 1;
 
+    //app是否控制头部停止
+    public static boolean isHeadStop = false;
+
+    //app控制头部的初始值
+    public static int LAST_HEAD_ANGLE_ABOUT = 5;
+    public static int LAST_HEAD_ANGLE_UP_DOWN = 5;
+
 }

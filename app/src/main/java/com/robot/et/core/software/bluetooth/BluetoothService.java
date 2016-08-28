@@ -28,8 +28,8 @@ import org.json.JSONTokener;
  * Created by houdeming on 2016/8/25.
  */
 public class BluetoothService extends Service {
-    //演示robot2  address：20:16:06:20:65:84
-    //备用AIRobot address：20:16:06:20:70:69
+    //演示robot2  address：20:16:06:20:65:84   密码：0000
+    //备用AIRobot address：20:16:06:20:70:69   密码：0000
     private final String BLUE_ADDRESS = "20:16:06:20:65:84";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothChatService mChatService;
@@ -193,17 +193,29 @@ public class BluetoothService extends Service {
                 int xFState = info.getxF();
                 if (xFState == 1) {//有唤醒
                     int xFAngle = info.getxAg();
-                    Log.i("bluthresult", "xFAngle===" + xFAngle);
+                    Log.i("wakeup", "xFAngle===" + xFAngle);
                     //当在人脸检测的时候不发送广播
                     if (!DataConfig.isFaceRecogniseIng) {
                         //软件做业务
                         interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
                         sendBroadcast(interruptIntent);
 
-                        //硬件去转身
-                        turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                        turnIntent.putExtra("degree", xFAngle);
-                        sendBroadcast(turnIntent);
+                        //0-60  头向右转  ： 300-360  头向左转
+                        //左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+                        if (xFAngle > 0 && xFAngle <= 60) {//0-60  头向右转
+                            String angle = "-" + xFAngle;
+                            Log.i("wakeup", "angle===" + angle);
+                            BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, angle);
+                        } else if (xFAngle >= 300 && xFAngle <= 360) {//300-360  头向左转
+                            int temp = 360 - xFAngle;
+                            String angle = String.valueOf(temp);
+                            Log.i("wakeup", "angle===" + angle);
+                            BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, angle);
+                        } else {//硬件去转身
+                            turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+                            turnIntent.putExtra("degree", xFAngle);
+                            sendBroadcast(turnIntent);
+                        }
                     }
                 }
 

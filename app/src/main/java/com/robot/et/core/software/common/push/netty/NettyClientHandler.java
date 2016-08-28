@@ -51,21 +51,25 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                     doPushResult(info);
                     return;
                 }
-                boolean isStop = false;
+                DataConfig.isHeadStop = false;
                 Log.i("netty", "direction===" + direction);
                 if (TextUtils.isDigitsOnly(direction)) {
                     int moveKey = Integer.parseInt(direction);
-                    if (moveKey == 5) {
-                        isStop = true;
-                    }
                     if (moveKey < 10) {
+                        if (moveKey == 5) {
+                            if (isControlHead) {
+                                DataConfig.isHeadStop = true;
+                            }
+                        }
+                        isControlHead = false;
                         Log.i("netty", "控制脚走");
                         BroadcastEnclosure.controlMoveByApp(context, moveKey);
                     } else {
-                        int directionTurn = DataConfig.TURN_HEAD_ABOUT;
-                        String angle = "";
                         //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
-                        switch (moveKey) {
+                        isControlHead = true;
+                        int directionTurn = DataConfig.TURN_HEAD_ABOUT;
+                        String angle = "5";
+                        switch (moveKey) {//左右 -60----60//上下 -18-----18
                            case 11://头向前
                                Log.i("netty", "头向前");
                                directionTurn = DataConfig.TURN_HEAD_UP_DOWN;
@@ -89,11 +93,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                            default:
                                break;
                        }
-//                        while (!isStop) {
-//                            Log.i("netty", "控制头");
-//                            SystemClock.sleep(1000);
-//                        }
-                        BroadcastEnclosure.controlHead(context, directionTurn, angle);
+                        handleHead(directionTurn, angle);
+
                     }
                 } else {
                     String splite = "__";
@@ -106,6 +107,16 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                 }
             }
         }
+    }
+
+    private boolean isControlHead = false;
+    //控制头
+    private void handleHead(int directionTurn, String angle) {
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP);
+        intent.putExtra("directionTurn", directionTurn);
+        intent.putExtra("angle", angle);
+        context.sendBroadcast(intent);
     }
 
     // 获取小车、方向的int值

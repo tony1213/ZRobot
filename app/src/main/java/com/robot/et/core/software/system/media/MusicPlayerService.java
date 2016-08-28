@@ -8,18 +8,17 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
-import android.media.audiofx.Visualizer;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
-import com.robot.et.core.software.common.view.SpectrumManager;
-import com.robot.et.core.software.common.view.ViewCommon;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ public class MusicPlayerService extends Service {
     // 媒体播放器对象
     private MediaPlayer mediaPlayer;
     private Intent intent;
-    private Visualizer mVisualizer;//频谱器
+//    private Visualizer mVisualizer;//频谱器
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -42,10 +41,10 @@ public class MusicPlayerService extends Service {
         Log.i("music", "MusicPlayerService onCreate()");
         mediaPlayer = new MediaPlayer();
         //实例化Visualizer，参数SessionId可以通过MediaPlayer的对象获得
-        mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
-        //采样 - 参数内必须是2的位数 - 如64,128,256,512,1024
-        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-        SpectrumManager.setVisualizer(mVisualizer);
+//        mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
+//        //采样 - 参数内必须是2的位数 - 如64,128,256,512,1024
+//        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+//        SpectrumManager.setVisualizer(mVisualizer);
 
         intent = new Intent();
 
@@ -56,9 +55,10 @@ public class MusicPlayerService extends Service {
             public void onCompletion(MediaPlayer arg0) {
                 Log.i("music", "音乐播放完成");
                 DataConfig.isPlayMusic = false;
-                //播放的是APP推送来的歌曲，继续播放下一首
-                SpectrumManager.hideSpectrum();
 
+//                SpectrumManager.hideSpectrum();
+
+                //播放的是APP推送来的歌曲，继续播放下一首
                 if (DataConfig.isJpushPlayMusic) {
                     String musicName = MusicManager.getCurrentPlayName();
                     if (!TextUtils.isEmpty(musicName)) {
@@ -67,6 +67,7 @@ public class MusicPlayerService extends Service {
                     return;
                 }
 
+                BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_OFF);
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
                 sendBroadcast(intent);
             }
@@ -118,6 +119,8 @@ public class MusicPlayerService extends Service {
 
     //开始播放
     private void play(String musicSrc) {
+        BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_BLINK);
+
         if (!TextUtils.isEmpty(musicSrc)) {
             try {
                 mediaPlayer.reset();// 把各项参数恢复到初始状态
@@ -152,8 +155,8 @@ public class MusicPlayerService extends Service {
         public void onPrepared(MediaPlayer mp) {
             Log.i("music", "音乐开始播放");
             DataConfig.isPlayMusic = true;
-            ViewCommon.initView();
-            SpectrumManager.showSpectrum();
+//            ViewCommon.initView();
+//            SpectrumManager.showSpectrum();
 
             mediaPlayer.start(); // 开始播放
 
@@ -167,7 +170,7 @@ public class MusicPlayerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mVisualizer.release();
+//        mVisualizer.release();
         if (mediaPlayer != null) {
             stopPlay();
             mediaPlayer.release();

@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -23,6 +25,8 @@ import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FaceManager;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by houdeming on 2016/7/27.
@@ -51,6 +55,7 @@ public class MsgReceiverService extends Service {
         filter.addAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION);
         filter.addAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
+        filter.addAction(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP);
 
         registerReceiver(receiver, filter);
 
@@ -135,9 +140,76 @@ public class MsgReceiverService extends Service {
                 }
                 SpeechImpl.getInstance().cancelListen();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "看我拍的怎么样呢，嘿嘿");
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP)) {//app控制头
+                directionTurn = intent.getIntExtra("directionTurn", 0);
+                angle = intent.getStringExtra("angle");
+                Log.i("netty", "app控制头  directionTurn==" + directionTurn + ",angle===" + angle);
+                if (timer == null) {
+                    timer = new Timer();
+                }
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        handler.sendEmptyMessage(1);
+                    }
+                }, 0, 1000);
             }
         }
     };
+
+    private int directionTurn;
+    private String angle;
+
+    private Timer timer;
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                if (DataConfig.isHeadStop) {
+                    if (timer != null) {
+                        timer.cancel();
+                        timer = null;
+                    }
+                } else {
+                    //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+                    BroadcastEnclosure.controlHead(MsgReceiverService.this, directionTurn, angle);
+
+                    int angleValue = getAngle();
+                    if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 -60----60
+                        DataConfig.LAST_HEAD_ANGLE_ABOUT = angleValue;
+                        if (angleValue == -60 || angleValue == 60) {
+                            DataConfig.isHeadStop = true;
+                        }
+                    } else if (directionTurn == DataConfig.TURN_HEAD_UP_DOWN) {//上下 -18-----18
+                        DataConfig.LAST_HEAD_ANGLE_UP_DOWN = angleValue;
+                        if (angleValue == -18 || angleValue == 18) {
+                            DataConfig.isHeadStop = true;
+                        }
+                    }
+                    angle = String.valueOf(angleValue);
+                }
+            }
+        }
+    };
+
+    //左右 -60----60    上下 -18-----18   获取一直发的角度
+    private int getAngle() {
+        int data = 0;
+        if (!TextUtils.isEmpty(angle)) {
+            if (angle.contains("-") || TextUtils.isDigitsOnly(angle)) {
+                int angleValue = Integer.parseInt(angle);
+                if (angleValue >= 0) {
+                    angleValue += 5;
+                } else {
+                    angleValue -= 5;
+                }
+                data = angleValue;
+                angle = String.valueOf(data);
+            }
+        }
+        return data;
+    }
 
     @Override
     public void onDestroy() {

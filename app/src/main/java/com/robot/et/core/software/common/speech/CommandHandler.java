@@ -341,28 +341,54 @@ public class CommandHandler {
                 } else {//控制机器人
                     DataConfig.isControlRobotMove = true;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
-                    StringBuffer buffer = new StringBuffer();
-                    for(int j=0;j<result.length();j++){
-                        char tempChar = result.charAt(j);
-                        if(Character.isDigit(tempChar)){
-                            buffer.append(tempChar);
-                        }
-                    }
-                    String tempDistance = buffer.toString();
-                    String digit = "";
-                    Log.i("ifly","digit===" + digit);
-                    if(!TextUtils.isEmpty(tempDistance)){
-                        digit = tempDistance;
-                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, digit);
-                    } else {
-                        BroadcastEnclosure.controlRobotMove(context, moveKey);
-                    }
+
+                    int digit = getIntNum(result);
+                    Log.i("iflyresult", "result===" + result);
+                    Log.i("iflyresult", "digit===" + digit);
+//                    if (digit != 0) {
+//                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
+//                    } else {
+//                        BroadcastEnclosure.controlRobotMove(context, moveKey);
+//                    }
 
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    //获取要走的距离
+    private int getIntNum(String result) {
+        int data = 0;
+        if (!TextUtils.isEmpty(result)) {
+            char[] datas = new char[]{'一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '两'};
+            int resultLength = result.length();
+            StringBuffer buffer = new StringBuffer();
+            for (int i = 0; i < resultLength; i++) {
+                char temp = result.charAt(i);
+                if (Character.isDigit(temp)) {
+                    buffer.append(temp);
+                } else {
+                    int datasLength = datas.length;
+                    for (int j = 0; j < datasLength; j++) {
+                        if (temp == datas[j]) {
+                            data = j + 1;
+                            if (j == datas.length - 1) {
+                                data = 2;
+                            }
+                        }
+                    }
+                }
+            }
+            String tempDistance = buffer.toString();
+            if (!TextUtils.isEmpty(tempDistance)) {
+                if (TextUtils.isDigitsOnly(tempDistance)) {
+                    data = Integer.parseInt(tempDistance);
+                }
+            }
+        }
+        return data;
     }
 
     //是否是自定义问答
@@ -397,20 +423,20 @@ public class CommandHandler {
     public boolean isRosService(String result) {
         String content = "";
         if (!TextUtils.isEmpty(result)) {
-            if (result.contains("记住这个是")||result.contains("记住这是")) {
+            if (result.contains("记住这个是") || result.contains("记住这是")) {
                 int start = result.indexOf("是");
                 content = result.substring(start + 1, result.length());
-                sendRos("DeepLearn",content);
+                sendRos("DeepLearn", content);
                 SpeechImpl.getInstance().startListen();
                 return true;
-            }else {
+            } else {
                 String rosKey = EnumManager.getRosServiceKey(result);
-                    Log.i("ros", "rosKey===" + rosKey);
-                    if (!TextUtils.isEmpty(rosKey)) {
-                        sendRos(rosKey,"");
-                        SpeechImpl.getInstance().startListen();
-                        return true;
-                    }
+                Log.i("ros", "rosKey===" + rosKey);
+                if (!TextUtils.isEmpty(rosKey)) {
+                    sendRos(rosKey, "");
+                    SpeechImpl.getInstance().startListen();
+                    return true;
+                }
             }
         }
         return false;
@@ -546,21 +572,21 @@ public class CommandHandler {
     }
 
     //ros的广播
-    private void sendRos(String rosKey,String name) {
+    private void sendRos(String rosKey, String name) {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
         intent.putExtra("rosKey", rosKey);
-        intent.putExtra("name",name);
+        intent.putExtra("name", name);
         context.sendBroadcast(intent);
     }
 
-    private void sendRosMove(String rosKey,String x,String y,String angle) {
+    private void sendRosMove(String rosKey, String x, String y, String angle) {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
         intent.putExtra("rosKey", rosKey);
-        intent.putExtra("dotX",x);
-        intent.putExtra("dotY",y);
-        intent.putExtra("angle",angle);
+        intent.putExtra("dotX", x);
+        intent.putExtra("dotY", y);
+        intent.putExtra("angle", angle);
         context.sendBroadcast(intent);
     }
 

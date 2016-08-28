@@ -77,5 +77,7 @@ public class BroadcastAction {
     public static String ACTION_ROS_SERVICE = "com.robot.et.ros";
     //自动拍照完毕广播
     public static String ACTION_TAKE_PHOTO_COMPLECTED = "com.robot.et.take.photo.complected";
+    //APP控制头部
+    public static String ACTION_CONTROL_HEAD_BY_APP = "com.robot.et.control.head.by.app";
 
 }
