@@ -423,7 +423,6 @@ public class CommandHandler {
     public boolean isRosService(String result) {
         String content = "";
         if (!TextUtils.isEmpty(result)) {
-            if (result.contains("记住这个是") || result.contains("记住这是")) {
                 if (result.contains("导航到")) {
                     //获取目的地
                     int start = result.indexOf("到");
@@ -453,7 +452,7 @@ public class CommandHandler {
                     sendRos("DeepLearn", content);
                     SpeechImpl.getInstance().startListen();
                     return true;
-                } else {
+                }else {
                     String rosKey = EnumManager.getRosServiceKey(result);
                     Log.i("ros", "rosKey===" + rosKey);
                     if (!TextUtils.isEmpty(rosKey)) {
@@ -463,7 +462,6 @@ public class CommandHandler {
                     }
                 }
             }
-        }
         return false;
     }
 

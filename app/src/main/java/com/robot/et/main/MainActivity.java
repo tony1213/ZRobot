@@ -136,8 +136,7 @@ public class MainActivity extends RosActivity {
     @Override
     public void startMasterChooser() {
         Log.e(TAG,"开始执行MasterChooserService");
-        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "机器人初始化中，请等待。");
-        SpeechImpl.getInstance().cancelListen();
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "机器人初始化中，请等待。");
         startService(new Intent(this, MasterChooserService.class));
     }
 
@@ -218,6 +217,7 @@ public class MainActivity extends RosActivity {
             @Override
             public void onSuccess(GetInteractionsResponse response) {
                 List<Interaction> apps = response.getInteractions();
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"初始化成功");
                 if (apps.size() > 0) {
                     availableAppsCache = (ArrayList<Interaction>) apps;
 
