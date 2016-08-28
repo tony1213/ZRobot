@@ -20,7 +20,7 @@ public enum RosServiceEnum {
 	* @description Load A Map + Save A Map +Control Move
 	* Created by Tony
 	*/
-	WORLDNAVIGATION("World Navigation","世界地图导航"),//匹配Rapp中的World Navigation
+	WORLDNAVIGATION("World Navigation","地图导航"),//匹配Rapp中的World Navigation
 
 	SAVEAMAP("SaveAMap","保存地图"),
 	SAVEAMAP2("SaveAMap","地图保存"),
@@ -31,8 +31,20 @@ public enum RosServiceEnum {
 	* @description Call the Rapp's Follower
 	* Created by Tony
 	*/
-	FOLLOWER("Follower","跟我走"),//匹配Rapp中的Follower
+/*
+    FOLLOWER("Follower","跟我走"),//匹配Rapp中的Follower
 	FOLLOWER2("Follower","跟我来"),//匹配Rapp中的Follower
+*/
+
+	/*
+	* 跟随模块服务
+	* @description Call the Rapp's Follower
+	* Created by Tony
+	*/
+	WORLDFOLLOWER("WORLDFOLLOWER","不要跟着我"),//就是跟随
+
+	WORLDFOLLOWER2("WORLDFOLLOWER","跟着我"),//
+
 
 
 	/*
