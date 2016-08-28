@@ -150,6 +150,7 @@ public class MainActivity extends RosActivity {
         LinearLayout showMusicView = (LinearLayout) findViewById(R.id.ll_show_music);
         LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
         ImageView imageView = (ImageView) findViewById(R.id.img_one);
+        ImageView imageBitmap = (ImageView) findViewById(R.id.img_one_bitmap);
 
         TextManager.setView(showText, tvText);
         EmotionManager.setView(showEmotion, imgLeft, imgRight);
@@ -164,7 +165,7 @@ public class MainActivity extends RosActivity {
         ));
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
-        OneImgManager.setView(showOneImg, imageView);
+        OneImgManager.setView(showOneImg, imageView, imageBitmap);
     }
 
     void init2(RoconDescription roconDescription) {

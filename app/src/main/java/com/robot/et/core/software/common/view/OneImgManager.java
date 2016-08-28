@@ -10,28 +10,36 @@ import android.widget.LinearLayout;
  */
 public class OneImgManager {
     private static ImageView imageView;
+    private static ImageView imageBitmap;
     private static LinearLayout showLinearLayout;
 
-    public static void setView(LinearLayout showLinearLayout, ImageView imageView) {
+    public static void setView(LinearLayout showLinearLayout, ImageView imageView, ImageView imageBitmap) {
         OneImgManager.showLinearLayout = showLinearLayout;
         OneImgManager.imageView = imageView;
+        OneImgManager.imageBitmap = imageBitmap;
     }
 
     //显示图片
     public static void showImg(int resId) {
         if (imageView != null) {
             showImgLinearLayout(true);
+            if (imageBitmap != null) {
+                imageBitmap.setVisibility(View.GONE);
+            }
+            imageView.setVisibility(View.VISIBLE);
             imageView.setBackgroundResource(resId);
         }
     }
 
     //显示图片
     public static void showImg(Bitmap bitmap) {
-        if (imageView != null) {
+        if (imageBitmap != null) {
             showImgLinearLayout(true);
-            if (bitmap != null) {
-                imageView.setImageBitmap(bitmap);
+            if (imageView != null) {
+                imageView.setVisibility(View.GONE);
             }
+            imageBitmap.setVisibility(View.VISIBLE);
+            imageBitmap.setImageBitmap(bitmap);
         }
     }
 
