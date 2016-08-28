@@ -203,15 +203,15 @@ public class BluetoothService extends Service {
                         interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
                         sendBroadcast(interruptIntent);
 
-                        handleAngle(xFAngle);
-
-                        Log.i("wakeup", "headAngle===" + headAngle);
-                        Log.i("wakeup", "bodyAngle===" + bodyAngle);
-                        //头部去转
-                        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle));
+//                        handleAngle(xFAngle);
+//
+//                        Log.i("wakeup", "headAngle===" + headAngle);
+//                        Log.i("wakeup", "bodyAngle===" + bodyAngle);
+//                        //头部去转
+//                        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle));
                         //身体去转
                         turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                        turnIntent.putExtra("degree", bodyAngle);
+                        turnIntent.putExtra("degree", xFAngle);
                         sendBroadcast(turnIntent);
                     }
                 }
