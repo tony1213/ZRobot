@@ -35,11 +35,13 @@ public class RmapClient extends AbstractNodeMain {
 
     @Override
     public void onStart(final ConnectedNode connectedNode) {
-        ServiceClient<RmapRequest, RmapResponse> serviceClient;
+        ServiceClient<RmapRequest, RmapResponse> serviceClient =null;
         try {
             serviceClient = connectedNode.newServiceClient("/turtlebot/save_only_map", com.robot.et.core.software.ros.map.Rmap._TYPE);
         } catch (ServiceNotFoundException e) {
-            throw new RosRuntimeException(e);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化地图服务");
+            return;
+//            throw new RosRuntimeException(e);
         }
         final RmapRequest request = serviceClient.newMessage();
         request.setMapName(mapName);
@@ -53,7 +55,8 @@ public class RmapClient extends AbstractNodeMain {
             @Override
             public void onFailure(RemoteException e) {
                 Log.e("ROS_Client","onFailure");
-                throw new RosRuntimeException(e);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "保存地图出现异常");
+//                throw new RosRuntimeException(e);
             }
         });
     }

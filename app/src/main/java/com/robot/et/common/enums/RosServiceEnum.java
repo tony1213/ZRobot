@@ -60,6 +60,8 @@ public enum RosServiceEnum {
 
 	DEEPLEARNCLOSE("DeepLearnClose","关闭视觉学习"),
 
+	DELETEALLVISUAL("DeleteAllVisual","忘记学习内容"),
+
 	/*
      * ******服务
      * Created by Tony

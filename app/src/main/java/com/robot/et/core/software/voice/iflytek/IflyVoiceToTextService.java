@@ -88,7 +88,7 @@ public class IflyVoiceToTextService extends SpeechService {
             public void run() {
                 handler.sendEmptyMessage(0);
             }
-        }, 5 * 60 * 1000);//设置多少分钟沉睡（单位毫秒）
+        }, 60 * 60 * 1000);//设置多少分钟沉睡（单位毫秒）
     }
 
     //停止计时

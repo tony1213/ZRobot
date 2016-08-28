@@ -156,9 +156,9 @@ public class CommandHandler {
 
                 break;
             case SHUT_UP_SCENE:// 闭嘴
-                flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
-                sleep();
+//                flag = true;
+//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
+//                sleep();
 
                 break;
             case DO_ACTION_SCENE:// 智能学习做动作

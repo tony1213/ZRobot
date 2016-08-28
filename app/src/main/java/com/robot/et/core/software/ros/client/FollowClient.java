@@ -34,11 +34,13 @@ public class FollowClient extends AbstractNodeMain {
 
     @Override
     public void onStart(final ConnectedNode connectedNode) {
-        ServiceClient<FollowRequest, FollowResponse> serviceClient;
+        ServiceClient<FollowRequest, FollowResponse> serviceClient = null;
         try {
             serviceClient = connectedNode.newServiceClient("/turtlebot_follower/change_state", com.robot.et.core.software.ros.follow.Follow._TYPE);
         } catch (ServiceNotFoundException e) {
-            throw new RosRuntimeException(e);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化跟随服务");
+            return;
+//            throw new RosRuntimeException(e);
         }
         final FollowRequest request = serviceClient.newMessage();
         request.setState(state);
@@ -52,7 +54,8 @@ public class FollowClient extends AbstractNodeMain {
             @Override
             public void onFailure(RemoteException e) {
                 Log.e("ROS_Client","onFailure");
-                throw new RosRuntimeException(e);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "跟随出现异常");
+//                throw new RosRuntimeException(e);
             }
         });
     }

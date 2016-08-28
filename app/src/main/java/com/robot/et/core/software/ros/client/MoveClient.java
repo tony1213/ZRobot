@@ -54,11 +54,12 @@ public class MoveClient extends AbstractNodeMain {
 
     @Override
     public void onStart(final ConnectedNode connectedNode) {
-        ServiceClient<MoveRequest, MoveResponse> serviceClient;
+        ServiceClient<MoveRequest, MoveResponse> serviceClient=null;
         try {
             serviceClient = connectedNode.newServiceClient("set_goal", com.robot.et.core.software.ros.move.Move._TYPE);
         } catch (ServiceNotFoundException e) {
-            throw new RosRuntimeException(e);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化移动服务");
+            return;
         }
         final MoveRequest request = serviceClient.newMessage();
         request.setFrame(frame);
@@ -80,7 +81,7 @@ public class MoveClient extends AbstractNodeMain {
             public void onFailure(RemoteException e) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "移动出现异常");
                 Log.e("WorldNavigation", "onFailure");
-                throw new RosRuntimeException(e);
+//                throw new RosRuntimeException(e);
             }
         });
     }

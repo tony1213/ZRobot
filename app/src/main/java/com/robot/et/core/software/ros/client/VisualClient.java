@@ -34,12 +34,13 @@ public class VisualClient extends AbstractNodeMain {
 
     @Override
     public void onStart(final ConnectedNode connectedNode) {
-        ServiceClient<VisualRequest, VisualResponse> serviceClient;
+        ServiceClient<VisualRequest, VisualResponse> serviceClient =null;
         try {
             serviceClient = connectedNode.newServiceClient("learn_to_recognize_ros_server", com.robot.et.core.software.ros.visual.Visual._TYPE);
         } catch (ServiceNotFoundException e) {
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
-            throw new RosRuntimeException(e);
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
+            return;
+//            throw new RosRuntimeException(e);
         }
         final VisualRequest request = serviceClient.newMessage();
         request.setId(flag);
@@ -142,7 +143,7 @@ public class VisualClient extends AbstractNodeMain {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
                 SpeechImpl.getInstance().startListen();
                 Log.e("ROS_Client", "onFailure");
-                throw new RosRuntimeException(e);
+//                throw new RosRuntimeException(e);
             }
         });
     }
