@@ -21,6 +21,7 @@ import com.robot.et.util.BroadcastEnclosure;
 public class BluthControlMoveService extends Service {
     private int i;
     private int controlNumAways;
+    private final String TAG = "bluthMove";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -46,11 +47,11 @@ public class BluthControlMoveService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_AROUND_TOYCAR)) {//控制周围小车
-                Log.i("Move", "控制周围小车");
+                Log.i(TAG, "控制周围小车");
                 int direction = intent.getIntExtra("direction", 0);
                 int toyCarNum = intent.getIntExtra("toyCarNum", 0);
-                Log.i("Move", "控制周围小车direction===" + direction);
-                Log.i("Move", "toyCarNum===" + toyCarNum);
+                Log.i(TAG, "控制周围小车direction===" + direction);
+                Log.i(TAG, "toyCarNum===" + toyCarNum);
                 contrlToyCarMove(direction, toyCarNum);
 
                 if (DataConfig.isControlToyCar) {
@@ -67,30 +68,30 @@ public class BluthControlMoveService extends Service {
                         intent.putExtra("toyCarNum", toyCarNum);
                         sendBroadcast(intent);
                     } else {
-                        Log.i("Move", "directionType 停止===" + direction);
+                        Log.i(TAG, "directionType 停止===" + direction);
                         DataConfig.controlNum = controlNumAways;
                         contrlToyCarMove(5, toyCarNum);
                     }
                 }
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_WAVING)) {//举手摆手
-                Log.i("Move", "举手摆手");
+                Log.i(TAG, "举手摆手");
                 String handDirection = intent.getStringExtra("handDirection");
                 String handCategory = intent.getStringExtra("handCategory");
                 String num = intent.getStringExtra("num");
-                Log.i("Move", "handCategory===" + handCategory);
+                Log.i(TAG, "handCategory===" + handCategory);
                 if (!TextUtils.isEmpty(handDirection) && !TextUtils.isEmpty(handCategory)) {
                     handAction(handDirection, handCategory);
                 }
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//嘴的LED灯
-                Log.i("Move", "嘴的LED灯");
+                Log.i(TAG, "嘴的LED灯");
                 String LEDState = intent.getStringExtra("LEDState");
                 if (!TextUtils.isEmpty(LEDState)) {
                     controlMouthLED(LEDState);
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_TOYCAR_AWAYS)) {//语音不停的控制小车
-                Log.i("Move", "语音不停的控制小车");
+                Log.i(TAG, "语音不停的控制小车");
                 int direction = intent.getIntExtra("directionType", 0);
                 int toyCarNum = intent.getIntExtra("toyCarNum", 0);
                 DataConfig.controlNum++;
@@ -99,10 +100,10 @@ public class BluthControlMoveService extends Service {
                 }
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_TURN_HEAD)) {//控制头转
-                Log.i("Move", "控制头转");
+                Log.i(TAG, "控制头转");
                 int directionValue = intent.getIntExtra("direction", DataConfig.TURN_HEAD_ABOUT);
                 String angleValue = intent.getStringExtra("angle");
-                Log.i("Move", "控制头转angleValue==" + angleValue);//-30
+                Log.i(TAG, "控制头转angleValue==" + angleValue);//-30
                 if (!TextUtils.isEmpty(angleValue)) {
                     if (angleValue.contains("-") || TextUtils.isDigitsOnly(angleValue)) {
                         controlHeadTurn(directionValue, Integer.parseInt(angleValue));
@@ -117,28 +118,28 @@ public class BluthControlMoveService extends Service {
     //控制小车
     private void contrlToyCarMove(int directionType, int toyCarNum) {
         if (directionType != 0) {
-            Log.i("Move", "控制机器人周围玩具toyCarNum===" + toyCarNum);
+            Log.i(TAG, "控制机器人周围玩具toyCarNum===" + toyCarNum);
             RobotAction action = new RobotAction();
             action.setCategory("go");
             switch (directionType) {
                 case 1:
-                    Log.i("Move", "玩具控制 向前");
+                    Log.i(TAG, "玩具控制 向前");
                     action.setAction("forward");
                     break;
                 case 2:
-                    Log.i("Move", "玩具控制 向后");
+                    Log.i(TAG, "玩具控制 向后");
                     action.setAction("backward");
                     break;
                 case 3:
-                    Log.i("Move", "玩具控制 向左");
+                    Log.i(TAG, "玩具控制 向左");
                     action.setAction("turnLeft");
                     break;
                 case 4:
-                    Log.i("Move", "玩具控制 向右");
+                    Log.i(TAG, "玩具控制 向右");
                     action.setAction("turnRight");
                     break;
                 case 5:
-                    Log.i("Move", "玩具控制 停止");
+                    Log.i(TAG, "玩具控制 停止");
                     action.setAction("stop");
                     break;
                 default:
@@ -205,7 +206,7 @@ public class BluthControlMoveService extends Service {
     }
 
     private void sendMoveAction(String result) {
-        Log.i("Move", "json===" + result);
+        Log.i(TAG, "json===" + result);
         if (!TextUtils.isEmpty(result)) {
             byte[] content = result.getBytes();
             byte[] end = new byte[]{0x0a};//结束符

@@ -150,7 +150,11 @@ public class DataConfig {
     public static boolean isHeadStop = false;
 
     //app控制头部的初始值
-    public static int LAST_HEAD_ANGLE_ABOUT = 5;
-    public static int LAST_HEAD_ANGLE_UP_DOWN = 5;
+    public static int LAST_HEAD_ANGLE_ABOUT = 0;
+    public static int LAST_HEAD_ANGLE_UP_DOWN = 0;
+
+    //控制头的方向
+    public static boolean isHeadLeft = false;
+    public static boolean isHeadUp = false;
 
 }

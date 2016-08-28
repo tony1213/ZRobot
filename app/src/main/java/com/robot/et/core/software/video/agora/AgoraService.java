@@ -54,9 +54,6 @@ public class AgoraService extends Service {
                 Log.i("agora", "AgoraService    极光推送过来进入agora");
                 JpushInfo info = intent.getParcelableExtra("JpushInfo");
                 if (info != null) {
-                    if (DataConfig.isVideoOrVoice) {//正在通话中
-                        return;
-                    }
                     joinAgoraRoom(info);
                 }
             }

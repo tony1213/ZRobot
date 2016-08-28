@@ -107,6 +107,8 @@ public class BluetoothService extends Service {
                                 SpeechImpl.getInstance().cancelListen();
                                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "蓝牙已连接");
                             }
+                            //头部复位
+                            BroadcastEnclosure.controlHead(BluetoothService.this, DataConfig.TURN_HEAD_ABOUT, "0");
                             break;
                         case BluetoothChatService.STATE_CONNECTING:// 正在连接
                             Log.i("bluth", "STATE_CONNECTING");

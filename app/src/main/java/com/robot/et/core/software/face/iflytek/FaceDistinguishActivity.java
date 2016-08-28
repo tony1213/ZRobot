@@ -316,9 +316,15 @@ public class FaceDistinguishActivity extends Activity {
                                 FaceUtil.drawFaceRect(canvas, face, PREVIEW_WIDTH, PREVIEW_HEIGHT, frontCamera, false);
                             }
                         }
+                        int length = faces.length;
                         //检测到一个人脸
-                        Log.i("face", "faces.length==" + faces.length);
-                        if (faces.length == 1) {
+                        Log.i("face", "faces.length==" + length);
+                        if (length > 1) {
+                            sendMsg("抱歉，我一下子认识不了这么多人呢", false);
+                            return;
+                        }
+
+                        if (length == 1) {
                             mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
                             noFaceCount = 0;
                             //转身  多次检测的时候只转一次头

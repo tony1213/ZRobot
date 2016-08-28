@@ -178,12 +178,12 @@ public class MsgReceiverService extends Service {
                     int angleValue = getAngle();
                     if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 -60----60
                         DataConfig.LAST_HEAD_ANGLE_ABOUT = angleValue;
-                        if (angleValue == -60 || angleValue == 60) {
+                        if (angleValue <= -60 || angleValue >= 60) {
                             DataConfig.isHeadStop = true;
                         }
                     } else if (directionTurn == DataConfig.TURN_HEAD_UP_DOWN) {//上下 -18-----18
                         DataConfig.LAST_HEAD_ANGLE_UP_DOWN = angleValue;
-                        if (angleValue == -18 || angleValue == 18) {
+                        if (angleValue <= -20 || angleValue >= 20) {
                             DataConfig.isHeadStop = true;
                         }
                     }
@@ -199,11 +199,34 @@ public class MsgReceiverService extends Service {
         if (!TextUtils.isEmpty(angle)) {
             if (angle.contains("-") || TextUtils.isDigitsOnly(angle)) {
                 int angleValue = Integer.parseInt(angle);
-                if (angleValue >= 0) {
-                    angleValue += 5;
-                } else {
-                    angleValue -= 5;
+                if (DataConfig.isHeadUp) {//上
+                    if (angleValue > -20 && angleValue < 20) {
+                        angleValue -= 5;
+                    }else {
+                        angleValue = -20;
+                    }
+                } else {//下
+                    if (angleValue > -20 && angleValue < 20) {
+                        angleValue += 5;
+                    }else {
+                        angleValue = 20;
+                    }
                 }
+
+                if (DataConfig.isHeadLeft) {//左
+                    if (angleValue > -60 && angleValue < 60) {
+                        angleValue -= 5;
+                    }else {
+                        angleValue = -60;
+                    }
+                } else {//右
+                    if (angleValue > -60 && angleValue < 60) {
+                        angleValue += 5;
+                    }else {
+                        angleValue = 60;
+                    }
+                }
+
                 data = angleValue;
                 angle = String.valueOf(data);
             }
