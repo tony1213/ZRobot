@@ -65,6 +65,7 @@ import org.ros.node.NodeMainExecutor;
 import org.ros.node.service.ServiceResponseListener;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -98,7 +99,7 @@ public class MainActivity extends RosActivity {
     private PositionControler positionControler; //ROS 获取当前位置的坐标（Topic:/amcl_pose）
     private FollowClient followClient; //ROS跟随服务Client：（Service：/turtlebot_follower/change_state）
 
-//        private MoveControler mover; //ROS 操作Twist控制Robot（Topic:/cmd_vel_mux/input/teleop && /odom）
+    private MoveControler mover; //ROS 操作Twist控制Robot（Topic:/cmd_vel_mux/input/teleop && /odom）
 
     public MainActivity(){
         super("XRobot","Xrobot");//本体的ROS IP和端口
@@ -384,8 +385,8 @@ public class MainActivity extends RosActivity {
     @Override
     protected void init(NodeMainExecutor nodeMainExecutor) {
         Log.e(TAG,"init(NodeMainExecutor nodeMainExecutor)");
-//        mover=new MoveControler();
-//        mover.isPublishVelocity(false);
+        mover=new MoveControler();
+        mover.isPublishVelocity(false);
 
         positionControler =new PositionControler();//获取当前的位置坐标
         try {
@@ -408,7 +409,7 @@ public class MainActivity extends RosActivity {
                 // If we come back from an app, it should be already initialized, so call execute again would crash
                 nodeMainExecutorService.execute(pairSubscriber, nodeConfiguration.setNodeName(pairSubscriber.NODE_NAME));
             }
-//            nodeMainExecutorService.execute(mover, nodeConfiguration.setNodeName("mover"));
+            nodeMainExecutorService.execute(mover, nodeConfiguration.setNodeName("mover"));
 
             nodeMainExecutorService.execute(positionControler, nodeConfiguration.setNodeName("positionControler"));
 //            nodeMainExecutor.execute(positionControler, nodeConfiguration);
@@ -532,70 +533,106 @@ public class MainActivity extends RosActivity {
                     doStopAction();
                 }
             }else  if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)){
-                String direction=String.valueOf(intent.getIntExtra("direction",5));
-
-                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
-                if (null==direction|| TextUtils.equals("", direction)) {
-                    return;
-                }
-                if (TextUtils.equals("1",direction)){
-                    moveClient=new MoveClient("base_link",1.0f,0.0f,0.0f);
-                }else if (TextUtils.equals("2",direction)){
-                    moveClient=new MoveClient("base_link",-1.0f,0.0f,0.0f);
-                }else if (TextUtils.equals("3",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
-                }else if (TextUtils.equals("4",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
-                } else if (TextUtils.equals("5",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,0.0f);
-                }
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
-
 //                String direction=String.valueOf(intent.getIntExtra("direction",5));
+//
 //                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
 //                if (null==direction|| TextUtils.equals("", direction)) {
 //                    return;
 //                }
-//                if (TextUtils.equals("1",direction)||TextUtils.equals("2",direction)){
-//                    doMoveAction(direction);
+//                if (TextUtils.equals("1",direction)){
+//                    moveClient=new MoveClient("base_link",1.0f,0.0f,0.0f);
+//                }else if (TextUtils.equals("2",direction)){
+//                    moveClient=new MoveClient("base_link",-1.0f,0.0f,0.0f);
 //                }else if (TextUtils.equals("3",direction)){
-////                    doTrunAction(mover.getCurrentDegree(),270);
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
 //                }else if (TextUtils.equals("4",direction)){
-////                    doTrunAction(mover.getCurrentDegree(),90);
-//                }else if (TextUtils.equals("5",direction)){
-//                    doMoveAction(direction);
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
+//                } else if (TextUtils.equals("5",direction)){
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,0.0f);
 //                }
+//                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+
+                String direction=String.valueOf(intent.getIntExtra("direction",5));
+                Log.i("ControlMove","MainActivity语音控制时，得到的direction参数："+direction);
+                if (null==direction|| TextUtils.equals("", direction)) {
+                    return;
+                }
+                if (TextUtils.equals("1",direction)||TextUtils.equals("2",direction)){
+                    doMoveAction(direction);
+                    try {
+                        Thread.sleep(1500);
+
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    doMoveAction("5");
+                }else if (TextUtils.equals("3",direction)){
+                    doTrunAction(mover.getCurrentDegree(),270);
+                }else if (TextUtils.equals("4",direction)){
+                    doTrunAction(mover.getCurrentDegree(),90);
+                }else if (TextUtils.equals("5",direction)){
+                    doMoveAction(direction);
+                }
             }else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS)){
                 //基于WorldNavigation的语音控制运动
-                Log.e("ROS_Client","Service：Voice Control");
+
                 String direction=String.valueOf(intent.getIntExtra("direction",5));
                 String digit = intent.getStringExtra("digit");
+                Log.e("ControlMove","MainActivity:ROS语音控制时，得到的direction参数："+direction);
                 if (TextUtils.equals("",direction)||TextUtils.equals("",digit)){
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的语音指令不正确，请确认。");
                     return;
                 }
-                float d = Float.valueOf(digit);
                 if (TextUtils.equals("1",direction)){
-                    moveClient=new MoveClient("base_link",d,0,0);
+                    doMoveAction(direction);
+                    try {
+                        Thread.sleep(1500);
+
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    doMoveAction("5");
                 }else if (TextUtils.equals("2",direction)){
-                    moveClient=new MoveClient("base_link",-d,0,0);
+                    doMoveAction(direction);
+                    try {
+                        Thread.sleep(2500);
+
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    doMoveAction("5");
                 }else if (TextUtils.equals("3",direction)){
-                    moveClient=new MoveClient("base_link",0,0,d*2*CIRCLE/360.0f);
+                    doTrunAction(mover.getCurrentDegree(),270);
                 }else if (TextUtils.equals("4",direction)){
-                    moveClient=new MoveClient("base_link",0,0,-d*2*CIRCLE/360.0f);
+                    doTrunAction(mover.getCurrentDegree(),90);
                 }else if (TextUtils.equals("5",direction)){
-                    moveClient=new MoveClient("base_link",0,0,0);
+                    doMoveAction(direction);
                 }
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+//                float d = Float.valueOf(digit);
+//                if (TextUtils.equals("1",direction)){
+//                    moveClient=new MoveClient("base_link",d,0,0);
+//                }else if (TextUtils.equals("2",direction)){
+//                    moveClient=new MoveClient("base_link",-d,0,0);
+//                }else if (TextUtils.equals("3",direction)){
+//                    moveClient=new MoveClient("base_link",0,0,d*2*CIRCLE/360.0f);
+//                }else if (TextUtils.equals("4",direction)){
+//                    moveClient=new MoveClient("base_link",0,0,-d*2*CIRCLE/360.0f);
+//                }else if (TextUtils.equals("5",direction)){
+//                    moveClient=new MoveClient("base_link",0,0,0);
+//                }
+//                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
                 Log.e("ROS_Client","Service：Get WakeUp Degree");
-                float d =intent.getIntExtra("degree",0);
-//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
-                moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+
+                double d =intent.getIntExtra("degree",0);
+                doTrunAction(mover.getCurrentDegree(),d);
+////                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
+//                moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
+//                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
-                moveClient=new MoveClient("base_link",0,0,0);
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+//                doMoveAction("5");
+//                moveClient=new MoveClient("base_link",0,0,0);
+//                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             }
         }
     };
@@ -604,46 +641,46 @@ public class MainActivity extends RosActivity {
     * 硬编码控制Robot前进
     * 描述：直接操作Twist
     */
-//    private void doMoveAction(String message) {
-//        mover.isPublishVelocity(true);
-//        if (TextUtils.equals("1", message)) {
-//            Log.i("ROS_MOVE", "机器人移动方向:向前");
-//            mover.execMoveForword();
-//        } else if (TextUtils.equals("2", message)) {
-//            Log.i("ROS_MOVE", "机器人移动方向:向后");
-//            mover.execMoveBackForward();
-//        } else if (TextUtils.equals("3", message)) {
-//            Log.i("ROS_MOVE", "机器人移动方向:向左");
-//            mover.execTurnLeft();
-//        } else if (TextUtils.equals("4", message)) {
-//            Log.i("ROS_MOVE", "机器人移动方向:向右");
-//            mover.execTurnRight();
-//        } else if (TextUtils.equals("5", message)) {
-//            Log.i("ROS_MOVE", "机器人移动方向:停止");
-//            mover.execStop();
-//        }
-//    }
+    private void doMoveAction(String message) {
+        mover.isPublishVelocity(true);
+        if (TextUtils.equals("1", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向前");
+            mover.execMoveForword();
+        } else if (TextUtils.equals("2", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向后");
+            mover.execMoveBackForward();
+        } else if (TextUtils.equals("3", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向左");
+            mover.execTurnLeft();
+        } else if (TextUtils.equals("4", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:向右");
+            mover.execTurnRight();
+        } else if (TextUtils.equals("5", message)) {
+            Log.i("ROS_MOVE", "机器人移动方向:停止");
+            mover.execStop();
+        }
+    }
 
     /*
     * 硬编码控制Robot转弯
     *
     */
-//    public void doTrunAction(double currentDegree,double degree){
-//        mover.isPublishVelocity(true);
-//        double temp;
-//        if (currentDegree+degree<=180){
-//            temp=currentDegree+degree;
-//        }else {
-//            temp=currentDegree+degree-360;
-//        }
-//        if ((degree > 0 && degree < 180)){
-//            mover.execTurnRight();
-//            mover.setDegree(temp);
-//        }else{
-//            mover.execTurnLeft();
-//            mover.setDegree(temp);
-//        }
-//    }
+    public void doTrunAction(double currentDegree,double degree){
+        mover.isPublishVelocity(true);
+        double temp;
+        if (currentDegree+degree<=180){
+            temp=currentDegree+degree;
+        }else {
+            temp=currentDegree+degree-360;
+        }
+        if ((degree > 0 && degree < 180)){
+            mover.execTurnRight();
+            mover.setDegree(temp);
+        }else{
+            mover.execTurnLeft();
+            mover.setDegree(temp);
+        }
+    }
 
     protected void doRappControlerAction(final ArrayList<Interaction> apps, final String role,final String displayName){
         doStopAction();

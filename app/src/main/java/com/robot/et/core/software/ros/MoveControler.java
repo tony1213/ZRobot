@@ -46,9 +46,9 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
     //是否右转
     private volatile boolean isTurnRight =false;
     //前进速度
-    private double forwardSpeed = 0.1;
+    private double forwardSpeed = 0.2;
     //后退速度
-    private double backwardSpeed = 0.1;
+    private double backwardSpeed = 0.2;
     //左转速度
     private double turnLeftSpeed = 0.3;
     //右转速度
@@ -82,16 +82,16 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
                 if (publishVelocity) {
                     if (isForward){
                         Log.i("ROS_MOVE","前进");
-                        publishVelocity(forwardSpeed,0,0);
+                        publishVelocity(0.3,0,0);
                     }else if (isBackWard){
                         Log.i("ROS_MOVE","后退");
-                        publishVelocity(-backwardSpeed,0,0);
+                        publishVelocity(-0.3,0,0);
                     }else if (isTurnLeft){
                         Log.i("ROS_MOVE","向左");
-                        publishVelocity(0,0,turnLeftSpeed);
+                        publishVelocity(0,0,0.7);
                     }else if (isTurnRight){
                         Log.i("ROS_MOVE","向右");
-                        publishVelocity(0,0,-turnRightSpeed);
+                        publishVelocity(0,0,-0.7);
                     }else {
                         Log.i("ROS_MOVE","停止");
                         publishVelocity(0,0,0);
@@ -99,7 +99,7 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
                     publisher.publish(currentVelocityCommand);
                 }
             }
-        }, 0, 80);
+        }, 0, 100);
     }
 
     @Override
@@ -111,13 +111,13 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
         heading = Math.atan2(2 * y * w - 2 * x * z, x * x - y * y - z * z + w * w) * 180 / Math.PI;
         currentOrientation = (float) -heading;
         //第一种计算方案
-        if (Math.abs(currentOrientation-degree) < 40){
-            this.turnRightSpeed=this.turnLeftSpeed=0.3;
-        }else if (Math.abs(currentOrientation-degree) < 20){
-            this.turnRightSpeed=this.turnLeftSpeed=0.2;
-        }else if (Math.abs(currentOrientation-degree) < 10){
-            this.turnRightSpeed=this.turnLeftSpeed=0.1;
-        }else if (Math.abs(currentOrientation-degree) < 5){
+        if (Math.abs(currentOrientation-degree) < 20){
+//            this.turnRightSpeed=this.turnLeftSpeed=0.3;
+//        }else if (Math.abs(currentOrientation-degree) < 20){
+//            this.turnRightSpeed=this.turnLeftSpeed=0.2;
+//        }else if (Math.abs(currentOrientation-degree) < 10){
+//            this.turnRightSpeed=this.turnLeftSpeed=0.1;
+//        }else if (Math.abs(currentOrientation-degree) < 5){
             publishVelocity=false;
         }
     }
