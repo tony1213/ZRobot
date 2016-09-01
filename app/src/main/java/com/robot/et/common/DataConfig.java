@@ -142,19 +142,19 @@ public class DataConfig {
     //是否是自动拍照
     public static boolean isTakePicture  = false;
 
-    //控制头转向的方向  0:左右  1:上下
+    //控制头转向的方向  0:左右  1:前后
     public final static int TURN_HEAD_ABOUT = 0;
-    public final static int TURN_HEAD_UP_DOWN = 1;
+    public final static int TURN_HEAD_AROUND = 1;
 
     //app是否控制头部停止
     public static boolean isHeadStop = false;
 
     //app控制头部的初始值
     public static int LAST_HEAD_ANGLE_ABOUT = 0;
-    public static int LAST_HEAD_ANGLE_UP_DOWN = 0;
+    public static int LAST_HEAD_ANGLE_AROUND = 0;
 
     //控制头的方向
     public static boolean isHeadLeft = false;
-    public static boolean isHeadUp = false;
+    public static boolean isHeadFront = false;
 
 }

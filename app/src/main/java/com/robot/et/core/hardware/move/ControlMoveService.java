@@ -190,7 +190,7 @@ public class ControlMoveService extends Service {
         action.setCategory("head");
         if (directionValue == DataConfig.TURN_HEAD_ABOUT) {
             action.setAction("Horizontal");
-        } else if (directionValue == DataConfig.TURN_HEAD_UP_DOWN) {
+        } else if (directionValue == DataConfig.TURN_HEAD_AROUND) {
             action.setAction("Vertical");
         }
         action.setAngle(angleValue);

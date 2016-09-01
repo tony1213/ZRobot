@@ -111,7 +111,7 @@ public class FaceDistinguishActivity extends Activity {
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
 
         if (!DataConfig.isTakePicture) {
-            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_UP_DOWN, "10");
+            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "10");
         }
 
     }
@@ -402,7 +402,7 @@ public class FaceDistinguishActivity extends Activity {
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
 
         if (!DataConfig.isTakePicture) {
-            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_UP_DOWN, "0");
+            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
         }
     }
 

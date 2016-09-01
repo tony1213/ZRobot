@@ -181,12 +181,12 @@ public class ScriptHandler implements Script {
         boolean isSingle = true;
         if (TextUtils.equals(content, "抬头")) {
             Log.i("netty", "doScriptAction() 抬头");
-            headDirection = DataConfig.TURN_HEAD_UP_DOWN;
+            headDirection = DataConfig.TURN_HEAD_AROUND;
             turnAngle = "5";
             isSingle = true;
         } else if (TextUtils.equals(content, "点头")) {
             Log.i("netty", "doScriptAction() 点头");
-            headDirection = DataConfig.TURN_HEAD_UP_DOWN;
+            headDirection = DataConfig.TURN_HEAD_AROUND;
             turnAngle = "-5";
             isSingle = false;
             isHeadUp = true;
@@ -207,7 +207,7 @@ public class ScriptHandler implements Script {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_UP_DOWN, "5");
+                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, "5");
                 }
             }, 1000);
         }

@@ -173,62 +173,60 @@ public class MsgReceiverService extends Service {
                     }
                 } else {
                     //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+                    int angleValue = getAngle();
+                    angle = String.valueOf(angleValue);
+                    Log.i("netty", "app控制头  angleValue==" + angleValue + ",angle====" + angle);
                     BroadcastEnclosure.controlHead(MsgReceiverService.this, directionTurn, angle);
 
-                    int angleValue = getAngle();
-                    if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 -60----60
+                    if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 +60 --- -60
                         DataConfig.LAST_HEAD_ANGLE_ABOUT = angleValue;
                         if (angleValue <= -60 || angleValue >= 60) {
                             DataConfig.isHeadStop = true;
                         }
-                    } else if (directionTurn == DataConfig.TURN_HEAD_UP_DOWN) {//上下 -18-----18
-                        DataConfig.LAST_HEAD_ANGLE_UP_DOWN = angleValue;
+                    } else if (directionTurn == DataConfig.TURN_HEAD_AROUND) {//前后 -18 ----- +18
+                        DataConfig.LAST_HEAD_ANGLE_AROUND = angleValue;
                         if (angleValue <= -20 || angleValue >= 20) {
                             DataConfig.isHeadStop = true;
                         }
                     }
-                    angle = String.valueOf(angleValue);
                 }
             }
         }
     };
 
-    //左右 -60----60    上下 -18-----18   获取一直发的角度
+    //左右 +60 ---- -60    前后 -18 ----- +18   获取一直发的角度
     private int getAngle() {
         int data = 0;
         if (!TextUtils.isEmpty(angle)) {
             if (angle.contains("-") || TextUtils.isDigitsOnly(angle)) {
                 int angleValue = Integer.parseInt(angle);
-                if (DataConfig.isHeadUp) {//上
-                    if (angleValue > -20 && angleValue < 20) {
-                        angleValue -= 5;
-                    }else {
-                        angleValue = -20;
+                int incrementValue = 5;//每次递增的值
+                if (directionTurn == DataConfig.TURN_HEAD_AROUND) {//前后
+                    if (DataConfig.isHeadFront) {//前
+                        angleValue -= incrementValue;
+                        if (angleValue <= -20) {
+                            angleValue = -20;
+                        }
+                    } else {//后
+                        angleValue += incrementValue;
+                        if (angleValue >= 20) {
+                            angleValue = 20;
+                        }
                     }
-                } else {//下
-                    if (angleValue > -20 && angleValue < 20) {
-                        angleValue += 5;
-                    }else {
-                        angleValue = 20;
+                } else {//左右
+                    if (DataConfig.isHeadLeft) {//左
+                        angleValue += incrementValue;
+                        if (angleValue >= 60) {
+                            angleValue = 60;
+                        }
+                    } else {//右
+                        angleValue -= incrementValue;
+                        if (angleValue <= -60) {
+                            angleValue = -60;
+                        }
                     }
                 }
-
-                if (DataConfig.isHeadLeft) {//左
-                    if (angleValue > -60 && angleValue < 60) {
-                        angleValue -= 5;
-                    }else {
-                        angleValue = -60;
-                    }
-                } else {//右
-                    if (angleValue > -60 && angleValue < 60) {
-                        angleValue += 5;
-                    }else {
-                        angleValue = 60;
-                    }
-                }
-
                 data = angleValue;
-                angle = String.valueOf(data);
             }
         }
         return data;

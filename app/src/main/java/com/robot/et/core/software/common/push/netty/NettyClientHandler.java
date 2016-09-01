@@ -70,48 +70,32 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                         isControlHead = true;
                         int directionTurn = DataConfig.TURN_HEAD_ABOUT;
                         int lastAboutHead = DataConfig.LAST_HEAD_ANGLE_ABOUT;//最后一次左右
-                        int lastUpDownHead = DataConfig.LAST_HEAD_ANGLE_UP_DOWN;//最后一次上下
+                        int lastAroundHead = DataConfig.LAST_HEAD_ANGLE_AROUND;//最后一次前后
                         String angle = "0";
-                        switch (moveKey) {//左右 -60----60//上下 -18-----18
+                        switch (moveKey) {//左右 +60 ---- -60  前后 -18 ----- +18
                            case 11://头向前
                                Log.i("netty", "头向前");
-                               DataConfig.isHeadUp = false;
-                               directionTurn = DataConfig.TURN_HEAD_UP_DOWN;
-                               if (lastUpDownHead == 0) {
-                                   angle = "-5";
-                               } else {
-                                   angle = String.valueOf(DataConfig.LAST_HEAD_ANGLE_UP_DOWN);
-                               }
+                               DataConfig.isHeadFront = true;
+                               directionTurn = DataConfig.TURN_HEAD_AROUND;
+                               angle = String.valueOf(lastAroundHead);
                                break;
                            case 12://头向后
                                Log.i("netty", "头向后");
-                               DataConfig.isHeadUp = true;
-                               directionTurn = DataConfig.TURN_HEAD_UP_DOWN;
-                               if (lastUpDownHead == 0) {
-                                   angle = "5";
-                               } else {
-                                   angle = String.valueOf(DataConfig.LAST_HEAD_ANGLE_UP_DOWN);
-                               }
+                               DataConfig.isHeadFront = false;
+                               directionTurn = DataConfig.TURN_HEAD_AROUND;
+                               angle = String.valueOf(lastAroundHead);
                                break;
                            case 13://头向左
                                Log.i("netty", "头向左");
                                DataConfig.isHeadLeft = true;
                                directionTurn = DataConfig.TURN_HEAD_ABOUT;
-                               if (lastAboutHead == 0) {
-                                   angle = "5";
-                               } else {
-                                   angle = String.valueOf(DataConfig.LAST_HEAD_ANGLE_ABOUT);
-                               }
+                               angle = String.valueOf(lastAboutHead);
                                break;
                            case 14://头向右
                                Log.i("netty", "头向右");
                                DataConfig.isHeadLeft = false;
                                directionTurn = DataConfig.TURN_HEAD_ABOUT;
-                               if (lastAboutHead == 0) {
-                                   angle = "-5";
-                               } else {
-                                   angle = String.valueOf(DataConfig.LAST_HEAD_ANGLE_ABOUT);
-                               }
+                               angle = String.valueOf(lastAboutHead);
                                break;
                            default:
                                break;

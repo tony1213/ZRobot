@@ -197,7 +197,7 @@ public class BluthControlMoveService extends Service {
         info.setcG("DIS");
         if (directionValue == DataConfig.TURN_HEAD_ABOUT) {
             info.setaT("HZ");
-        } else if (directionValue == DataConfig.TURN_HEAD_UP_DOWN) {
+        } else if (directionValue == DataConfig.TURN_HEAD_AROUND) {
             info.setaT("VT");
         }
         info.setaG(angleValue);
