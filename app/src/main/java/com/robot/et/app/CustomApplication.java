@@ -1,4 +1,4 @@
-package com.robot.et.main;
+package com.robot.et.app;
 
 import android.app.Application;
 

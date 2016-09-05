@@ -1,4 +1,4 @@
-package com.robot.et.main;
+package com.robot.et.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,8 +25,6 @@ import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.hardware.move.BluthControlMoveService;
-import com.robot.et.core.software.bluetooth.BluetoothService;
 import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -40,7 +38,6 @@ import com.robot.et.core.software.ros.MasterChooserService;
 import com.robot.et.core.software.ros.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
-import com.robot.et.core.software.ros.client.Client;
 import com.robot.et.core.software.ros.client.FollowClient;
 import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
@@ -65,7 +62,6 @@ import org.ros.node.NodeMainExecutor;
 import org.ros.node.service.ServiceResponseListener;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;

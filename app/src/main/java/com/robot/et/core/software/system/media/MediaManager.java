@@ -3,7 +3,7 @@ package com.robot.et.core.software.system.media;
 import android.content.Context;
 import android.media.AudioManager;
 
-import com.robot.et.main.CustomApplication;
+import com.robot.et.app.CustomApplication;
 
 //调节系统音量大小
 public class MediaManager {
