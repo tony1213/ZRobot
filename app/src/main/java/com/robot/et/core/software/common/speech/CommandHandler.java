@@ -59,15 +59,15 @@ public class CommandHandler {
                 return true;
             }
 
-            if (isControlMove(result)) {
-                return true;
-            }
-
             if (isScriptQA(result)) {
                 return true;
             }
 
             if (isMatchScene(result)) {
+                return true;
+            }
+
+            if (isControlMove(result)) {
                 return true;
             }
 
@@ -330,7 +330,6 @@ public class CommandHandler {
 
     //是否控制运动
     public boolean isControlMove(String result) {
-        Log.e("ControlMove","执行语音运动控制");
         if (!TextUtils.isEmpty(result)) {
             int moveKey = EnumManager.getMoveKey(result);
             Log.i("ifly", "moveKey===" + moveKey);
@@ -340,18 +339,15 @@ public class CommandHandler {
                     BroadcastEnclosure.controlToyCarMove(context, moveKey, getToyCarNum());
                     SpeechImpl.getInstance().startListen();
                 } else {//控制机器人
-                    Log.e("ControlMove","执行语音控制机器人");
                     DataConfig.isControlRobotMove = true;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
 
                     int digit = getIntNum(result);
-                    Log.i("ControlMove", "result===" + result);
-                    Log.i("ControlMove", "digit===" + digit);
+                    Log.i("iflyresult", "result===" + result);
+                    Log.i("iflyresult", "digit===" + digit);
                     if (digit != 0) {
-                        Log.e("ControlMove","数字不为空");
                         BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
                     } else {
-                        Log.e("ControlMove","数字为空");
                         BroadcastEnclosure.controlRobotMove(context, moveKey);
                     }
                 }
