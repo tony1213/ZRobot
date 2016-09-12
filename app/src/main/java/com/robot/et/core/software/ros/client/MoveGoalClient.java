@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2011 Google Inc.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
-
 package com.robot.et.core.software.ros.client;
 
 import android.text.TextUtils;
@@ -25,7 +9,6 @@ import com.robot.et.core.software.ros.move.MoveRequest;
 import com.robot.et.core.software.ros.move.MoveResponse;
 
 import org.ros.exception.RemoteException;
-import org.ros.exception.RosRuntimeException;
 import org.ros.exception.ServiceNotFoundException;
 import org.ros.namespace.GraphName;
 import org.ros.node.AbstractNodeMain;
@@ -33,20 +16,28 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
-public class MoveClient extends AbstractNodeMain {
+/**
+ * Created by wudong on 16/9/12.
+ */
+public class MoveGoalClient extends AbstractNodeMain {
 
     private String frame;
     private float x;
     private float y;
     private float angle;
 
-    public MoveClient(String frame,float x,float y,float angle) {
-        this.frame =frame;
-        this.x = x;
-        this.y = y;
-        this.angle = angle;
+    private  MoveGoalClient(){
+
     }
 
+    private static MoveGoalClient moveGoalClient = null;
+
+    public synchronized static MoveGoalClient getInstance(){
+        if (moveGoalClient == null){
+            moveGoalClient = new MoveGoalClient();
+        }
+        return moveGoalClient;
+    }
     @Override
     public GraphName getDefaultNodeName() {
         return GraphName.of("rosjava_tutorial_services/moveClient");
@@ -85,4 +76,39 @@ public class MoveClient extends AbstractNodeMain {
             }
         });
     }
+
+    public void setFrame(String frame){
+        this.frame = frame;
+    }
+
+    public void setPointX(float x){
+        this.x = x;
+    }
+
+    public void setPointY(float y){
+        this.y = y;
+    }
+
+    public void setPointAngle(float angle){
+        this.angle = angle;
+    }
+
+    public void setPointGoal(float x,float y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setPoseGoal(float x,float y,float angle){
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+    }
+
+    public void setPoseGoalWithMap(String frame,float x,float y,float angle){
+        this.frame = frame;
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+    }
+
 }

@@ -8,17 +8,17 @@ import org.ros.internal.message.Message;
 
 public interface VisualResponse extends Message {
     String _TYPE = "com.robot.et.core.software.ros.visual/VisualResponse";
-    String _DEFINITION = "int64 result1\nint64 result2\nstring name\n";
+    String _DEFINITION = "int16 status\nint16 confidence\nstring output_name\n";
 
-    long getResult1();
+    short getStatus();
 
-    void setResult1(long var1);
+    void setStatus(short var1);
 
-    long getResult2();
+    short getConfidence();
 
-    void setResult2(long var1);
+    void setConfidence(short var1);
 
-    String getName();
+    String getOutputName();
 
-    void setName(String var1);
+    void setOutputName(String var1);
 }

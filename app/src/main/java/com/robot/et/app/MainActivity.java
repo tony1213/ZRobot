@@ -1,4 +1,4 @@
-package com.robot.et.main;
+package com.robot.et.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -455,25 +455,25 @@ public class MainActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearnInit", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                    visualClient = new VisualClient(1, "");
+                    visualClient = new VisualClient((short) 1, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
                     SpeechImpl.getInstance().cancelListen();
-                    visualClient = new VisualClient(2, name);
+                    visualClient = new VisualClient((short)2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
-                    visualClient = new VisualClient(3, "");
+                    visualClient = new VisualClient((short)3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearnClose");
-                    visualClient = new VisualClient(4, "");
+                    visualClient = new VisualClient((short)4, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeleteAllVisual", flag)) {
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
-                    visualClient = new VisualClient(5, "");
+                    visualClient = new VisualClient((short)5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("SaveAMap", flag)) {
                     //保存地图(Service)
