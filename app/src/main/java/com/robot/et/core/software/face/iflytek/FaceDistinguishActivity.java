@@ -37,14 +37,12 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
-import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.face.iflytek.util.FaceRect;
 import com.robot.et.core.software.face.iflytek.util.FaceUtil;
 import com.robot.et.core.software.face.iflytek.util.ParseResult;
 import com.robot.et.entity.FaceInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FaceManager;
-import com.robot.et.util.FileUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,11 +55,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+// 人脸识别
 public class FaceDistinguishActivity extends Activity {
     private SurfaceView mPreviewSurface;
     private SurfaceView mFaceSurface;
     private Camera mCamera;
-    private int mCameraId = CameraInfo.CAMERA_FACING_FRONT;
+    // 默认打开后置摄像头  前置摄像头：CAMERA_FACING_FRONT  后置摄像头：CAMERA_FACING_BACK
+    private int mCameraId = CameraInfo.CAMERA_FACING_BACK;
     // Camera nv21格式预览帧的尺寸，默认设置640*480
     private int PREVIEW_WIDTH = 640;
     private int PREVIEW_HEIGHT = 480;
@@ -78,7 +78,6 @@ public class FaceDistinguishActivity extends Activity {
     private FaceDetector mFaceDetector;
 
     private boolean mStopTrack;
-    private long mLastClickTime;
     private int isAlign = 0;
     private FaceRequest mFaceRequest;
     private List<FaceInfo> faceInfos = new ArrayList<FaceInfo>();
@@ -87,32 +86,33 @@ public class FaceDistinguishActivity extends Activity {
     private int noFaceCount;//没有检测到人脸的次数
     private int screenCenterX;//屏幕中心X
     private int screenCenterY;//屏幕中心Y
-    private boolean isSendAngle;
+    private boolean isSendAngle;//发送移动角度
+    private boolean isVerify;//是否在验证
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_face_verify);
-
-        //灯亮
+        // 人脸识别的时候灯亮提示
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_ON);
-
+        // 获取屏幕中心点
         getScreenCenterPoint();
-
+        // 初始化界面
         initUI();
         nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
         buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
-        mAcc = new Accelerometer(FaceDistinguishActivity.this);
-        mFaceDetector = FaceDetector.createDetector(FaceDistinguishActivity.this, null);
+        mAcc = new Accelerometer(this);
+        // 获取FaceDetector对象
+        mFaceDetector = FaceDetector.createDetector(this, null);
         mFaceRequest = new FaceRequest(this);
-
+        // 设置正在人脸识别的全局标示
         DataConfig.isFaceRecogniseIng = true;
+        // 获取已注册人脸的数据
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
-
-        if (!DataConfig.isTakePicture) {
-            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "10");
-        }
+        // 开始人脸识别的时候头稍微向后转
+        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "10");
 
     }
 
@@ -121,12 +121,13 @@ public class FaceDistinguishActivity extends Activity {
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics dm = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(dm);
-        screenCenterX = dm.widthPixels/2;
-        screenCenterY = dm.heightPixels/2;
+        screenCenterX = dm.widthPixels / 2;
+        screenCenterY = dm.heightPixels / 2;
         Log.i("face", "screenCenterX===" + screenCenterX);
         Log.i("face", "screenCenterY===" + screenCenterY);
     }
 
+    // SurfaceView预览监听器
     private Callback mPreviewCallback = new Callback() {
 
         @Override
@@ -145,18 +146,7 @@ public class FaceDistinguishActivity extends Activity {
         }
     };
 
-    private void setSurfaceSize() {
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int width = metrics.widthPixels;
-        int height = (int) (width * PREVIEW_WIDTH / (float) PREVIEW_HEIGHT);
-        //取消边距，设置全屏
-//        LayoutParams params = new LayoutParams(width, height);
-//        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//        mPreviewSurface.setLayoutParams(params);
-//        mFaceSurface.setLayoutParams(params);
-    }
-
+    // 初始化界面
     private void initUI() {
         mPreviewSurface = (SurfaceView) findViewById(R.id.sfv_preview);
         mFaceSurface = (SurfaceView) findViewById(R.id.sfv_face);
@@ -164,14 +154,14 @@ public class FaceDistinguishActivity extends Activity {
         mPreviewSurface.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         mFaceSurface.setZOrderOnTop(true);
         mFaceSurface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
-        setSurfaceSize();
     }
 
+    // 打开相机
     private void openCamera() {
         if (null != mCamera) {
             return;
         }
+        // 检查相机权限
         if (!checkCameraPermission()) {
             Log.i("face", "摄像头权限未打开，请打开后再试");
             mStopTrack = true;
@@ -182,6 +172,7 @@ public class FaceDistinguishActivity extends Activity {
             mCameraId = CameraInfo.CAMERA_FACING_BACK;
         }
         try {
+            // 打开相机
             mCamera = Camera.open(mCameraId);
             if (CameraInfo.CAMERA_FACING_FRONT == mCameraId) {
                 Log.i("face", "前置摄像头已开启，点击可切换");
@@ -189,16 +180,18 @@ public class FaceDistinguishActivity extends Activity {
                 Log.i("face", "后置摄像头已开启，点击可切换");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.i("face", "Camera Exception==" + e.getMessage());
+            // 关闭相机
             closeCamera();
             return;
         }
+        // 设置相机Parameters参数
         Parameters params = mCamera.getParameters();
         params.setPreviewFormat(ImageFormat.NV21);
         params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
         mCamera.setParameters(params);
         // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
-        mCamera.setDisplayOrientation(90);
+//        mCamera.setDisplayOrientation(90);
         mCamera.setPreviewCallback(new PreviewCallback() {
 
             @Override
@@ -211,10 +204,11 @@ public class FaceDistinguishActivity extends Activity {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
             mCamera.startPreview();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.i("face", "Camera IOException==" + e.getMessage());
         }
     }
 
+    // 关闭相机
     private void closeCamera() {
         if (null != mCamera) {
             mCamera.setPreviewCallback(null);
@@ -224,6 +218,7 @@ public class FaceDistinguishActivity extends Activity {
         }
     }
 
+    // 检查相机权限
     private boolean checkCameraPermission() {
         int status = checkPermission(permission.CAMERA, Process.myPid(),
                 Process.myUid());
@@ -236,10 +231,11 @@ public class FaceDistinguishActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        // 开始人脸检测
         testFace();
-
     }
 
+    // 开始人脸检测
     private void testFace() {
         if (null != mAcc) {
             mAcc.start();
@@ -268,43 +264,38 @@ public class FaceDistinguishActivity extends Activity {
                     }
 
                     if (mFaceDetector == null) {
-                        /**
-                         * 离线视频流检测功能需要单独下载支持离线人脸的SDK 请开发者前往语音云官网下载对应SDK
-                         */
+                        // 离线视频流检测功能需要单独下载支持离线人脸的SDK 请开发者前往语音云官网下载对应SDK
                         Log.i("face", "本SDK不支持离线视频流检测");
                         break;
                     }
 
+                    // 获取人脸数据
                     String result = mFaceDetector.trackNV21(buffer, PREVIEW_WIDTH, PREVIEW_HEIGHT, isAlign, direction);
-
                     FaceRect[] faces = ParseResult.parseResult(result);
 
-                    Canvas canvas = mFaceSurface.getHolder().lockCanvas();
+                    // 获取检测到人脸的画布
+                    Canvas canvas = null;
+                    try {
+                        canvas = mFaceSurface.getHolder().lockCanvas();
+                    } catch (Exception e) {
+                        Log.i("face", "canvas Exception==" + e.getMessage());
+                    }
+
                     if (null == canvas) {
                         continue;
                     }
-
+                    // 设置画布
                     canvas.drawColor(0, PorterDuff.Mode.CLEAR);
                     canvas.setMatrix(mScaleMatrix);
 
+                    // 如果没有检测到人脸一直检测，连续检测次数大于250次（大约15秒左右）的时候自动关闭人脸检测
                     if (faces.length <= 0) {
                         noFaceCount++;
-                        if (DataConfig.isTakePicture) {
-                            if (noFaceCount > 10) {
-                                mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
-                                takePicture(mImageData);
-                            } else {
-                                mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
-                                continue;
-                            }
+                        if (noFaceCount >= 250) {
+                            sendMsg("请将您的脸部对准我的头部哦，再试一次吧", false);
                         } else {
-                            if (noFaceCount >= 250) {
-                                sendMsg("没有看见主人，人家好伤心呢。", false);
-                                finish();
-                            } else {
-                                mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
-                                continue;
-                            }
+                            mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
+                            continue;
                         }
                     }
 
@@ -316,15 +307,25 @@ public class FaceDistinguishActivity extends Activity {
                                     face.point[i] = FaceUtil.RotateDeg90(face.point[i], PREVIEW_WIDTH, PREVIEW_HEIGHT);
                                 }
                             }
-                            if (!DataConfig.isTakePicture) {
-                                FaceUtil.drawFaceRect(canvas, face, PREVIEW_WIDTH, PREVIEW_HEIGHT, frontCamera, false);
-                            }
+                            FaceUtil.drawFaceRect(canvas, face, PREVIEW_WIDTH, PREVIEW_HEIGHT, frontCamera, false);
                         }
-                        int length = faces.length;
-                        Log.i("face", "faces.length==" + length);
-                        //检测到有人脸
-                        if (length > 0) {
-                            mImageData = Bitmap2Bytes(decodeToBitMap(nv21));
+                        Log.i("face", "faces.length==" + faces.length);
+                        // 检测到有多张人脸时，继续检测，多张人脸时不支持注册验证
+                        if (faces.length > 1) {
+                            Log.i("face", "多张人脸");
+                            mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
+                            continue;
+                        }
+
+                        // 只有1张人脸并且没在验证的时候开始验证人脸
+                        if (faces.length == 1 && !isVerify) {
+                            Log.i("face", "只有1张人脸");
+                            isVerify = true;
+                            // 拷贝到临时数据中
+                            byte[] tmp = new byte[nv21.length];
+                            System.arraycopy(nv21, 0, tmp, 0, nv21.length);
+
+                            mImageData = Bitmap2Bytes(decodeToBitMap(tmp));
                             noFaceCount = 0;
                             //转身  多次检测的时候只转一次头
                             if (!isSendAngle) {
@@ -345,23 +346,17 @@ public class FaceDistinguishActivity extends Activity {
                                 String directionValue = getTurnDigit(pointY);
                                 Log.i("face", "directionValue===" + directionValue);
 
+                                // 发送控制头部运动的广播
                                 BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_ABOUT, directionValue);
                             }
-
-                            //识别
-                            if (DataConfig.isTakePicture) {
-                                takePicture(mImageData);
-                            } else {
-                                handleFace(mImageData, faceInfos);
-                            }
+                            // 处理识别到的人脸
+                            handleFace(mImageData, faceInfos);
                         }
                     } else {
                         Log.i("face", "faces===0");
                     }
+                    // 人脸识别结束一定要释放holder对象，不然报异常
                     mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
-
-                    mStopTrack = true;
-
                 }
             }
         }).start();
@@ -398,12 +393,10 @@ public class FaceDistinguishActivity extends Activity {
             mAcc.stop();
         }
         mStopTrack = true;
-        //灯灭
+        // 提示灯关闭
         BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
-
-        if (!DataConfig.isTakePicture) {
-            BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
-        }
+        // 通知头部复位
+        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
     }
 
     @Override
@@ -413,10 +406,9 @@ public class FaceDistinguishActivity extends Activity {
         mFaceDetector.destroy();
         DataConfig.isFaceRecogniseIng = false;
         DataConfig.isVoiceFaceRecognise = false;
-        DataConfig.isTakePicture = false;
     }
 
-    //脸部识别后的处理
+    // 脸部识别后的处理 对传来的注册数据一个一个遍历验证人脸，验证不通过便注册人脸
     private void handleFace(byte[] mImageData, List<FaceInfo> faceInfos) {
         if (null != mImageData && mImageData.length > 0) {
             int size = faceInfos.size();
@@ -432,23 +424,12 @@ public class FaceDistinguishActivity extends Activity {
             }
         } else {
             Log.i("face", "handleFace mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧", false);
+            isVerify = false;
+            isSendAngle = false;
         }
     }
 
-    //自动拍照
-    private void takePicture(byte[] mImageData) {
-        Bitmap bitmap = FileUtils.Bytes2Bimap(mImageData);
-        FaceManager.setBitmap(bitmap);
-        FileUtils.writeToFile(mImageData, "photo.png");
-        HttpManager.uploadFile(bitmap);
-        finish();
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
-        sendBroadcast(intent);
-    }
-
-    //验证
+    // 调用sdk方法验证
     private void verify(byte[] mImageData, String auId) {
         if (null != mImageData && mImageData.length > 0) {
             // 设置用户标识，格式为6-18个字符（由字母、数字、下划线组成，不得以数字开头，不能包含空格）。
@@ -458,11 +439,12 @@ public class FaceDistinguishActivity extends Activity {
             mFaceRequest.sendRequest(mImageData, mRequestListener);
         } else {
             Log.i("face", "verify mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧", false);
+            isVerify = false;
+            isSendAngle = false;
         }
     }
 
-    //注册
+    // 调用sdk方法注册
     private void registerFace(byte[] mImageData) {
         if (null != mImageData && mImageData.length > 0) {
             auId = getOnlyTime();
@@ -471,16 +453,19 @@ public class FaceDistinguishActivity extends Activity {
             mFaceRequest.sendRequest(mImageData, mRequestListener);
         } else {
             Log.i("face", "registerFace mImageData== null");
-            sendMsg("眼睛看花了，再让我看一次吧", false);
+            isVerify = false;
+            isSendAngle = false;
         }
     }
 
+    // 验证注册监听器
     private RequestListener mRequestListener = new RequestListener() {
 
         @Override
         public void onEvent(int eventType, Bundle params) {
         }
 
+        // 返回结果
         @Override
         public void onBufferReceived(byte[] buffer) {
             boolean isError = false;
@@ -490,9 +475,9 @@ public class FaceDistinguishActivity extends Activity {
 
                 JSONObject object = new JSONObject(result);
                 String type = object.optString("sst");
-                if ("reg".equals(type)) {
+                if ("reg".equals(type)) {// 注册
                     register(object);
-                } else if ("verify".equals(type)) {
+                } else if ("verify".equals(type)) {// 验证
                     verify(object);
                 }
             } catch (UnsupportedEncodingException e) {
@@ -503,42 +488,47 @@ public class FaceDistinguishActivity extends Activity {
                 isError = true;
             } finally {
                 if (isError) {
-                    sendMsg("眼睛累了，我去歇去喽", false);
+                    isVerify = false;
+                    isSendAngle = false;
                 }
             }
         }
 
+        // 调用该方法表示图片不对或者模糊看不清
         @Override
         public void onCompleted(SpeechError error) {
             if (error != null) {
                 testCount++;
                 if (testCount < 5) {
-                    testFace();
+                    isVerify = false;
+                    isSendAngle = false;
                 } else {
-                    sendMsg("眼睛累了，我去歇去喽", false);
+                    sendMsg("您离我太远了，可以靠近一点再试试吗", false);
                 }
             }
         }
     };
 
+    // 注册
     private void register(JSONObject obj) throws JSONException {
         int ret = obj.getInt("ret");
         if (ret != 0) {
             Log.i("face", "注册失败");
-            sendMsg("让我再认识你一次吧", false);
+            sendMsg("可以靠近点，让我再认识你一次吗？", false);
             return;
         }
         if ("success".equals(obj.get("rst"))) {
             Log.i("face", "注册成功");
             FaceManager.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
-            sendMsg("你好，我可以认识你吗？你叫什么名字啊？", true);
+            sendMsg("你好，我叫小黄人，我能认识你吗？", true);
         } else {
             Log.i("face", "注册失败");
-            sendMsg("让我再认识你一次吧", false);
+            sendMsg("可以靠近点，让我再认识你一次吗？", false);
         }
     }
 
+    // 验证，如果验证失败的话，继续验证下一个
     private void verify(JSONObject obj) throws JSONException {
         int ret = obj.getInt("ret");
         if (ret != 0) {
@@ -564,6 +554,7 @@ public class FaceDistinguishActivity extends Activity {
         }
     }
 
+    // 发送说话的广播
     private void sendMsg(String content, boolean isVerifySuccess) {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
@@ -573,6 +564,7 @@ public class FaceDistinguishActivity extends Activity {
         finish();
     }
 
+    // 压缩图片
     private Bitmap decodeToBitMap(byte[] data) {
         try {
             YuvImage image = new YuvImage(data, ImageFormat.NV21, PREVIEW_WIDTH, PREVIEW_HEIGHT, null);
@@ -589,6 +581,7 @@ public class FaceDistinguishActivity extends Activity {
         return null;
     }
 
+    // bitmap转byte数组
     private byte[] Bitmap2Bytes(Bitmap bm) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
@@ -602,5 +595,5 @@ public class FaceDistinguishActivity extends Activity {
         String dateTime = format.format(date);
         return dateTime;
     }
-
 }
+

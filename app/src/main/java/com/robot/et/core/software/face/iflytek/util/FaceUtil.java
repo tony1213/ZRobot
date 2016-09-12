@@ -15,6 +15,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -258,14 +259,13 @@ public class FaceUtil {
 	        File[] files = dir.listFiles(new CpuFilter());
 	        return files.length;
 	    } catch(Exception e) {
-	        e.printStackTrace();
+			Log.i("face", "getNumCores Exception==" + e.getMessage());
 	        return 1;
 	    }
 	}
 	
 	/**
 	 * 保存Bitmap至本地
-	 * @param Bitmap
 	 */
 	public static void saveBitmapToFile(Context context,Bitmap bmp){
 		String file_path = getImagePath(context);
@@ -277,9 +277,9 @@ public class FaceUtil {
 			fOut.flush();
 			fOut.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			Log.i("face", "saveBitmapToFile FileNotFoundException==" + e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.i("face", "saveBitmapToFile IOException==" + e.getMessage());
 		}
 	}
 }

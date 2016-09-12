@@ -7,10 +7,9 @@ import org.json.JSONObject;
  * 解析科大讯飞获取当前的service
  */
 public interface ParseResultCallBack {
-    //解析结果回调
+    // 解析结果回调
     void getResult(String question, String service, JSONObject jObject);
 
-    //解析异常
+    // 解析异常
     void onError(String errorMsg);
-
 }

@@ -19,6 +19,7 @@ public class SystemReceiver extends BroadcastReceiver {
 
     }
 
+    // 打开app
     private void openMainActivity(Context context) {
         Intent intent = new Intent();
         intent.setClass(context, MainActivity.class);

@@ -20,7 +20,10 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.system.media.Sound;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 import com.robot.et.util.Utilities;
@@ -38,9 +41,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     private String channelId;
     private LinearLayout mRemoteUserContainer;
     private int mRemoteUserViewWidth = 0;
-    RtcEngine rtcEngine;
+    private RtcEngine rtcEngine;
     //判断用户是否接通 默认不接通
-    private boolean isUserJoined;
+    private static boolean isUserJoined;
     //查看
     private boolean isLook;
     private int mLastRxBytes = 0;
@@ -111,29 +114,45 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         Log.i("agoravideo", "islook===" + isLook);
         Log.i("agoravideo", "mCallingType===" + mCallingType);
 
-        //30秒如果用户没有接通的话，自动挂断电话
+        // 主动呼叫时
         if (callType == DataConfig.PHONE_CALL_TO_MEN) {
-            new Handler().postDelayed(new Runnable() {
+            // 不是安保模式打来的电话的话自动挂断
+            if (!DataConfig.isSecurityCall) {
+                //播放打电话提示音（只在主动呼叫时播放）
+                BroadcastEnclosure.playSoundTips(this, Sound.SOUND_CALL_PHONE);
+                //15秒如果用户没有接通的话，自动挂断电话
+                new Handler().postDelayed(new Runnable() {
 
-                @Override
-                public void run() {
-                    if (!isUserJoined) {
-                        setRemoteUserViewVisibility(false);
-                        leaveChannel();
-                        isUserJoined = true;
-                        String content = "主人，对方暂时没有接听，如果需要，要重新拨通哦";
-                        SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+                    @Override
+                    public void run() {
+                        if (!isUserJoined) {
+                            setRemoteUserViewVisibility(false);
+                            leaveChannel();
+                            isUserJoined = true;
+                            speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，对方暂时没有接听");
 
-                        finish();
+                            // 通知APP关掉通话
+                            HttpManager.notifyAppCloseAgora(String.valueOf(RequestConfig.JPUSH_CALL_CLOSE));
+
+                            finish();
+                        }
                     }
-                }
-            }, 30 * 1000);
+                }, 15 * 1000);
+            }
+            // 重连netty
+            BroadcastEnclosure.connectNetty(this);
         }
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CLOSE_AGORA);
         filter.addAction(BroadcastAction.ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED);
         registerReceiver(receiver, filter);
+
+        // 暂时为了解决新板子，打不开摄像头问题,只打开一次便可以
+        if (!DataConfig.isSwitchCamera) {
+            DataConfig.isSwitchCamera = true;
+            rtcEngine.switchCamera();
+        }
 
     }
 
@@ -174,21 +193,19 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         finish();
         Log.i("agoravideo", "islook222===" + isLook);
         if (isLook || isNetWorkNotGood) { // 查看
-            Intent intent = new Intent();
+            Log.i("agoravideo", "查看");
             if (isLook) {
-                isLook = false;
-                intent.setAction(BroadcastAction.ACTION_PHONE_HANGUP);
-                sendBroadcast(intent);
+                hangUpPhone();
             } else {
                 isNetWorkNotGood = false;
-                String content = "主人，网络质量太差，如果需要，要重新拨通哦";
-                SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+                speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，网络不给力，已断开");
             }
         } else {
-            String content = "主人，对方已挂断，如果需要，要重新拨通哦";
-            SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+            Log.i("agoravideo", "不是查看");
+            speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，对方已挂断");
         }
 
+        isLook = false;
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_CLOSE);
         sendBroadcast(intent);
@@ -300,7 +317,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     @Override
     public void onNetworkQuality(int quality) {
         super.onNetworkQuality(quality);
-        Log.i("agoravideo", "onNetworkQuality  quality===" + quality);
+//        Log.i("agoravideo", "onNetworkQuality  quality===" + quality);
     }
 
     private void setRemoteUserViewVisibility(boolean isVisible) {
@@ -356,7 +373,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
     //更新码率
     public void onUpdateSessionStats(final IRtcEngineEventHandler.RtcStats stats) {
-        Log.i("agoravideo", "onUpdateSessionStats");
+//        Log.i("agoravideo", "onUpdateSessionStats");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -365,7 +382,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                 mLastRxBytes = stats.rxBytes;
                 mLastTxBytes = stats.txBytes;
                 mLastDuration = stats.totalDuration;
-                Log.i("agoravideo", "kbs===" + kbs);
+//                Log.i("agoravideo", "kbs===" + kbs);
 
             }
         });
@@ -444,6 +461,11 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                // 防止声音提示还有，停止掉
+                Intent intent = new Intent();
+                intent.setAction(BroadcastAction.ACTION_STOP_SOUND_TIPS);
+                sendBroadcast(intent);
+
                 View singleRemoteUser = mRemoteUserContainer.findViewById(Math.abs(uid));
                 if (singleRemoteUser != null) {
                     return;
@@ -473,11 +495,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     // 其他用户离开当前频道回调
     public void onUserOffline(final int uid) {
         Log.i("agoravideo", "onUserOffline");
-        if (isFinishing()) {
-            return;
-        }
 
         if (mRemoteUserContainer == null) {
+            Log.i("agoravideo", "mRemoteUserContainer == null");
             return;
         }
 
@@ -489,9 +509,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
                 Log.i("agoravideo", "当前房间还剩余人数======" + mRemoteUserContainer.getChildCount());
                 //当前没人视频或者通话
-                if (mRemoteUserContainer.getChildCount() == 0) {
-                    closeChannel();
-                }
+//                if (mRemoteUserContainer.getChildCount() == 0) {
+//                    closeChannel();
+//                }
             }
         });
 
@@ -505,7 +525,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
             super.onLeaveChannel(stats);
             finish();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.i("agoravideo", "onLeaveChannel Exception==" + e.getMessage());
         }
     }
 
@@ -544,18 +564,29 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         //不是查看的时候报异常问题
         if (!isLook) {
             if (err == 101) {
-                showError("声网key异常，如果需要，要重新拨通哦");
+                speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，声网key异常");
                 finish();
             } else if (err == 104) {
-                showError("网络异常，如果需要，要重新拨通哦");
+                speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，网络异常");
                 finish();
             }
 
         }
     }
 
-    private void showError(String content) {
-        SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_CLOSE, content);
+    // 说内容
+    private void speakContent(int speakType, String content) {
+        if (DataConfig.isSecurityCall) {// 安保模式打来的电话
+            hangUpPhone();
+        } else {// 非安保模式
+            SpeechImpl.getInstance().startSpeak(speakType, content);
+        }
     }
 
+    // 挂断电话不带声音提示
+    private void hangUpPhone() {
+        Intent intent = new Intent();
+        intent.setAction(BroadcastAction.ACTION_PHONE_HANGUP);
+        sendBroadcast(intent);
+    }
 }

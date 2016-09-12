@@ -2,6 +2,7 @@ package com.robot.et.common;
 
 /**
  * Created by Tony on 2016/7/25.
+ * 广播的action类
  */
 public class BroadcastAction {
 
@@ -16,25 +17,20 @@ public class BroadcastAction {
     //检测网络变化
     public static String ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED = "action.monitor.watch.network.traffic.speed";
 
-    //蓝牙数据接收
-    public static String ACTION_MOVE_TO_BLUTH ="action.control.robot.bluth";
-
-    //串口数据接收
-    public static String ACTION_MOVE_TO_SERIALPORT ="action.control.robot.serialport";
     //唤醒,打断或者转向的广播
     public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
     //唤醒后转身
     public static String ACTION_WAKE_UP_TURN_BY_DEGREE = "action.wake.up.turn.by.degree";
     //重置语音板的广播
     public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
+    //人体监测的广播
+    public static String ACTION_BODY_DETECTION = "action.body.detection";
+    //硬件触摸的广播
+    public static String ACTION_HARDWARE_TOUCH = "action.hardware.touch";
     //开始播放音乐
     public static String ACTION_PLAY_MUSIC_START = "action.play.music.start";
-    //音乐播放完成
-    public static String ACTION_PLAY_MUSIC_END = "action.play.music.end";
     //停止音乐播放
     public static String ACTION_STOP_MUSIC = "action.stop.music";
-    //说话
-    public static String ACTION_SPEAK = "action.speak";
     //脸部识别
     public static String ACTION_FACE_DISTINGUISH = "action.face.distinguish";
     //打开脸部识别
@@ -55,10 +51,14 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_WAVING = "action.control.waving";
     //控制机器人嘴LED灯的广播
     public static String ACTION_CONTROL_MOUTH_LED = "action.control.mouth.led";
+    //控制机器人耳朵LED灯的广播
+    public static String ACTION_CONTROL_EARS_LED = "action.control.ears.led";
+    //控制照明LED灯的广播
+    public static String ACTION_CONTROL_LIGHT_LED = "action.control.light.led";
     //跟随的广播
     public static String ACTION_CONTROL_ROBOT_FOLLOW = "action.control.robot.follow";
     //控制机器人转圈
-    public static String ACTION_CONTROL_ROBOT_TURN ="action.control.robot.turn";
+    public static String ACTION_CONTROL_ROBOT_TURN = "action.control.robot.turn";
     //控制小车不停车的广播
     public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
     //连接agora的广播
@@ -79,5 +79,9 @@ public class BroadcastAction {
     public static String ACTION_TAKE_PHOTO_COMPLECTED = "com.robot.et.take.photo.complected";
     //APP控制头部
     public static String ACTION_CONTROL_HEAD_BY_APP = "com.robot.et.control.head.by.app";
+    //播放声音提示（说话结束、拍照、打电话等）
+    public static String ACTION_PLAY_SOUND_TIPS = "com.robot.et.play.sound.tips";
+    //停止播放声音提示（说话结束、拍照、打电话等）
+    public static String ACTION_STOP_SOUND_TIPS = "com.robot.et.stop.sound.tips";
 
 }

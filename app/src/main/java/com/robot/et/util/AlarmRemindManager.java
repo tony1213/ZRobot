@@ -147,21 +147,19 @@ public class AlarmRemindManager {
         }
     }
 
-    // 增加Ifly提醒的操作 格式：日期 + 时间 + 做什么事
-    private static boolean addIflyRemind(String result) {
-        if (!TextUtils.isEmpty(result)) {
-            Log.i(TAG, "chat  answer===" + result);
-            String dates[] = result.split(DataConfig.SCHEDULE_SPLITE);
+    // 增加Ifly提醒的操作 格式：日期 + 时间 + 做什么事 + 说的日期 + 说的时间
+    private static boolean addIflyRemind(RemindInfo remindInfo) {
+        if (remindInfo != null) {
             RemindInfo info = new RemindInfo();
             info.setRobotNum(SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, ""));
-            info.setDate(dates[0]);
-            info.setTime(dates[1]);
-            info.setContent(dates[2]);
+            info.setDate(remindInfo.getDate());
+            info.setTime(remindInfo.getTime());
+            info.setContent(remindInfo.getContent());
             info.setRemindInt(DataConfig.REMIND_NO_ID);
             info.setFrequency(1);
             boolean flag = addAlarm(info);
             if (flag) {
-                setAlarmClock(dates[0], dates[1]);
+                setAlarmClock(remindInfo.getDate(), remindInfo.getTime());
             }
             return flag;
         }
@@ -169,13 +167,27 @@ public class AlarmRemindManager {
     }
 
     //讯飞提醒提示
-    public static String getIflyRemindTips(String result) {
-        boolean flag = addIflyRemind(result);
+    public static String getIflyRemindTips(RemindInfo info) {
+        // 日期 + 时间 + 做什么事 + 说的日期 + 说的时间
+        boolean flag = addIflyRemind(info);
         String content = "";
         if (flag) {
-            content = "主人，您的提醒，我已经记下来了";
+            // 格式：好的，明天xx时间提醒xx
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("好的，");
+            String speakDate = info.getSpeakDate();//要说的日期
+            if (!TextUtils.isEmpty(speakDate)) {
+                buffer.append(speakDate);
+            }
+            String speakTime = info.getSpeakTime();//要说的时间
+            if (!TextUtils.isEmpty(speakTime)) {
+                buffer.append(speakTime);
+            }
+            buffer.append("提醒");
+            buffer.append(info.getContent());
+            content = buffer.toString();
         } else {
-            content = "主人，我是一个聪明的小黄人，不用重复提醒哦";
+            content = "主人，这个提醒我已经记住了呢，不用重复提醒哦";
         }
         return content;
     }

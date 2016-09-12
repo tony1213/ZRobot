@@ -1,7 +1,5 @@
 package com.robot.et.util;
 
-import android.graphics.Bitmap;
-
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.FaceInfo;
 
@@ -13,9 +11,8 @@ import java.util.List;
  */
 public class FaceManager {
     private static List<FaceInfo> infos = new ArrayList<FaceInfo>();
-    private static String authorId;
-    private static String authorName;
-    private static Bitmap bitmap;
+    private static String authorId;// 人脸注册的id
+    private static String authorName;// 人脸注册的名字
 
     public static void setNewFaceInfo(List<FaceInfo> faceInfos) {
         int size = faceInfos.size();
@@ -31,6 +28,7 @@ public class FaceManager {
         return infos;
     }
 
+    // 增加识别的信息
     public static void addFaceInfo(String faceName) {
         FaceInfo info = new FaceInfo();
         info.setAuthorId(getAuthorId());
@@ -52,13 +50,5 @@ public class FaceManager {
 
     public static void setAuthorName(String authorName) {
         FaceManager.authorName = authorName;
-    }
-
-    public static Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public static void setBitmap(Bitmap bitmap) {
-        FaceManager.bitmap = bitmap;
     }
 }

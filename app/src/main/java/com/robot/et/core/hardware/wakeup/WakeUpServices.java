@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.ScriptConfig;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.ShellUtils;
 
@@ -37,33 +39,45 @@ public class WakeUpServices extends Service {
         interruptIntent = new Intent();
         turnIntent = new Intent();
 
+        // 获取人体检测的串口id
         faceFd = WakeUp.faceWakeUpInit();
         Log.i("wakeup", "face faceFd==" + faceFd);
+        // 没隔3秒去检测一次人体感应
         faceWakeUp();
 
+        // 打开串口
         openI2C();
+        // 获取语音唤醒的串口id
         voiceFd = WakeUp.wakeUpInit();
         Log.i("wakeup", "voice voiceFd==" + voiceFd);
+        // 去检测是否有语音唤醒
         voiceWakeUp();
 
     }
 
     //打开I2C，一般的手机上面会出现错误
     private void openI2C() {
+        try {
+
+        } catch (Exception e) {
+
+        }
         List<String> commnandList = new ArrayList<String>();
+        commnandList.add("su");
+        SystemClock.sleep(1000);
+        commnandList.add("setenforce 0");
         commnandList.add("chmod 777 /sys/class/gpio");
         commnandList.add("chmod 777 /sys/class/gpio/export");
-        commnandList.add("echo 68 > /sys/class/gpio/export");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio68");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio68/direction");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio68/edge");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio68/value");
-        commnandList.add("echo 72 > /sys/class/gpio/export");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio72");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio72/direction");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio72/edge");
-        commnandList.add("chmod 777 /sys/class/gpio/gpio72/value");
-        commnandList.add("setenforce 0");
+        commnandList.add("echo 13 > /sys/class/gpio/export");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio13");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio13/direction");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio13/edge");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio13/value");
+        commnandList.add("echo 225 > /sys/class/gpio/export");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio225");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio225/direction");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio225/edge");
+        commnandList.add("chmod 777 /sys/class/gpio/gpio225/value");
         ShellUtils.execCommand(commnandList, true);
     }
 
@@ -74,9 +88,11 @@ public class WakeUpServices extends Service {
             public void run() {
                 while (true) {
                     if (voiceFd > 0) {
+                        // 获取语音唤醒的状态值，当为1的时候代表唤醒，0的时候没有人唤醒
                         int wakeUpState = WakeUp.getWakeUpState();
 //					Log.i("wakeup", "wakeUpState:" + wakeUpState);
                         if (wakeUpState == 1) {
+                            // 获取唤醒的角度
                             int degree = WakeUp.getWakeUpDegree();
                             Log.i("wakeup", "degree:" + degree);
                             WakeUp.setGainDirection(0);// 设置麦克0为主麦
@@ -86,11 +102,25 @@ public class WakeUpServices extends Service {
                                 //软件做业务
                                 interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
                                 sendBroadcast(interruptIntent);
+                                // 小于30度只头转
+                                if (degree >= 330 && degree <= 360) {
+                                    // 330-360  头向左转, 向左10度即+10
+                                    int digit = 360 - degree;// 要转的角度
+                                    BroadcastEnclosure.controlHead(WakeUpServices.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(digit));
 
-                                //硬件去转身
-                                turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                                turnIntent.putExtra("degree", degree);
-                                sendBroadcast(turnIntent);
+                                } else if (degree >= 0 && degree <= 30) {
+                                    // 0-30  头向右转, 向右10度即-10，
+                                    String digit = "-" + degree;// 要转的角度
+                                    BroadcastEnclosure.controlHead(WakeUpServices.this, DataConfig.TURN_HEAD_ABOUT, digit);
+
+                                } else {// 大于30度时身体转过去，手同时摆动
+                                    //硬件去转身
+                                    turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+                                    turnIntent.putExtra("degree", degree);
+                                    sendBroadcast(turnIntent);
+                                    // 摆手
+                                    BroadcastEnclosure.controlWaving(WakeUpServices.this, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
+                                }
                             }
                         } else {
 //						 Log.i("wakeup", "no wakeUp");
@@ -110,11 +140,13 @@ public class WakeUpServices extends Service {
             public void run() {
                 while (true) {
                     if (faceFd > 0) {
+                        // 获取人体检测的状态值，1代表检测到人体，0代表没有检测到人体
                         int faceWakeUpState = WakeUp.getFaceWakeUpState();
                         if (faceWakeUpState == 1) {
                             //有人影进入范围
                             Log.i("wakeup", "检测到人影");
-                            BroadcastEnclosure.openFaceRecognise(WakeUpServices.this, false);
+                            // 发送人体感应的广播
+                            BroadcastEnclosure.bodyDetection(WakeUpServices.this);
                         } else {
                             //没有人影进入范围
 //                            Log.i("wakeup", "未检测到人影");
@@ -125,7 +157,7 @@ public class WakeUpServices extends Service {
                     try {
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Log.i("wakeup", "faceWakeUp InterruptedException=" + e.getMessage());
                     }
                 }
             }
@@ -136,7 +168,7 @@ public class WakeUpServices extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_RESET)) {
+            if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_RESET)) {// 唤醒重置
                 Log.i("wakeup", "唤醒重置");
                 int i = WakeUp.wakeUpReset();
             }
