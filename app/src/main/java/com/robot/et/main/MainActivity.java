@@ -43,6 +43,7 @@ import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.Client;
 import com.robot.et.core.software.ros.client.FollowClient;
 import com.robot.et.core.software.ros.client.MoveClient;
+import com.robot.et.core.software.ros.client.MoveGoalClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.position.PositionControler;
@@ -95,6 +96,7 @@ public class MainActivity extends RosActivity {
     private VisualClient visualClient;//ROS 视觉识别的Client（Service：learn_to_recognize_ros_server）
     private RmapClient rmapClient;   //ROS 地图保存的Client（Service：/turtlebot/save_only_map）
     private MoveClient moveClient;   //ROS 运动控制（Topic:/set_goal）
+    private MoveGoalClient moveGoalClient; ////ROS 运动控制（Topic:/set_goal）
     private PositionControler positionControler; //ROS 获取当前位置的坐标（Topic:/amcl_pose）
     private FollowClient followClient; //ROS跟随服务Client：（Service：/turtlebot_follower/change_state）
 
@@ -123,6 +125,7 @@ public class MainActivity extends RosActivity {
         initService();
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.robot.et.rocon");
+        filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS);
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
@@ -453,25 +456,25 @@ public class MainActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearnInit",flag)){
                     Log.e("ROS_Client","Service：Start DeepLearnInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                    visualClient=new VisualClient(1,"");
+                    visualClient=new VisualClient((short) 1,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearn",flag)){
                     Log.e("ROS_Client","Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
                     SpeechImpl.getInstance().cancelListen();
-                    visualClient=new VisualClient(2,name);
+                    visualClient=new VisualClient((short) 2,name);
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnRec",flag)){
                     Log.e("ROS_Client","Service：Start DeepLearnRec");
-                    visualClient=new VisualClient(3,"");
+                    visualClient=new VisualClient((short) 3,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnClose",flag)){
                     Log.e("ROS_Client","Service：Start DeepLearnClose");
-                    visualClient=new VisualClient(4,"");
+                    visualClient=new VisualClient((short) 4,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 }else if (TextUtils.equals("DeleteAllVisual",flag)){
                     Log.e("ROS_Client","Service：Start DeleteAllVisual");
-                    visualClient=new VisualClient(5,"");
+                    visualClient=new VisualClient((short) 5,"");
                     nodeMainExecutorService.execute(visualClient,nodeConfiguration.setNodeName("deepLearnClient"));
                 }
                 else if (TextUtils.equals("SaveAMap",flag)){
@@ -539,17 +542,22 @@ public class MainActivity extends RosActivity {
                     return;
                 }
                 if (TextUtils.equals("1",direction)){
-                    moveClient=new MoveClient("base_link",1.0f,0.0f,0.0f);
+                    moveGoalClient.getInstance().setPoseGoalWithMap("base_link",1.0f,0.0f,0.0f);
+//                    moveClient=new MoveClient("base_link",1.0f,0.0f,0.0f);
                 }else if (TextUtils.equals("2",direction)){
-                    moveClient=new MoveClient("base_link",-1.0f,0.0f,0.0f);
+                    moveGoalClient.getInstance().setPoseGoalWithMap("base_link",-1.0f,0.0f,0.0f);
+//                    moveClient=new MoveClient("base_link",-1.0f,0.0f,0.0f);
                 }else if (TextUtils.equals("3",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
+                    moveGoalClient.getInstance().setPoseGoalWithMap("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
                 }else if (TextUtils.equals("4",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
+                    moveGoalClient.getInstance().setPoseGoalWithMap("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
                 } else if (TextUtils.equals("5",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,0.0f);
+                    moveGoalClient.getInstance().setPoseGoalWithMap("base_link",0.0f,0.0f,0.0f);
+//                    moveClient=new MoveClient("base_link",0.0f,0.0f,0.0f);
                 }
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                nodeMainExecutorService.execute(moveGoalClient,nodeConfiguration.setNodeName("moveClient"));
 
 //                String direction=String.valueOf(intent.getIntExtra("direction",5));
 //                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
@@ -575,6 +583,7 @@ public class MainActivity extends RosActivity {
                     return;
                 }
                 float d = Float.valueOf(digit);
+                Log.e("ROS_Client","获取的语音角度为："+d);
                 if (TextUtils.equals("1",direction)){
                     moveClient=new MoveClient("base_link",d,0,0);
                 }else if (TextUtils.equals("2",direction)){
@@ -590,7 +599,7 @@ public class MainActivity extends RosActivity {
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
                 Log.e("ROS_Client","Service：Get WakeUp Degree");
                 float d =intent.getIntExtra("degree",0);
-//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
                 moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
                 nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)){
