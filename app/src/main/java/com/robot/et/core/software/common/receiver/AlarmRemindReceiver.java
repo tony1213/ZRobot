@@ -34,9 +34,11 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
     //闹铃提醒
     private void remindTips() {
         long minute = System.currentTimeMillis();
+        // 获取当前时间闹铃提醒的信息
         List<RemindInfo> infos = AlarmRemindManager.getRemindTips(minute);
         int infoSize = infos.size();
         Log.i("alarm", "infos.size()===" + infoSize);
+        // 可能同一时间有多个闹铃，遍历多个闹铃
         if (infos != null && infoSize > 0) {
             List<String> datas = new ArrayList<String>();
             for (int i = 0; i < infoSize; i++) {
@@ -105,7 +107,7 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
                 }
             } else {
                 //闹铃
-                content = "主人您好，您设置的" + remindContent + "提醒时间到了，不要忘记哦。";
+                content = "主人，要" + remindContent + "了";
             }
 
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, content);

@@ -18,5 +18,7 @@ public class SharedPreferencesKeys {
 	public static final String AGORA_CALL_PATTERN = "agora_call_pattern";
 	//记录agora正在通话的手机号
 	public static final String AGORA_CALL_PHONENUM = "agora_call_phonenum";
+	//管理员的手机号
+	public static final String ADMINISTRATORS_PHONENUM = "administrators_phonenum";
 
 }

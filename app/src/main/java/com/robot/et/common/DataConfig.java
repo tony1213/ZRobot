@@ -62,8 +62,8 @@ public class DataConfig {
     public final static int SPEAK_TYPE_SHOW_QRCODE = 4;
     //闹铃提醒
     public static final int SPEAK_TYPE_REMIND_TIPS = 5;
-    //欢迎语
-    public static final int SPEAK_TYPE_WELCOME = 6;
+    //天气
+    public static final int SPEAK_TYPE_WEATHER = 6;
     //剧本问答对话
     public static final int SPEAK_TYPE_SCRIPT = 7;
     //睡觉
@@ -72,8 +72,6 @@ public class DataConfig {
 
     //歌曲信息连接符
     public static String MUSIC_SPLITE = "&";
-    // 提醒内容中间的分隔符
-    public static String SCHEDULE_SPLITE = ",";
     //音乐文件不存在了
     public static String MUSIC_NOT_EXIT = "抱歉，主人，音乐文件已经不存在了，再换一首别的歌吧";
 
@@ -125,22 +123,20 @@ public class DataConfig {
     //是否处于沉睡
     public static boolean isSleep = false;
     //是否正在人脸识别
-    public static boolean isFaceRecogniseIng  = false;
+    public static boolean isFaceRecogniseIng = false;
 
     //是否控制机器人移动
-    public static boolean isControlRobotMove  = false;
+    public static boolean isControlRobotMove = false;
 
     //是否进入认识环境场景
-    public static boolean isIntoKnowEnvironment  = false;
+    public static boolean isIntoKnowEnvironment = false;
     //是否开启漫游
-    public static boolean isStartRoam  = false;
+    public static boolean isStartRoam = false;
     //是否完成识别
-    public static boolean isRecogniseComplected  = false;
+    public static boolean isRecogniseComplected = false;
 
     //是否是语音打开人脸识别
-    public static boolean isVoiceFaceRecognise  = false;
-    //是否是自动拍照
-    public static boolean isTakePicture  = false;
+    public static boolean isVoiceFaceRecognise = false;
 
     //控制头转向的方向  0:左右  1:前后
     public final static int TURN_HEAD_ABOUT = 0;
@@ -150,11 +146,28 @@ public class DataConfig {
     public static boolean isHeadStop = false;
 
     //app控制头部的初始值
+    // 记录左右头部最后一次的位置
     public static int LAST_HEAD_ANGLE_ABOUT = 0;
+    // 记录前后头部最后一次的位置
     public static int LAST_HEAD_ANGLE_AROUND = 0;
 
     //控制头的方向
+    // 是否是向左
     public static boolean isHeadLeft = false;
+    // 是否是向前
     public static boolean isHeadFront = false;
+
+    // 是否是看看照片
+    public static boolean isLookPhoto = false;
+    // 是否是安保模式
+    public static boolean isSecuritySign = false;
+
+    //机器人周围的小车的编号,默认是0
+    public static int toyCarNum = 0;
+
+    // 是否切换摄像头
+    public static boolean isSwitchCamera = false;
+    // 电话是否是从安保模式过来
+    public static boolean isSecurityCall = false;
 
 }

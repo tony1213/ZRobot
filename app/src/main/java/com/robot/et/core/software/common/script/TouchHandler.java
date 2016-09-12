@@ -24,6 +24,7 @@ public class TouchHandler {
     private final static int TOUCH_BELLY = 4;//肚子
     private final static int TOUCH_HAND_FOOT = 5;//脚
 
+    // 响应触摸机器人的处理
     public static void responseTouch(Context context, String touchKey) {
         if (!TextUtils.isEmpty(touchKey)) {
             if (TextUtils.isDigitsOnly(touchKey)) {
@@ -78,6 +79,7 @@ public class TouchHandler {
     //摆手
     private static void waving(final Context context, final String handCategory) {
         BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+        // 1.5秒后把手放下来
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

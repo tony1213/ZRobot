@@ -8,7 +8,6 @@ import android.util.Log;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.core.software.bluetooth.BluthHand;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.NetResultParse;
 import com.robot.et.core.software.common.network.NettyClientCallBack;
@@ -110,8 +109,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
                         Log.i("netty", "datas[0]===" + datas[0]);
                         Log.i("netty", "datas[1]===" + datas[1]);
                         BroadcastEnclosure.controlToyCarMove(context, getIntNum(datas[1]), getIntNum(datas[0]));
-                    } else {
-                        BluthHand.handleJsonResult(context, direction);
                     }
                 }
             }
@@ -306,19 +303,27 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> impl
 
     //播放.mp3文件
     private void playMp3(int mediaType, String mediaName, String musicName) {
+        // 保存当前播放类型
         MusicManager.setCurrentMediaType(mediaType);
+        // 保存当前播放类型名字
         MusicManager.setCurrentMediaName(mediaName);
+        // 保存当前播放歌曲
         MusicManager.setCurrentPlayName(musicName);
 
+        // 告诉app当前播放的状态
         HttpManager.pushMediaState(mediaName, "open", musicName, this);
+        // 如果正在视频的话，不播放音乐
         if (DataConfig.isVideoOrVoice) {
             return;
         }
+        // 每次播放心的音乐之前停止说、唱歌跟听
         SpeechImpl.getInstance().cancelSpeak();
         BroadcastEnclosure.stopMusic(context);
         SpeechImpl.getInstance().cancelListen();
         DataConfig.isJpushPlayMusic = true;
+        // 获取播放音乐前要说的内容
         String speakContent = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_JPUSH, mediaType, musicName);
+        // 把内容说出来
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, speakContent);
     }
 

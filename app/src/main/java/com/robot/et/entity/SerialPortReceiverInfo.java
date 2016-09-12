@@ -2,10 +2,10 @@ package com.robot.et.entity;
 
 /**
  * Created by houdeming on 2016/8/26.
- * 蓝牙接受数据
+ * 串口接受数据
  * {"rdl":0,"rdm":0,"rdr":0,"xf":1,"xag":20,"hw":1}
  */
-public class BluthReceiverInfo {
+public class SerialPortReceiverInfo {
     private int xF;//讯飞唤醒状态
     private int xAg;//讯飞唤醒角度
     private int hw;//红外状态
@@ -61,7 +61,7 @@ public class BluthReceiverInfo {
         this.rdR = rdR;
     }
 
-    public BluthReceiverInfo() {
+    public SerialPortReceiverInfo() {
         super();
     }
 }

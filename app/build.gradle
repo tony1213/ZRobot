@@ -40,5 +40,6 @@ dependencies {
     compile group: 'com.squareup.okio', name: 'okio', version: '1.6.0'
     compile group: 'io.netty', name: 'netty-all', version: '5.0.0.Alpha2'
     compile group: 'com.alibaba', name: 'fastjson', version: '1.2.7'
+    compile group: 'com.google.zxing', name: 'core', version: '3.2.0'
 
 }

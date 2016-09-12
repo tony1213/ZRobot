@@ -85,6 +85,7 @@ public class ScriptParse {
         }
     }
 
+    // 获取具体的信息
     private static List<ScriptActionInfo> getInfos(JSONArray array) {
         List<ScriptActionInfo> infos = new ArrayList<ScriptActionInfo>();
         try {

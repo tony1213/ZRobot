@@ -1,5 +1,6 @@
 package com.robot.et.common;
 
+// 本体访问服务器的链接url
 public class UrlConfig {
 
     //接口总线  网络：139.196.171.217:8080    本地：192.168.1.28:8089
@@ -22,5 +23,9 @@ public class UrlConfig {
     public final static String UPLOAD_FILE_PATH = URL_PATH + "file/upload";
     //拍照后文件上传
     public final static String UPLOAD_PHOTOGRAPH_FILE_PATH = URL_PATH + "robotPicture/upload";
+    //获取一页的照片
+    public final static String GET_PIC_PATH = URL_PATH + "robotPicture/displayRobotPicture";
+    //获取其他页的照片
+    public final static String LOAD_PIC_PATH = URL_PATH + "robotPicture/downloadImage";
 
 }
