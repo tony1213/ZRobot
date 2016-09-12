@@ -1,4 +1,4 @@
-package com.robot.et.app;
+package com.robot.et.main;
 
 import android.app.Application;
 
@@ -8,9 +8,16 @@ import com.robot.et.common.DataConfig;
 
 public class CustomApplication extends Application {
 
+	private static CustomApplication instance;
+
+	public static CustomApplication getInstance() {
+		return instance;
+	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		instance = this;
 		initVoice();
 	}
 
