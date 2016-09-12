@@ -27,7 +27,7 @@ public class PhoneManager {
         PhoneManager.userName = userName;
     }
 
-    //获取语音打电话要说的内容
+    // 获取语音打电话要说的内容
     public static String getCallContent(String userName, String result) {
         String content = "";
         if (!TextUtils.isEmpty(result)) {
@@ -49,7 +49,7 @@ public class PhoneManager {
         return content;
     }
 
-    //解析获取房间号
+    // 解析json获取要拨打电话的房间号
     private static String getRoomNum(String result) {
         String roomNumber = "";
         if (!TextUtils.isEmpty(result)) {
@@ -76,7 +76,6 @@ public class PhoneManager {
                 }
             } catch (JSONException e) {
                 Log.i(TAG, "getRoomNum JSONException");
-                roomNumber = "";
             }
         }
         return roomNumber;

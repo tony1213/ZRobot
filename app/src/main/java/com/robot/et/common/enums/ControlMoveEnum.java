@@ -1,8 +1,8 @@
 package com.robot.et.common.enums;
 
-//控制动的指令
+// 控制动的指令
 public enum ControlMoveEnum {
-
+    
     FORWARD(1, "前进"),
     FORWARD2(1, "向前"),
     FORWARD3(1, "过来"),
@@ -16,10 +16,12 @@ public enum ControlMoveEnum {
     STOP(5, "停止"),
     STOP2(5, "停");
 
+    // 动作指令的key，当控制运动时所要传递的动作key值
     private int moveKey;
+    // 所代表的具体动作说明
     private String moveName;
 
-    private ControlMoveEnum(int moveKey, String moveName) {
+    ControlMoveEnum(int moveKey, String moveName) {
         this.moveKey = moveKey;
         this.moveName = moveName;
     }

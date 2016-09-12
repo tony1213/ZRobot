@@ -2,9 +2,9 @@ package com.robot.et.entity;
 
 /**
  * Created by houdeming on 2016/8/24.
- * 蓝牙发送数据key值
+ * 串口发送数据key值
  */
-public class BluthSendInfo {
+public class SerialPortSendInfo {
     private String cG;//category
     private String aT;//action
     private String DIS;//DigitalServoDriver
@@ -78,7 +78,7 @@ public class BluthSendInfo {
         this.side = side;
     }
 
-    public BluthSendInfo() {
+    public SerialPortSendInfo() {
         super();
     }
 }

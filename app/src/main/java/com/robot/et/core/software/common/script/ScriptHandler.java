@@ -30,6 +30,7 @@ public class ScriptHandler implements Script {
     public static void playScript(Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
             BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+            // 根据剧本名字获取具体的剧本信息
             List<ScriptActionInfo> infos = getScriptActions(content);
             Log.i("netty", "playScript() infos.size()====" + infos.size());
             if (infos != null && infos.size() > 0) {

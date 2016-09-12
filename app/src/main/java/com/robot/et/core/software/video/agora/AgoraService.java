@@ -64,6 +64,7 @@ public class AgoraService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+        DataConfig.isSwitchCamera = false;
     }
 
     //加入agora房间
@@ -114,6 +115,7 @@ public class AgoraService extends Service {
         }
     }
 
+    // 开始视频的时候要停止说话，听，唱歌
     private void joinRoomerBegin(String roomNum) {
         SpeechImpl.getInstance().cancelSpeak();
         SpeechImpl.getInstance().cancelListen();

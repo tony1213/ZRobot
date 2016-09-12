@@ -13,88 +13,130 @@ package com.robot.et.entity;
  * requireAnswer  要求回答内容
  * spareContent   备用内容
  * spareType   备用int型值
+ * speakDate 说的日期
+ * speakTime 说的时间
  */
 public class RemindInfo {
-	private String robotNum;
-	private String date;
-	private String time;
-	private String content;
-	private int remindInt;
-	private int frequency;
-	private String originalAlarmTime;
-	private String remindMen;
-	private String requireAnswer;
-	private String spareContent;
-	private int spareType;
-	public String getRobotNum() {
-		return robotNum;
-	}
-	public void setRobotNum(String robotNum) {
-		this.robotNum = robotNum;
-	}
-	public String getDate() {
-		return date;
-	}
-	public void setDate(String date) {
-		this.date = date;
-	}
-	public String getTime() {
-		return time;
-	}
-	public void setTime(String time) {
-		this.time = time;
-	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
-	public int getRemindInt() {
-		return remindInt;
-	}
-	public void setRemindInt(int remindInt) {
-		this.remindInt = remindInt;
-	}
-	public int getFrequency() {
-		return frequency;
-	}
-	public void setFrequency(int frequency) {
-		this.frequency = frequency;
-	}
-	public String getOriginalAlarmTime() {
-		return originalAlarmTime;
-	}
-	public void setOriginalAlarmTime(String originalAlarmTime) {
-		this.originalAlarmTime = originalAlarmTime;
-	}
-	public String getRemindMen() {
-		return remindMen;
-	}
-	public void setRemindMen(String remindMen) {
-		this.remindMen = remindMen;
-	}
-	public String getRequireAnswer() {
-		return requireAnswer;
-	}
-	public void setRequireAnswer(String requireAnswer) {
-		this.requireAnswer = requireAnswer;
-	}
-	public String getSpareContent() {
-		return spareContent;
-	}
-	public void setSpareContent(String spareContent) {
-		this.spareContent = spareContent;
-	}
-	public int getSpareType() {
-		return spareType;
-	}
-	public void setSpareType(int spareType) {
-		this.spareType = spareType;
-	}
+    private String robotNum;
+    private String date;
+    private String time;
+    private String content;
+    private int remindInt;
+    private int frequency;
+    private String originalAlarmTime;
+    private String remindMen;
+    private String requireAnswer;
+    private String spareContent;
+    private int spareType;
+    private String speakDate;
+    private String speakTime;
 
-	public RemindInfo() {
-		super();
-	}
-	
+    public String getRobotNum() {
+        return robotNum;
+    }
+
+    public void setRobotNum(String robotNum) {
+        this.robotNum = robotNum;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getRemindInt() {
+        return remindInt;
+    }
+
+    public void setRemindInt(int remindInt) {
+        this.remindInt = remindInt;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public String getOriginalAlarmTime() {
+        return originalAlarmTime;
+    }
+
+    public void setOriginalAlarmTime(String originalAlarmTime) {
+        this.originalAlarmTime = originalAlarmTime;
+    }
+
+    public String getRemindMen() {
+        return remindMen;
+    }
+
+    public void setRemindMen(String remindMen) {
+        this.remindMen = remindMen;
+    }
+
+    public String getRequireAnswer() {
+        return requireAnswer;
+    }
+
+    public void setRequireAnswer(String requireAnswer) {
+        this.requireAnswer = requireAnswer;
+    }
+
+    public String getSpareContent() {
+        return spareContent;
+    }
+
+    public void setSpareContent(String spareContent) {
+        this.spareContent = spareContent;
+    }
+
+    public int getSpareType() {
+        return spareType;
+    }
+
+    public void setSpareType(int spareType) {
+        this.spareType = spareType;
+    }
+
+    public String getSpeakDate() {
+        return speakDate;
+    }
+
+    public void setSpeakDate(String speakDate) {
+        this.speakDate = speakDate;
+    }
+
+    public String getSpeakTime() {
+        return speakTime;
+    }
+
+    public void setSpeakTime(String speakTime) {
+        this.speakTime = speakTime;
+    }
+
+    public RemindInfo() {
+        super();
+    }
+
 }
