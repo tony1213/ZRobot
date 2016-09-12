@@ -1,4 +1,4 @@
-package com.robot.et.service.software.system.music;
+package com.robot.et.core.software.system.media;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -14,6 +14,12 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.ScriptConfig;
+import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.MusicManager;
 
 import java.io.IOException;
 
@@ -22,6 +28,7 @@ public class MusicPlayerService extends Service {
     // 媒体播放器对象
     private MediaPlayer mediaPlayer;
     private Intent intent;
+//    private Visualizer mVisualizer;//频谱器
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -33,6 +40,12 @@ public class MusicPlayerService extends Service {
         super.onCreate();
         Log.i("music", "MusicPlayerService onCreate()");
         mediaPlayer = new MediaPlayer();
+        //实例化Visualizer，参数SessionId可以通过MediaPlayer的对象获得
+//        mVisualizer = new Visualizer(mediaPlayer.getAudioSessionId());
+//        //采样 - 参数内必须是2的位数 - 如64,128,256,512,1024
+//        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
+//        SpectrumManager.setVisualizer(mVisualizer);
+
         intent = new Intent();
 
         //设置音乐播放完成时的监听器
@@ -41,6 +54,20 @@ public class MusicPlayerService extends Service {
             @Override
             public void onCompletion(MediaPlayer arg0) {
                 Log.i("music", "音乐播放完成");
+                DataConfig.isPlayMusic = false;
+
+//                SpectrumManager.hideSpectrum();
+
+                //播放的是APP推送来的歌曲，继续播放下一首
+                if (DataConfig.isJpushPlayMusic) {
+                    String musicName = MusicManager.getCurrentPlayName();
+                    if (!TextUtils.isEmpty(musicName)) {
+                        playAppLower(musicName);
+                    }
+                    return;
+                }
+
+                BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_OFF);
                 intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_END);
                 sendBroadcast(intent);
             }
@@ -66,6 +93,18 @@ public class MusicPlayerService extends Service {
         }
     };
 
+    //播放APP推送来的下一首
+    private void playAppLower(String musicName) {
+        int currentType = MusicManager.getCurrentMediaType();
+        if (currentType != 0 && !TextUtils.isEmpty(musicName)) {
+            String musicSrc = MusicManager.getLowerMusicSrc(currentType, musicName + ".mp3");
+            Log.i("music", "MusicPlayerService musicSrc ===" + musicSrc);
+            MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
+            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new NettyClientHandler(this));
+            play(musicSrc);
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
@@ -80,6 +119,8 @@ public class MusicPlayerService extends Service {
 
     //开始播放
     private void play(String musicSrc) {
+        BroadcastEnclosure.controlMouthLED(MusicPlayerService.this, ScriptConfig.LED_BLINK);
+
         if (!TextUtils.isEmpty(musicSrc)) {
             try {
                 mediaPlayer.reset();// 把各项参数恢复到初始状态
@@ -113,13 +154,23 @@ public class MusicPlayerService extends Service {
         @Override
         public void onPrepared(MediaPlayer mp) {
             Log.i("music", "音乐开始播放");
+            DataConfig.isPlayMusic = true;
+//            ViewCommon.initView();
+//            SpectrumManager.showSpectrum();
+
             mediaPlayer.start(); // 开始播放
+
+            if (DataConfig.isJpushPlayMusic) {//来自app音乐
+                new ScriptHandler().scriptPlayMusic(MusicPlayerService.this, true);
+            }
+
         }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+//        mVisualizer.release();
         if (mediaPlayer != null) {
             stopPlay();
             mediaPlayer.release();

@@ -8,13 +8,13 @@ import org.ros.internal.message.Message;
 
 public interface VisualRequest extends Message {
     String _TYPE = "com.robot.et.core.software.ros.visual/VisualRequest";
-    String _DEFINITION = "int64 id\nstring name\n";
+    String _DEFINITION = "int16 request_id\nstring input_name\n";
 
-    long getId();
+    short getRequestId();
 
-    void setId(long var1);
+    void setRequestId(short var1);
 
-    String getName();
+    String getInputName();
 
-    void setName(String var1);
+    void setInputName(String var1);
 }

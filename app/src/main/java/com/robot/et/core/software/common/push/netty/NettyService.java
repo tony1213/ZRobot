@@ -53,16 +53,12 @@ public class NettyService extends Service implements RobotInfoCallBack {
         registerReceiver(receiver, filter);
 
         share = SharedPreferencesUtils.getInstance();
-        // 获取机器编号
         String robotNum = share.getString(SharedPreferencesKeys.ROBOT_NUM, "");
         if (TextUtils.isEmpty(robotNum)) {
-            // 获取机器设备码
             deviceId = new DeviceUuidFactory(this).getDeviceUuid();
             Log.i("netty", "deviceId===" + deviceId);
-            // 获取机器信息
             HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, deviceId, this);
         } else {
-            // 连接netty
             BroadcastEnclosure.connectNetty(this);
         }
     }
@@ -129,7 +125,6 @@ public class NettyService extends Service implements RobotInfoCallBack {
         }
     }
 
-    // 实现接口方法，获取机器信息成功
     @Override
     public void onSuccess(RobotInfo info) {
         Log.i("netty", "NettyService RobotInfoImpl  onSuccess");
@@ -145,7 +140,6 @@ public class NettyService extends Service implements RobotInfoCallBack {
         }
     }
 
-    // 实现接口方法，获取机器信息失败
     @Override
     public void onFail(String errorMsg) {
         Log.i("netty", "NettyService RobotInfoImpl  onFail");

@@ -4,19 +4,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.entity.JpushInfo;
-import com.robot.et.entity.PictureInfo;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.entity.RobotInfo;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by houdeming on 2016/8/2.
@@ -36,12 +31,6 @@ public class NetResultParse {
                     JSONObject jObject = object.getJSONObject("robot");
                     info = new RobotInfo();
                     info.setRobotNum(jObject.getString("robotNumber"));
-                    if (jObject.has("robotMasterMobile")) {
-                        String adminPhone = jObject.getString("robotMasterMobile");
-                        if (!TextUtils.isEmpty(adminPhone)) {
-                            info.setAdminPhone(adminPhone);
-                        }
-                    }
                 }
             } catch (JSONException e) {
                 Log.i("netty", "getRobotInfo JSONException");
@@ -67,31 +56,6 @@ public class NetResultParse {
             }
         }
         return false;
-    }
-
-    //获取图片的信息
-    public static List<PictureInfo> getPicInfos(String result) {
-        List<PictureInfo> infos = new ArrayList<PictureInfo>();
-        if (!TextUtils.isEmpty(result)) {
-            try {
-                JSONTokener tokener = new JSONTokener(result);
-                JSONObject object = new JSONObject(tokener);
-                String resultCode = object.getString("resultCode");
-                if (TextUtils.equals(resultCode, "00")) {
-                    JSONArray dataArray = object.getJSONArray("robotPictures");
-                    for (int i = 0; i < dataArray.length(); i++) {
-                        JSONObject jsonObject = dataArray.getJSONObject(i);
-                        PictureInfo info = new PictureInfo();
-                        info.setPicName(jsonObject.getString("pictureName"));
-                        info.setCreateTime(jsonObject.getString("createTime"));
-                        infos.add(info);
-                    }
-                }
-            } catch (JSONException e) {
-                Log.i("netty", "getPicInfos JSONException");
-            }
-        }
-        return infos;
     }
 
     //解析netty发来的json

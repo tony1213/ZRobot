@@ -24,7 +24,7 @@ public class FileUtils {
     //读取asset目录下文件
     public static String readFile(Context context, String file, String code) {
         if (null == context) {
-            Log.i(TAG, "context is null");
+            Log.e(TAG, "context is null");
             return "";
         } else {
             AssetManager am = context.getAssets();
@@ -39,7 +39,7 @@ public class FileUtils {
                 result = new String(buf, code);
                 in.close();
             } catch (Exception e) {
-                Log.e(TAG, "readFile Exception==" + e.getMessage());
+                e.printStackTrace();
             }
             return result;
         }
@@ -89,7 +89,6 @@ public class FileUtils {
         }
     }
 
-    // 保存路径
     public static void saveFilePath(Bitmap bitmap, String fileName) {
         OutputStream stream = null;
         try {
@@ -106,7 +105,6 @@ public class FileUtils {
         }
     }
 
-    // 获取路径
     public static File[] getFiles(String filePath) {
         File[] files = null;
         if (!TextUtils.isEmpty(filePath)) {
@@ -116,7 +114,6 @@ public class FileUtils {
         return files;
     }
 
-    // byte数组转bitmap
     public static Bitmap Bytes2Bimap(byte[] data) {
         Bitmap bitmap = null;
         if (data != null && data.length != 0) {

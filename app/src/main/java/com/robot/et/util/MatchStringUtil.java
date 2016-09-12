@@ -56,16 +56,6 @@ public class MatchStringUtil {
     public static String startRecogniseEnvRegex = "^" + baseRegex + "*((可以)|(好的))+" + baseRegex + "*$";
     //识别环境完成
     public static String recogniseComplectedEnvRegex = "^" + baseRegex + "*((识别)|(认识)|(学习))+" + baseRegex + "*(完了)+" + baseRegex + "*$";
-    // 看看照片的标志
-    public static String lookPhotoRegex = "^" + baseRegex + "*看+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
-    // 上一张照片
-    public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个))+" + baseRegex + "*$";
-    // 下一张照片
-    public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个))+" + baseRegex + "*$";
-    // 进入安保场景的标志
-    public static String openSecuritySignRegex = "^" + baseRegex + "*((进入)|(打开)|(开启))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
-    // 解除安保场景的标志
-    public static String closeSecuritySignRegex = "^" + baseRegex + "*((解除)|(退出)|(关闭))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
 
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {
@@ -155,7 +145,6 @@ public class MatchStringUtil {
         return carNum;
     }
 
-    // 获取人脸识别时候的名字
     public static String getFaceName(String str) {
         String content = "";
         if (!TextUtils.isEmpty(str)) {

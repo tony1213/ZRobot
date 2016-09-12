@@ -1,11 +1,18 @@
 package com.robot.et.core.software.voice.iflytek;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.TextUnderstander;
+import com.iflytek.cloud.TextUnderstanderListener;
+import com.iflytek.cloud.UnderstanderResult;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.SceneServiceEnum;
@@ -15,19 +22,17 @@ import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.core.software.voice.iflytek.util.PhoneManager;
 import com.robot.et.core.software.voice.iflytek.util.ResultParse;
-import com.robot.et.entity.RemindInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.MusicManager;
-import com.robot.et.voice.ifly.ITextUnderstand;
-import com.robot.et.voice.ifly.TextUnderstand;
 
 import org.json.JSONObject;
 
-// 科大讯飞文本理解
-public class IflyTextUnderstanderService extends SpeechService implements ITextUnderstand {
+//科大讯飞文本理解
+public class IflyTextUnderstanderService extends SpeechService {
+
+    private TextUnderstander mTextUnderstander;
     private String underStandContent;
-    private TextUnderstand textUnderstand;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -38,37 +43,107 @@ public class IflyTextUnderstanderService extends SpeechService implements ITextU
     public void onCreate() {
         super.onCreate();
         Log.i("ifly", "IflyTextUnderstanderService onCreate()");
+        mTextUnderstander = TextUnderstander.createTextUnderstander(this, textUnderstanderListener);
         SpeechImpl.setService(this);
-        // 初始化
-        textUnderstand = new TextUnderstand(this, this);
 
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        textUnderstand.destroy();
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
     }
 
-    // 如果有答案，直接说答案，没答案的话，把问题传给图灵进行理解
+
+    //文本理解
+    private void textUnderstander(String content) {
+        if (mTextUnderstander.isUnderstanding()) {
+            Log.i("ifly", "文本理取消");
+            mTextUnderstander.cancel();
+        }
+        // 函数调用返回值
+        int ret = mTextUnderstander.understandText(content, textListener);
+        if (ret != 0) {
+            Log.i("ifly", "文本理解错误码ret==" + ret);
+            SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
+        }
+    }
+
+    private InitListener textUnderstanderListener = new InitListener() {
+
+        @Override
+        public void onInit(int code) {
+            if (code != ErrorCode.SUCCESS) {
+                Log.i("ifly", "文本理解初始化失败,错误码code==" + code);
+            }
+        }
+    };
+
+    private TextUnderstanderListener textListener = new TextUnderstanderListener() {
+
+        @Override
+        public void onResult(UnderstanderResult result) {
+            Log.i("ifly", "文本理解onResult");
+            Message message = handler.obtainMessage();
+            message.obj = result;
+            handler.sendMessage(message);
+        }
+
+        @Override
+        public void onError(SpeechError error) {
+            // 文本语义不能使用回调错误码14002，请确认您下载sdk时是否勾选语义场景和私有语义的发布
+            Log.i("ifly", "文本理解onError Code==" + error.getErrorCode());
+            SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
+        }
+    };
+
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            UnderstanderResult result = (UnderstanderResult) msg.obj;
+            Log.i("ifly", "文本理解onResult  result===" + result);
+            if (null != result) {
+                String text = result.getResultString();
+                Log.i("ifly", "文本理解text===" + text);
+                if (!TextUtils.isEmpty(text)) {
+                    resultHandle(text);
+                } else {
+                    SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
+                }
+            } else {
+                Log.i("ifly", "文本理解不正确");
+                SpeechImpl.getInstance().understanderTextByTuring(underStandContent);
+            }
+        }
+
+        ;
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mTextUnderstander.isUnderstanding()) {
+            mTextUnderstander.cancel();
+        }
+        mTextUnderstander.destroy();
+    }
+
     private void speakContent(String question, String answer) {
         Log.i("ifly", "IflyTextUnderstanderService question===" + question);
         Log.i("ifly", "IflyTextUnderstanderService answer===" + answer);
+
         if (!TextUtils.isEmpty(answer)) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, answer);
         } else {
             SpeechImpl.getInstance().understanderTextByTuring(question);
         }
+
     }
 
-    // 具体处理文本理解的结果
     private void resultHandle(String result) {
         ResultParse.parseAnswerResult(result, new ParseResultCallBack() {
             @Override
             public void getResult(String question, String service, JSONObject jObject) {
                 if (!TextUtils.isEmpty(question)) {
                     if (!TextUtils.isEmpty(service)) {
-                        // 获取当前属于哪一个场景
                         SceneServiceEnum serviceEnum = EnumManager.getIflyScene(service);
                         Log.i("ifly", "IflyTextUnderstanderService serviceEnum===" + serviceEnum);
                         if (serviceEnum != null) {
@@ -127,12 +202,10 @@ public class IflyTextUnderstanderService extends SpeechService implements ITextU
 
                                     break;
                                 case SCHEDULE://提醒
-                                    // 日期 + 时间 + 做什么事 + 说的日期 + 说的时间
-                                    RemindInfo info = ResultParse.getRemindData(jObject);
-                                    if (info != null) {
-                                        if (!TextUtils.isEmpty(info.getDate())) {
-                                            answer = AlarmRemindManager.getIflyRemindTips(info);
-                                        }
+                                    // 日期 + 时间 + 做什么事
+                                    answer = ResultParse.getRemindData(jObject, DataConfig.SCHEDULE_SPLITE);
+                                    if (!TextUtils.isEmpty(answer)) {
+                                        answer = AlarmRemindManager.getIflyRemindTips(answer);
                                     }
                                     speakContent(question, answer);
 
@@ -162,7 +235,7 @@ public class IflyTextUnderstanderService extends SpeechService implements ITextU
                                             StringBuffer buffer = new StringBuffer(1024);
                                             buffer.append(answer).append(city).append(area).append("的天气");
                                             String weatherContent = buffer.toString();
-                                            textUnderstand.understandText(weatherContent);
+                                            textUnderstander(weatherContent);
                                         }
                                     } else {
                                         speakContent(question, answer);
@@ -183,7 +256,7 @@ public class IflyTextUnderstanderService extends SpeechService implements ITextU
                                                 String content = PhoneManager.getCallContent(userName, result);
                                                 if (!TextUtils.isEmpty(content)) {
                                                     DataConfig.isAgoraVideo = true;
-                                                    SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话");
+                                                    SpeechImpl.getInstance().startSpeak(RequestConfig.JPUSH_CALL_VIDEO, "正在给" + content + "打电话，" + "要耐心等待哦");
                                                 } else {
                                                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "主人，还没有这个人的电话呢，换个试试吧");
                                                 }
@@ -235,53 +308,15 @@ public class IflyTextUnderstanderService extends SpeechService implements ITextU
 
     }
 
-    /**
-     * 继承父类方法
-     * 文本理解（外部调用）
-     *
-     * @param content 要理解的内容
-     */
     @Override
     public void understanderTextByIfly(String content) {
         super.understanderTextByIfly(content);
         Log.i("ifly", "IflyTextUnderstanderService understanderTextByIfly===" + content);
         if (!TextUtils.isEmpty(content)) {
             underStandContent = content;
-            boolean isSuccess = textUnderstand.understandText(content);
-            if (!isSuccess) {
-                speakContent(content, "");
-            }
+            textUnderstander(content);
         } else {
             SpeechImpl.getInstance().startListen();
         }
-    }
-
-    /**
-     * 实现ITextUnderstand接口方法
-     * 理解成功（调用sdk内部方法）
-     *
-     * @param result 返回理解的结果
-     */
-    @Override
-    public void onResult(String result) {
-        if (!TextUtils.isEmpty(result)) {
-            resultHandle(result);
-        } else {
-            speakContent(underStandContent, "");
-        }
-    }
-
-    /**
-     * 实现ITextUnderstand接口方法
-     * 理解异常（调用sdk内部方法）
-     *
-     * @param error 返回错误信息
-     */
-    @Override
-    public void onError(SpeechError error) {
-        // 文本语义不能使用回调错误码14002，请确认您下载sdk时是否勾选语义场景和私有语义的发布
-        Log.i("ifly", "文本理解onError Code==" + error.getErrorCode());
-        // 使用图灵理解
-        speakContent(underStandContent, "");
     }
 }

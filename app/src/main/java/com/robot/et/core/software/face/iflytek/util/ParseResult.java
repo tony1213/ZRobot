@@ -2,7 +2,6 @@ package com.robot.et.core.software.face.iflytek.util;
 
 import android.graphics.Point;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,11 +51,10 @@ public class ParseResult {
 						point++;
 					}
 				} catch (JSONException e) {
-					Log.i("face", "parseResult JSONException==" + e.getMessage());
 				}
 			}
 		} catch (Exception e) {
-			Log.i("face", "parseResult Exception==" + e.getMessage());
+			e.printStackTrace();
 		}
 		return rect;
 	}

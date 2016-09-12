@@ -11,10 +11,10 @@
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:minHeight="50dp"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
-        android:visibility="gone"
         >
 
         <!-- 静音 -->

@@ -82,24 +82,6 @@ public class BroadcastEnclosure {
         }
     }
 
-    //耳朵灯
-    public static void controlEarsLED(Context context, String LEDState) {
-        if (!TextUtils.isEmpty(LEDState)) {
-            intent.setAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
-            intent.putExtra("LEDState", LEDState);
-            context.sendBroadcast(intent);
-        }
-    }
-
-    //照明灯
-    public static void controlLightLED(Context context, String LEDState) {
-        if (!TextUtils.isEmpty(LEDState)) {
-            intent.setAction(BroadcastAction.ACTION_CONTROL_LIGHT_LED);
-            intent.putExtra("LEDState", LEDState);
-            context.sendBroadcast(intent);
-        }
-    }
-
     //跟随
     public static void controlFollow(Context context, String robotNum, int toyCarNum) {
         intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_FOLLOW);
@@ -117,15 +99,16 @@ public class BroadcastEnclosure {
     }
 
     //连接agora
-    public static void connectAgora(Context context, int type) {
+    public static void connectAgora(Context context, int type){
         intent.setAction(BroadcastAction.ACTION_CONNECT_AGORA);
         intent.putExtra("type", type);
         context.sendBroadcast(intent);
     }
 
     //打开人脸识别
-    public static void openFaceRecognise(Context context) {
+    public static void openFaceRecognise(Context context, boolean isVoiceFaceRecognise){
         intent.setAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
+        intent.putExtra("isVoiceFaceRecognise", isVoiceFaceRecognise);
         context.sendBroadcast(intent);
     }
 
@@ -158,23 +141,4 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
-    //播放声音提示的广播
-    public static void playSoundTips(Context context, int soundId) {
-        intent.putExtra("soundId", soundId);
-        intent.setAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
-        context.sendBroadcast(intent);
-    }
-
-    //触摸的广播
-    public static void touchRobot(Context context, int touchId) {
-        intent.putExtra("touchId", touchId);
-        intent.setAction(BroadcastAction.ACTION_HARDWARE_TOUCH);
-        context.sendBroadcast(intent);
-    }
-
-    //人体感应的广播
-    public static void bodyDetection(Context context) {
-        intent.setAction(BroadcastAction.ACTION_BODY_DETECTION);
-        context.sendBroadcast(intent);
-    }
 }

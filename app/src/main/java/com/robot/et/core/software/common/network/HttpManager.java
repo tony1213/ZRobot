@@ -1,5 +1,6 @@
 package com.robot.et.core.software.common.network;
 
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -7,7 +8,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.okhttp.HttpEngine;
-import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.util.FileUtils;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 import com.squareup.okhttp.Call;
@@ -20,11 +21,11 @@ import java.io.IOException;
 
 /**
  * Created by houdeming on 2016/8/2.
- * 发送数据到服务器
  */
 public class HttpManager {
     private final static String TAG = "netty";
-    private static SharedPreferencesUtils share;
+
+    private static final SharedPreferencesUtils share;
 
     static {
         share = SharedPreferencesUtils.getInstance();
@@ -33,7 +34,7 @@ public class HttpManager {
     //初始化获取机器人的信息
     public static void getRobotInfo(String url, final String deviceId, final RobotInfoCallBack callBack) {
         HttpEngine.Param[] params = new HttpEngine.Param[]{
-                new HttpEngine.Param("deviceId", deviceId)
+                new HttpEngine.Param("deviceId", deviceId),
         };
         HttpEngine httpEngine = HttpEngine.getInstance();
         Request request = httpEngine.createRequest(url, params);
@@ -43,18 +44,14 @@ public class HttpManager {
             @Override
             public void onFailure(Request request, IOException arg1) {
                 Log.i(TAG, "getRobotInfo()  onFailure");
-                if (callBack != null) {
-                    callBack.onFail(arg1.getMessage());
-                }
+                callBack.onFail(arg1.getMessage());
             }
 
             @Override
             public void onResponse(Response request) throws IOException {
                 String json = request.body().string();
                 Log.i(TAG, "getRobotInfo()  json==" + json);
-                if (callBack != null) {
-                    callBack.onSuccess(NetResultParse.parseRobotInfo(json));
-                }
+                callBack.onSuccess(NetResultParse.parseRobotInfo(json));
             }
 
         });
@@ -85,9 +82,7 @@ public class HttpManager {
                 if (NetResultParse.isSuccess(result)) {
                     Log.i(TAG, "向APP发送媒体状态成功");
                 }
-                if (callBack != null) {
-                    callBack.connect(result);
-                }
+                callBack.connect(result);
             }
 
         });
@@ -117,9 +112,7 @@ public class HttpManager {
                 if (NetResultParse.isSuccess(result)) {
                     Log.i(TAG, "向APP推送消息成功");
                 }
-                if (callBack != null) {
-                    callBack.connect(result);
-                }
+                callBack.connect(result);
             }
 
         });
@@ -146,9 +139,7 @@ public class HttpManager {
                 String result = response.body().string();
                 Log.i("json", "getRoomNum()  result==" + result);
                 if (!TextUtils.isEmpty(result)) {
-                    if (callBack != null) {
-                        callBack.getPhoneInfo(userName, result);
-                    }
+                    callBack.getPhoneInfo(userName, result);
                 }
             }
 
@@ -208,21 +199,28 @@ public class HttpManager {
                 String result = response.body().string();
                 Log.i(TAG, "result====" + result);
                 if (NetResultParse.isSuccess(result)) {
-                    Log.i(TAG, "通知APP关闭agora成功");
+                    Log.i(TAG, "网速不好关闭agora成功");
                 }
             }
 
         });
     }
 
-    //上传自动拍照的图片
-    public static void uploadFile(String robotNum, String[] fileKeys, File[] files) {
+    //上传文件
+    public static void uploadFile(Bitmap bitmap) {
+        String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
         HttpEngine.Param[] params = new HttpEngine.Param[]{
                 new HttpEngine.Param("robotNumber", robotNum)
         };
+        String[] fileKeys = new String[]{"file"};
+        String fileName = robotNum + "_" + System.currentTimeMillis() + ".png";
+        FileUtils.saveFilePath(bitmap, fileName);
+        File[] files = FileUtils.getFiles(FileUtils.getFilePath(fileName));
+        Log.i(TAG, "filePath====" + FileUtils.getFilePath(fileName));
+        HttpEngine httpEngine = HttpEngine.getInstance();
+        Request request;
         try {
-            HttpEngine httpEngine = HttpEngine.getInstance();
-            Request request = httpEngine.createRequest(UrlConfig.UPLOAD_PHOTOGRAPH_FILE_PATH, files, fileKeys, params);
+            request = httpEngine.createRequest(UrlConfig.UPLOAD_PHOTOGRAPH_FILE_PATH, files, fileKeys, params);
             Call call = httpEngine.createRequestCall(request);
             call.enqueue(new Callback() {
 
@@ -245,29 +243,4 @@ public class HttpManager {
         }
     }
 
-    //获取要显示的图片
-    public static void getPic(String updateType, String createTime, final Gallery.PicInfoCallBack callBack) {
-        HttpEngine.Param[] params = new HttpEngine.Param[]{
-                new HttpEngine.Param("robotNumber", share.getString(SharedPreferencesKeys.ROBOT_NUM, "")),
-                new HttpEngine.Param("updateType", updateType),
-                new HttpEngine.Param("createTime", createTime)
-        };
-        HttpEngine httpEngine = HttpEngine.getInstance();
-        Request request = httpEngine.createRequest(UrlConfig.GET_PIC_PATH, params);
-        Call call = httpEngine.createRequestCall(request);
-        call.enqueue(new Callback() {
-
-            @Override
-            public void onFailure(Request arg0, IOException arg1) {
-            }
-
-            @Override
-            public void onResponse(Response response) throws IOException {
-                String result = response.body().string();
-                Log.i(TAG, "result====" + result);
-                callBack.getPicInfos(NetResultParse.getPicInfos(result));
-            }
-
-        });
-    }
 }

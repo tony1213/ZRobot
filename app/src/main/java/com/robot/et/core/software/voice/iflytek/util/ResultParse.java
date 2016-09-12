@@ -3,8 +3,8 @@ package com.robot.et.core.software.voice.iflytek.util;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.iflytek.cloud.RecognizerResult;
 import com.robot.et.core.software.voice.iflytek.ParseResultCallBack;
-import com.robot.et.entity.RemindInfo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +23,46 @@ import java.util.Random;
 public class ResultParse {
 
     private final static String TAG = "json";
+
+    // 科大讯飞语音听写的结果json解析
+    public static String printResult(RecognizerResult results, HashMap<String, String> mIatResults) {
+        String text = parseVoiceToTextResult(results.getResultString());
+        String sn = "";
+        // 读取json结果中的sn字段
+        try {
+            JSONObject resultJson = new JSONObject(results.getResultString());
+            sn = resultJson.optString("sn");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mIatResults.put(sn, text);
+        StringBuffer resultBuffer = new StringBuffer();
+        for (String key : mIatResults.keySet()) {
+            resultBuffer.append(mIatResults.get(key));
+        }
+        String result = resultBuffer.toString();
+        return result;
+    }
+
+    // 科大讯飞语音听写json解析
+    private static String parseVoiceToTextResult(String json) {
+        StringBuffer ret = new StringBuffer();
+        try {
+            JSONTokener tokener = new JSONTokener(json);
+            JSONObject joResult = new JSONObject(tokener);
+
+            JSONArray words = joResult.getJSONArray("ws");
+            for (int i = 0; i < words.length(); i++) {
+                // 转写结果词，默认使用第一个结果
+                JSONArray items = words.getJSONObject(i).getJSONArray("cw");
+                JSONObject obj = items.getJSONObject(0);
+                ret.append(obj.getString("w"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ret.toString();
+    }
 
     /*
      * 科大讯飞语义理解的json解析
@@ -121,35 +162,25 @@ public class ResultParse {
     }
 
     //获取提醒
-    public static RemindInfo getRemindData(JSONObject jObject) {
-        RemindInfo info = null;
+    public static String getRemindData(JSONObject jObject, String scheduleSplit) {
+        String json = "";
         try {
             JSONObject jsonObject = jObject.getJSONObject("semantic");
             JSONObject object = jsonObject.getJSONObject("slots");
-            info = new RemindInfo();
             String content = object.getString("content");// 做什么事
-            info.setContent(content);
-            if (object.has("datetime")) {
-                JSONObject dataObject = object.getJSONObject("datetime");
-                String date = dataObject.getString("date");// 日期
-                info.setDate(date);
-                String time = dataObject.getString("time");// 时间
-                info.setTime(time);
-                String dateOrig = "";
-                if (dataObject.has("dateOrig")) {
-                    dateOrig = dataObject.getString("dateOrig");// 说的日期
-                    info.setSpeakDate(dateOrig);
-                }
-                String timeOrig = "";
-                if (dataObject.has("timeOrig")) {
-                    timeOrig = dataObject.getString("timeOrig");// 说的时间
-                    info.setSpeakTime(timeOrig);
-                }
-            }
+            JSONObject dataObject = object.getJSONObject("datetime");
+            String time = dataObject.getString("time");// 时间
+            String date = dataObject.getString("date");// 日期
+
+            StringBuffer buffer = new StringBuffer(1024);
+            // 日期 + 时间 + 做什么事
+            buffer.append(date).append(scheduleSplit).append(time).append(scheduleSplit).append(content);
+            json = buffer.toString();
+
         } catch (JSONException e) {
             Log.i(TAG, "getRemindData  JSONException");
         }
-        return info;
+        return json;
     }
 
     //获取天气
@@ -217,7 +248,7 @@ public class ResultParse {
             }
 
             if (!TextUtils.isEmpty(pmValue)) {
-                buffer.append(",pm2.5：").append(pmValue);
+                buffer.append(",pm值：").append(pmValue);
             }
 
             content = buffer.toString();
@@ -283,7 +314,7 @@ public class ResultParse {
                 }
             }
 
-            buffer.append("pm2.5：").append(pmValue).append(",空气质量：").append(weather).append(",空气质量指数：").append(aqi);
+            buffer.append("pm值：").append(pmValue).append(",空气质量：").append(weather).append(",空气质量指数：").append(aqi);
             content = buffer.toString();
 
         } catch (JSONException e) {
