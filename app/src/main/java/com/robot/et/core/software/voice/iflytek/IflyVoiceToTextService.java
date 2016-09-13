@@ -12,6 +12,7 @@ import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
+import com.robot.et.core.software.common.speech.Gallery;
 import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -231,9 +232,11 @@ public class IflyVoiceToTextService extends SpeechService implements IVoiceDicta
 
             if (DataConfig.isLookPhoto) {// 查看图片
                 if (MatchStringUtil.matchString(result, MatchStringUtil.lastPhotoRegex)) {// 上一张照片
+                    Gallery.showLastOnePic();
                     beginListen();
                     return;
                 } else if (MatchStringUtil.matchString(result, MatchStringUtil.nextPhotoRegex)) {// 下一张照片
+                    Gallery.showNextPic();
                     beginListen();
                     return;
                 } else {

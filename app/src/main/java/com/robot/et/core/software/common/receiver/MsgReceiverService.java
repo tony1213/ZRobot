@@ -28,6 +28,7 @@ import com.robot.et.core.software.system.media.IMusic;
 import com.robot.et.core.software.system.media.Music;
 import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.db.RobotDB;
+import com.robot.et.util.BitmapUtil;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
 import com.robot.et.util.MusicManager;
@@ -166,7 +167,7 @@ public class MsgReceiverService extends Service implements IMusic {
                     // 把数据写到内存卡上
                     FileUtils.writeToFile(photoData, "photo.png");
                     // 把byte数组转化为Bitmap
-                    Bitmap bitmap = FileUtils.Bytes2Bimap(photoData);
+                    Bitmap bitmap = BitmapUtil.byte2Bitmap(photoData);
                     // 上传图片到服务器
                     upLoadFile(bitmap, robotNum);
                 }
