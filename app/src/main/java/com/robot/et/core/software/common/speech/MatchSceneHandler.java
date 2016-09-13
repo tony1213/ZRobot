@@ -12,9 +12,9 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
+import com.robot.et.core.software.camera.TakePhotoActivity;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
-import com.robot.et.core.software.camera.AutoPhotographActivity;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -183,7 +183,7 @@ public class MatchSceneHandler {
             case LOOK_PHOTO_SCENE:// 看看照片的标志
                 flag = true;
                 DataConfig.isLookPhoto = true;
-//                Gallery.getShowPic(context);
+                Gallery.getShowPic(context);
                 SpeechImpl.getInstance().startListen();
 
                 break;
@@ -205,12 +205,13 @@ public class MatchSceneHandler {
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
                 // 开始自动拍照
                 Intent intent = new Intent();
-                intent.setClass(context, AutoPhotographActivity.class);
+                intent.setClass(context, TakePhotoActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
 
                 break;
             /*case VISION_LEARN_SCENE:// 视觉学习
+
                 flag = true;
                 String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
                 Log.i("ifly", "visionContent=====" + visionContent);

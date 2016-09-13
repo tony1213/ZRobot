@@ -168,7 +168,7 @@
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             />
 
-        <activity android:name=".core.software.camera.AutoPhotographActivity"
+        <activity android:name=".core.software.camera.TakePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"

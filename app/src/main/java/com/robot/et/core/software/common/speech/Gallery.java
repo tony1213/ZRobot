@@ -6,8 +6,11 @@ import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
+import com.robot.et.common.DataConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.view.OneImgManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.entity.PictureInfo;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
@@ -28,16 +31,16 @@ import java.util.List;
  */
 public class Gallery {
     private static final String TAG = "pic";
-    private static List<PictureInfo> infos = new ArrayList<PictureInfo>();
+    private static List<PictureInfo> mInfos = new ArrayList<PictureInfo>();
     // 当前图片的位置
-    public static int CURRENT_INDEX = 0;
+    private static int CURRENT_INDEX = 0;
+    // 图片名字
+    private static String picName;
+    // 图片创建时间
+    private static String createTime;
 
-    public static List<PictureInfo> getInfos() {
-        return infos;
-    }
-
-    public static void setInfos(List<PictureInfo> infos) {
-        Gallery.infos = infos;
+    private static void setInfos(List<PictureInfo> infos) {
+        Gallery.mInfos = infos;
     }
 
     // 获取所有图片
@@ -46,8 +49,27 @@ public class Gallery {
             @Override
             public void getPicInfos(List<PictureInfo> infos) {
                 Log.i(TAG, "getPicInfos.size==" + infos.size());
+                // 每次去查图片之前都把缓存的清掉，与服务器保持最新
+                if (mInfos != null && mInfos.size() > 0) {
+                    mInfos.clear();
+                }
                 if (infos != null && infos.size() > 0) {
                     setInfos(infos);
+                    CURRENT_INDEX = 0;
+                    PictureInfo info = infos.get(CURRENT_INDEX);
+                    picName = info.getPicName();
+                    createTime = info.getCreateTime();
+                    CURRENT_INDEX ++;
+                    String url = getUrl(picName);
+                    loadPic(url, new BitmapCallBack() {
+                        @Override
+                        public void getBitmap(Bitmap bitmap) {
+                            if (bitmap != null) {
+                                ViewCommon.initView();
+                                OneImgManager.showImg(bitmap);
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -56,12 +78,29 @@ public class Gallery {
 
     // 获取上一张图片
     public static void showLastOnePic() {
+        // 如果当前是第一张的话，就不再去查了
+        if (CURRENT_INDEX == 0) {
+            SpeechImpl.getInstance().cancelListen();
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已经是第一张了呢，看看下一张吧");
+            return;
+        }
 
+        HttpManager.getPic("up", createTime, new PicInfoCallBack() {
+            @Override
+            public void getPicInfos(List<PictureInfo> infos) {
+
+            }
+        });
     }
 
     // 获取下一张图片
     public static void showNextPic() {
+        HttpManager.getPic("down", createTime, new PicInfoCallBack() {
+            @Override
+            public void getPicInfos(List<PictureInfo> infos) {
 
+            }
+        });
     }
 
     // 图片信息的回调
@@ -75,14 +114,14 @@ public class Gallery {
     }
 
     // 获取下载的连接
-    private String getUrl(String picName) {
+    private static String getUrl(String picName) {
         String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
         String urlGet = UrlConfig.LOAD_PIC_PATH + "?fileName=" + picName + "&robotNumber=" + robotNum;
         return urlGet;
     }
 
     // 下载网络图片
-    private void loadPic(final String url, final BitmapCallBack callBack) {
+    private static void loadPic(final String url, final BitmapCallBack callBack) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -116,7 +155,7 @@ public class Gallery {
                             outputStream.write(b, 0, len);
                         }
                     }
-                    final Bitmap bitmap = BitmapFactory.decodeFile(downloadFile.getAbsolutePath());//解析我们下载的文件
+                    Bitmap bitmap = BitmapFactory.decodeFile(downloadFile.getAbsolutePath());//解析我们下载的文件
                     callBack.getBitmap(bitmap);
                 } catch (MalformedURLException e) {
                     Log.i(TAG, "loadPic MalformedURLException==" + e.getMessage());

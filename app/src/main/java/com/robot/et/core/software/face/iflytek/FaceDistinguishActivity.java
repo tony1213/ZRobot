@@ -5,15 +5,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -41,13 +37,13 @@ import com.robot.et.core.software.face.iflytek.util.FaceRect;
 import com.robot.et.core.software.face.iflytek.util.FaceUtil;
 import com.robot.et.core.software.face.iflytek.util.ParseResult;
 import com.robot.et.entity.FaceInfo;
+import com.robot.et.util.BitmapUtil;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FaceManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -325,7 +321,7 @@ public class FaceDistinguishActivity extends Activity {
                             byte[] tmp = new byte[nv21.length];
                             System.arraycopy(nv21, 0, tmp, 0, nv21.length);
 
-                            mImageData = Bitmap2Bytes(decodeToBitMap(tmp));
+                            mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT));
                             noFaceCount = 0;
                             //转身  多次检测的时候只转一次头
                             if (!isSendAngle) {
@@ -562,30 +558,6 @@ public class FaceDistinguishActivity extends Activity {
         intent.putExtra("isVerifySuccess", isVerifySuccess);
         sendBroadcast(intent);
         finish();
-    }
-
-    // 压缩图片
-    private Bitmap decodeToBitMap(byte[] data) {
-        try {
-            YuvImage image = new YuvImage(data, ImageFormat.NV21, PREVIEW_WIDTH, PREVIEW_HEIGHT, null);
-            if (image != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT), 80, stream);
-                Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
-                stream.close();
-                return bmp;
-            }
-        } catch (Exception ex) {
-            Log.e("face", "Error:" + ex.getMessage());
-        }
-        return null;
-    }
-
-    // bitmap转byte数组
-    private byte[] Bitmap2Bytes(Bitmap bm) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        return baos.toByteArray();
     }
 
     //获取时间的唯一数

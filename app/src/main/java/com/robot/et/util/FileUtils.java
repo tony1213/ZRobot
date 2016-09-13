@@ -3,7 +3,6 @@ package com.robot.et.util;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -115,14 +114,4 @@ public class FileUtils {
         }
         return files;
     }
-
-    // byte数组转bitmap
-    public static Bitmap Bytes2Bimap(byte[] data) {
-        Bitmap bitmap = null;
-        if (data != null && data.length != 0) {
-            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-        }
-        return bitmap;
-    }
-
 }
