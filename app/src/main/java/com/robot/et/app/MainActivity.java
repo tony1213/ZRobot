@@ -80,8 +80,6 @@ public class MainActivity extends RosActivity {
 
     private final float CIRCLE = 3.1415926535f; //圆周率
 
-    private boolean isWorldNavigationOpen = false;
-
     private ArrayList<Interaction> availableAppsCache;
     private Interaction selectedInteraction;
     private RoconDescription roconDescription;
@@ -498,7 +496,6 @@ public class MainActivity extends RosActivity {
                     nodeMainExecutorService.execute(rmapClient, nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation", flag)) {
                     //地图导航(Rapp)
-                    isWorldNavigationOpen = true;
                     Log.e("ROS_Client", "Rapp:Start World Navigation");
                     doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
                 } else if (TextUtils.equals("PositionName", flag)) {
