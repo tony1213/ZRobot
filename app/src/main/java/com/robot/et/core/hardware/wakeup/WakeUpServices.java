@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.ShellUtils;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WakeUpServices extends Service {
-
     private int voiceFd;
     private int faceFd;
     private Intent interruptIntent, turnIntent;
@@ -111,8 +111,11 @@ public class WakeUpServices extends Service {
                                     turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
                                     turnIntent.putExtra("degree", degree);
                                     sendBroadcast(turnIntent);
+                                    // 耳朵的灯光在运动的时候进行闪烁
+                                    BroadcastEnclosure.controlEarsLED(WakeUpServices.this, EarsLightConfig.EARS_BLINK);
                                     // 摆手
                                     BroadcastEnclosure.controlWaving(WakeUpServices.this, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
+
                                 }
                             }
                         } else {
@@ -139,7 +142,7 @@ public class WakeUpServices extends Service {
                             //有人影进入范围
                             Log.i("wakeup", "检测到人影");
                             // 发送人体感应的广播
-                            BroadcastEnclosure.bodyDetection(WakeUpServices.this);
+//                            BroadcastEnclosure.bodyDetection(WakeUpServices.this);
                         } else {
                             //没有人影进入范围
 //                            Log.i("wakeup", "未检测到人影");

@@ -81,7 +81,13 @@ public class CommandHandler {
                 } else {//控制机器人
                     Log.e("ControlMove", "执行语音控制机器人");
                     DataConfig.isControlRobotMove = true;
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getRandomAnswer());
+                    String content = "";
+                    if (result.contains("过来")) {
+                        content = "好的，主人，我来啦";
+                    } else {
+                        content = getRandomAnswer();
+                    }
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
                     int digit = getIntNum(result);
                     Log.i("ControlMove", "result===" + result);
@@ -188,12 +194,6 @@ public class CommandHandler {
             } else if (TextUtils.equals("不要跟着我", result)) {
                 sendRos("WORLDFOLLOWER", "0");
                 SpeechImpl.getInstance().startListen();
-            } else if (result.contains("记住这个是") || result.contains("记住这是")) {
-                int start = result.indexOf("是");
-                content = result.substring(start + 1, result.length());
-                sendRos("DeepLearn", content);
-                SpeechImpl.getInstance().startListen();
-                return true;
             } else {
                 String rosKey = EnumManager.getRosServiceKey(result);
                 Log.i("ros", "rosKey===" + rosKey);

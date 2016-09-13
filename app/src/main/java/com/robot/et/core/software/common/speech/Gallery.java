@@ -1,6 +1,5 @@
 package com.robot.et.core.software.common.speech;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -32,80 +31,114 @@ import java.util.List;
 public class Gallery {
     private static final String TAG = "pic";
     private static List<PictureInfo> mInfos = new ArrayList<PictureInfo>();
-    // 当前图片的位置
+    // 当前图片的位置（从0开始）
     private static int CURRENT_INDEX = 0;
-    // 图片名字
-    private static String picName;
-    // 图片创建时间
+    // 图片创建时间（用于获取上下张图片）
     private static String createTime;
 
-    private static void setInfos(List<PictureInfo> infos) {
-        Gallery.mInfos = infos;
-    }
-
-    // 获取所有图片
-    public static void getShowPic(Context context) {
+    // 获取所有图片 第一次去请求图片时，可以不带参数
+    public static void getShowPic() {
         HttpManager.getPic("", "", new PicInfoCallBack() {
             @Override
             public void getPicInfos(List<PictureInfo> infos) {
                 Log.i(TAG, "getPicInfos.size==" + infos.size());
-                // 每次去查图片之前都把缓存的清掉，与服务器保持最新
-                if (mInfos != null && mInfos.size() > 0) {
-                    mInfos.clear();
-                }
                 if (infos != null && infos.size() > 0) {
-                    setInfos(infos);
+                    // 每次去查图片之前都把缓存的清掉，与服务器保持最新
+                    if (mInfos != null && mInfos.size() > 0) {
+                        mInfos.clear();
+                    }
+                    // 保存数据
+                    mInfos.addAll(infos);
+                    // 初始脚标为0
                     CURRENT_INDEX = 0;
-                    PictureInfo info = infos.get(CURRENT_INDEX);
-                    picName = info.getPicName();
-                    createTime = info.getCreateTime();
-                    CURRENT_INDEX ++;
-                    String url = getUrl(picName);
-                    loadPic(url, new BitmapCallBack() {
-                        @Override
-                        public void getBitmap(Bitmap bitmap) {
-                            if (bitmap != null) {
-                                ViewCommon.initView();
-                                OneImgManager.showImg(bitmap);
-                            }
-                        }
-                    });
+                    showPic(mInfos.get(CURRENT_INDEX));
+                } else {
+                    noPic();
                 }
             }
         });
-
     }
 
     // 获取上一张图片
     public static void showLastOnePic() {
-        // 如果当前是第一张的话，就不再去查了
-        if (CURRENT_INDEX == 0) {
-            SpeechImpl.getInstance().cancelListen();
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已经是第一张了呢，看看下一张吧");
-            return;
-        }
-
-        HttpManager.getPic("up", createTime, new PicInfoCallBack() {
-            @Override
-            public void getPicInfos(List<PictureInfo> infos) {
-
+        if (mInfos != null && mInfos.size() > 0) {
+            // 如果当前是第一张的话，就不再去查了
+            if (CURRENT_INDEX <= 0) {
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已经是第一张了呢，看看下一张吧");
+                return;
             }
-        });
+            CURRENT_INDEX--;
+
+            if (CURRENT_INDEX < mInfos.size() && CURRENT_INDEX >= 0) {
+                showPic(mInfos.get(CURRENT_INDEX));
+                return;
+            }
+            SpeechImpl.getInstance().startListen();
+
+        } else {
+            noPic();
+        }
     }
 
     // 获取下一张图片
     public static void showNextPic() {
-        HttpManager.getPic("down", createTime, new PicInfoCallBack() {
-            @Override
-            public void getPicInfos(List<PictureInfo> infos) {
-
+        if (mInfos != null && mInfos.size() > 0) {
+            CURRENT_INDEX++;
+            if (CURRENT_INDEX < mInfos.size() && CURRENT_INDEX >= 0) {
+                showPic(mInfos.get(CURRENT_INDEX));
+            } else {// 如果当前是最后一张的话，去查新的
+                HttpManager.getPic("down", createTime, new PicInfoCallBack() {
+                    @Override
+                    public void getPicInfos(List<PictureInfo> infos) {
+                        if (infos != null && infos.size() > 0) {
+                            mInfos.addAll(infos);
+                            if (CURRENT_INDEX < mInfos.size()) {
+                                showPic(mInfos.get(CURRENT_INDEX));
+                            }
+                        } else {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已经没有照片了呢，再拍几张吧");
+                        }
+                    }
+                });
             }
-        });
+        } else {
+            noPic();
+        }
+    }
+
+    // 显示图片
+    private static void showPic(PictureInfo info) {
+        if (info != null) {
+            String picName = info.getPicName();
+            createTime = info.getCreateTime();
+            String url = getUrl(picName);
+            loadPic(url, new BitmapCallBack() {
+                @Override
+                public void getBitmap(Bitmap bitmap) {
+                    if (bitmap != null) {
+                        ViewCommon.initView();
+                        OneImgManager.showImg(bitmap);
+                    }
+                }
+            });
+        }
+        SpeechImpl.getInstance().startListen();
+    }
+
+    // 没有照片
+    private static void noPic() {
+        DataConfig.isLookPhoto = false;
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "还没有照片呢，快去拍一张吧");
     }
 
     // 图片信息的回调
     public interface PicInfoCallBack {
         void getPicInfos(List<PictureInfo> infos);
+    }
+
+    public interface IPicInfo {
+        // 获取图片信息
+        void getPicInfo(PictureInfo info);
     }
 
     // 下载的图片回调
@@ -143,7 +176,7 @@ public class Gallery {
                         downloadFile = new File(sdPath, fileName);//在sd卡目录下创建一个文件，就是我们下载的图片文件
                         outputStream = new FileOutputStream(downloadFile);
                     }
-                    byte[] b = new byte[20 * 1024];//创建一个2K字节大小的缓冲区
+                    byte[] b = new byte[20 * 1024];//创建一个20K字节大小的缓冲区
                     int len = 0;
                     if (outputStream != null) {
                 /*

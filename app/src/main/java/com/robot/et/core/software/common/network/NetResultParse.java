@@ -69,6 +69,26 @@ public class NetResultParse {
         return false;
     }
 
+    // 上传照片获取图片信息
+    public static PictureInfo getPicInfo(String result) {
+        PictureInfo info = null;
+        if (!TextUtils.isEmpty(result)) {
+            try {
+                JSONTokener tokener = new JSONTokener(result);
+                JSONObject object = new JSONObject(tokener);
+                String resultCode = object.getString("resultCode");
+                if (TextUtils.equals(resultCode, "00")) {
+                    JSONObject jsonObject = object.getJSONObject("robotPicture");
+                    info = new PictureInfo();
+                    info.setPicName(jsonObject.getString("pictureName"));
+                }
+            } catch (JSONException e) {
+                Log.i("netty", "getPicInfo JSONException");
+            }
+        }
+        return info;
+    }
+
     //获取图片的信息
     public static List<PictureInfo> getPicInfos(String result) {
         List<PictureInfo> infos = new ArrayList<PictureInfo>();

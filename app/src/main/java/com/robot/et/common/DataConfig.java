@@ -58,8 +58,6 @@ public class DataConfig {
     public final static int SPEAK_TYPE_MUSIC_START = 2;
     //什么都不做
     public final static int SPEAK_TYPE_DO_NOTHINF = 3;
-    //显示二维码的图片
-    public final static int SPEAK_TYPE_SHOW_QRCODE = 4;
     //闹铃提醒
     public static final int SPEAK_TYPE_REMIND_TIPS = 5;
     //天气
@@ -169,5 +167,8 @@ public class DataConfig {
     public static boolean isSwitchCamera = false;
     // 电话是否是从安保模式过来
     public static boolean isSecurityCall = false;
+
+    // 是否是显示下载图片的二维码
+    public static boolean isShowLoadPicQRCode = false;
 
 }

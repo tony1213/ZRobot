@@ -14,11 +14,14 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.TouchConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
+import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.voice.iflytek.util.PhoneManager;
 import com.robot.et.entity.RobotInfo;
@@ -67,22 +70,23 @@ public class HardwareReceiverService extends Service {
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_HARDWARE_TOUCH)) {// 硬件的触摸
                 Log.i(TAG, "HardwareReceiverService 硬件的触摸");
-                // 如果是安保模式的话，解除安保模式
-                if (DataConfig.isSecuritySign) {// 安保模式
-                    // 停止计时
-                    TimerManager.cancelTimer(timer);
-                    timer = null;
-                    // 解除预警，耳朵灯变常亮，照明灯30s后灭
-                    BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, "");
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 照明灯灭
-                            BroadcastEnclosure.controlLightLED(HardwareReceiverService.this, "");
-                        }
-                    }, 30 * 1000);
-                } else {// 不是安保模式
-
+                // 获取触摸的位置
+                int touchId = intent.getIntExtra("touchId", 0);
+                if (touchId != 0) {
+                    // 如果正在音视频的话什么也不处理
+                    if (DataConfig.isVideoOrVoice) {
+                        return;
+                    }
+                    //唤醒状态不去人脸识别
+                    if (!DataConfig.isSleep) {
+                        return;
+                    }
+                    // 停止掉听,唱歌,说话
+                    SpeechImpl.getInstance().cancelSpeak();
+                    SpeechImpl.getInstance().cancelListen();
+                    BroadcastEnclosure.stopMusic(HardwareReceiverService.this);
+                    // 响应触摸
+                    touch(touchId);
                 }
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_BODY_DETECTION)) {// 人体检测
@@ -109,7 +113,7 @@ public class HardwareReceiverService extends Service {
                         // 自身照明灯亮起
                         BroadcastEnclosure.controlLightLED(HardwareReceiverService.this, "");
                         // 耳朵灯旋转
-                        BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, "");
+                        BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_CLOCKWISE_TURN);
                         // 防止在拨打电话前检测到多次，每次计时之前，先停止掉前面的计时器，保证最新的计时时间
                         TimerManager.cancelTimer(timer);
                         timer = null;
@@ -166,6 +170,48 @@ public class HardwareReceiverService extends Service {
             content = wakeUpSpeakContent[i];
         }
         return content;
+    }
+
+    // 触摸的处理
+    private void touch(int touchId) {
+        switch (touchId) {
+            case TouchConfig.TOUCH_HEAD_TOP:// 头顶
+                // 如果是安保模式的话，解除安保模式
+                if (DataConfig.isSecuritySign) {// 安保模式
+                    // 停止计时
+                    TimerManager.cancelTimer(timer);
+                    timer = null;
+                    // 解除预警，耳朵灯变常亮，照明灯30s后灭
+                    BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BRIGHT);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // 照明灯灭
+                            BroadcastEnclosure.controlLightLED(HardwareReceiverService.this, "");
+                        }
+                    }, 30 * 1000);
+                } else {// 不是安保模式
+                    TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_HEAD_TOP));
+                }
+                break;
+            case TouchConfig.TOUCH_HEAD_BACK:// 后脑勺
+                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_HEAD_BACK));
+                break;
+            case TouchConfig.TOUCH_EARS_LEFT:// 左耳
+                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_EARS_LEFT));
+                break;
+            case TouchConfig.TOUCH_EARS_RIGHT:// 右耳
+                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_EARS_RIGHT));
+                break;
+            case TouchConfig.TOUCH_ABDOMEN:// 腹部
+                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_BELLY));
+                break;
+            case TouchConfig.TOUCH_BACK:// 背部
+                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_BACK));
+                break;
+            default:
+                break;
+        }
     }
 
     private Handler handler = new Handler() {

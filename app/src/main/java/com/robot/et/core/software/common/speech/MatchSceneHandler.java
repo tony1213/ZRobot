@@ -9,6 +9,7 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
@@ -169,7 +170,7 @@ public class MatchSceneHandler {
                         FaceManager.addFaceInfo(faceName);
                         ViewCommon.initView();
                         OneImgManager.showImg(R.mipmap.robot_qr_code);
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "好的，我记住了，请扫描二维码和我聊天");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了，请扫描二维码和我聊天");
                     }
                 }
 
@@ -183,8 +184,7 @@ public class MatchSceneHandler {
             case LOOK_PHOTO_SCENE:// 看看照片的标志
                 flag = true;
                 DataConfig.isLookPhoto = true;
-                Gallery.getShowPic(context);
-                SpeechImpl.getInstance().startListen();
+                Gallery.getShowPic();
 
                 break;
             case OPEN_SECURITY_SCENE:// 进入安保场景
@@ -199,10 +199,10 @@ public class MatchSceneHandler {
                 break;
             case PHOTOGRAPH_SCENE:// 拍照
                 flag = true;
-                // 说提示音
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，3,2,1，茄子");
                 // 拍照时手抬起来
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
+                // 说提示音
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，3,2,1，茄子");
                 // 开始自动拍照
                 Intent intent = new Intent();
                 intent.setClass(context, TakePhotoActivity.class);
@@ -337,6 +337,9 @@ public class MatchSceneHandler {
         // 显示睡觉表情
         ViewCommon.initView();
         EmotionManager.showEmotion(R.mipmap.emotion_blink);
+        // 耳朵灯灭
+        BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
+        // 胸口灯呼吸
     }
 
     //增加视觉环境学习到数据库

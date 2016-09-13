@@ -204,6 +204,8 @@ public class TakePhotoActivity extends Activity {
         intent.putExtra("photoData", mImageData);
         sendBroadcast(intent);
 
+        // 1s之后关闭
+        SystemClock.sleep(1000);
         finish();
     }
 

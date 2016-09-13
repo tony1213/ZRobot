@@ -83,12 +83,10 @@ public class BroadcastEnclosure {
     }
 
     //耳朵灯
-    public static void controlEarsLED(Context context, String LEDState) {
-        if (!TextUtils.isEmpty(LEDState)) {
-            intent.setAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
-            intent.putExtra("LEDState", LEDState);
-            context.sendBroadcast(intent);
-        }
+    public static void controlEarsLED(Context context, int LEDState) {
+        intent.setAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
+        intent.putExtra("LEDState", LEDState);
+        context.sendBroadcast(intent);
     }
 
     //照明灯

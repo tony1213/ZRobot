@@ -32,7 +32,7 @@ import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.ScriptConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.core.software.face.iflytek.util.FaceRect;
 import com.robot.et.core.software.face.iflytek.util.FaceUtil;
 import com.robot.et.core.software.face.iflytek.util.ParseResult;
@@ -91,8 +91,8 @@ public class FaceDistinguishActivity extends Activity {
         // 设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_face_verify);
-        // 人脸识别的时候灯亮提示
-        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_ON);
+        // 人脸识别的时候耳朵灯光闪烁
+        BroadcastEnclosure.controlEarsLED(this, EarsLightConfig.EARS_BLINK);
         // 获取屏幕中心点
         getScreenCenterPoint();
         // 初始化界面
@@ -390,7 +390,7 @@ public class FaceDistinguishActivity extends Activity {
         }
         mStopTrack = true;
         // 提示灯关闭
-        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_OFF);
+        BroadcastEnclosure.controlEarsLED(this, EarsLightConfig.EARS_CLOSE);
         // 通知头部复位
         BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
     }

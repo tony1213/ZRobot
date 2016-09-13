@@ -10,7 +10,7 @@ import android.util.Log;
 import com.iflytek.cloud.SpeechError;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.ScriptConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
 import com.robot.et.core.software.common.speech.Gallery;
 import com.robot.et.core.software.common.speech.MatchSceneHandler;
@@ -166,7 +166,8 @@ public class IflyVoiceToTextService extends SpeechService implements IVoiceDicta
     public void onBeginOfSpeech() {
         // 此回调表示：sdk内部录音机已经准备好了，用户可以开始语音输入
         Log.i("ifly", "onBeginOfSpeech()");
-        BroadcastEnclosure.controlMouthLED(IflyVoiceToTextService.this, ScriptConfig.LED_ON);
+        // 听的时候灯光常亮
+        BroadcastEnclosure.controlEarsLED(IflyVoiceToTextService.this, EarsLightConfig.EARS_BRIGHT);
     }
 
     /**
@@ -177,7 +178,8 @@ public class IflyVoiceToTextService extends SpeechService implements IVoiceDicta
     public void onEndOfSpeech() {
         // 此回调表示：检测到了语音的尾端点，已经进入识别过程，不再接受语音输入
         Log.i("ifly", "结束说话 ");
-        BroadcastEnclosure.controlMouthLED(IflyVoiceToTextService.this, ScriptConfig.LED_OFF);
+        // 听结束灯光灭
+        BroadcastEnclosure.controlEarsLED(IflyVoiceToTextService.this, EarsLightConfig.EARS_CLOSE);
     }
 
     /**
@@ -233,11 +235,9 @@ public class IflyVoiceToTextService extends SpeechService implements IVoiceDicta
             if (DataConfig.isLookPhoto) {// 查看图片
                 if (MatchStringUtil.matchString(result, MatchStringUtil.lastPhotoRegex)) {// 上一张照片
                     Gallery.showLastOnePic();
-                    beginListen();
                     return;
                 } else if (MatchStringUtil.matchString(result, MatchStringUtil.nextPhotoRegex)) {// 下一张照片
                     Gallery.showNextPic();
-                    beginListen();
                     return;
                 } else {
                     DataConfig.isLookPhoto = false;
