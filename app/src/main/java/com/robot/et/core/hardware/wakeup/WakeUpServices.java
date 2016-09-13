@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
@@ -57,14 +56,8 @@ public class WakeUpServices extends Service {
 
     //打开I2C，一般的手机上面会出现错误
     private void openI2C() {
-        try {
-
-        } catch (Exception e) {
-
-        }
         List<String> commnandList = new ArrayList<String>();
         commnandList.add("su");
-        SystemClock.sleep(1000);
         commnandList.add("setenforce 0");
         commnandList.add("chmod 777 /sys/class/gpio");
         commnandList.add("chmod 777 /sys/class/gpio/export");
