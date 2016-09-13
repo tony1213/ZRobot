@@ -480,7 +480,6 @@ public class MainActivity extends RosActivity {
                     nodeMainExecutorService.execute(rmapClient, nodeConfiguration.setNodeName("RmapClient"));
                 } else if (TextUtils.equals("World Navigation", flag)) {
                     //地图导航(Rapp)
-                    isWorldNavigationOpen = true;
                     Log.e("ROS_Client", "Rapp:Start World Navigation");
                     doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
                 } else if (TextUtils.equals("PositionName", flag)) {
