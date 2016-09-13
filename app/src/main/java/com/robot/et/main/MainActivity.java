@@ -80,8 +80,6 @@ public class MainActivity extends RosActivity {
 
     private final float CIRCLE = 3.1415926535f; //圆周率
 
-    private boolean isWorldNavigationOpen = false;
-
     private ArrayList<Interaction> availableAppsCache;
     private Interaction selectedInteraction;
     private RoconDescription roconDescription;
