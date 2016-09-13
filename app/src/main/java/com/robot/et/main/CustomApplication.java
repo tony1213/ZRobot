@@ -5,6 +5,7 @@ import android.app.Application;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
+import com.squareup.leakcanary.LeakCanary;
 
 public class CustomApplication extends Application {
 
@@ -17,6 +18,7 @@ public class CustomApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		LeakCanary.install(this);
 		instance = this;
 		initVoice();
 	}
