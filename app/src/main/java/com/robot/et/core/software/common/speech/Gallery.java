@@ -3,6 +3,8 @@ package com.robot.et.core.software.common.speech;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
@@ -109,21 +111,35 @@ public class Gallery {
     // 显示图片
     private static void showPic(PictureInfo info) {
         if (info != null) {
-            String picName = info.getPicName();
+            final String picName = info.getPicName();
             createTime = info.getCreateTime();
             String url = getUrl(picName);
             loadPic(url, new BitmapCallBack() {
                 @Override
                 public void getBitmap(Bitmap bitmap) {
                     if (bitmap != null) {
-                        ViewCommon.initView();
-                        OneImgManager.showImg(bitmap);
+                        Message msg = picHandler.obtainMessage();
+                        msg.obj = bitmap;
+                        picHandler.sendMessage(msg);
                     }
                 }
             });
         }
         SpeechImpl.getInstance().startListen();
     }
+
+    // 主线程处理图片
+    private static Handler picHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bitmap bitmap = (Bitmap) msg.obj;
+            if (bitmap != null) {
+                ViewCommon.initView();
+                OneImgManager.showImg(bitmap, false);
+            }
+        }
+    };
 
     // 没有照片
     private static void noPic() {

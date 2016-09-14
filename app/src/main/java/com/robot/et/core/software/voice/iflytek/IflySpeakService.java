@@ -113,8 +113,11 @@ public class IflySpeakService extends SpeechService implements ISpeak {
         Log.i("ifly", "IflySpeakService  onCompleted()");
         // 回答完毕灯光灭
         BroadcastEnclosure.controlEarsLED(IflySpeakService.this, EarsLightConfig.EARS_CLOSE);
-        // 说话结束播放声音提示
-        BroadcastEnclosure.playSoundTips(IflySpeakService.this, Sound.SOUND_SPEAK_OVER);
+
+        if (currentType != DataConfig.SPEAK_TYPE_NO_SOUND_TIPS) {
+            // 说话结束播放声音提示
+            BroadcastEnclosure.playSoundTips(IflySpeakService.this, Sound.SOUND_SPEAK_OVER);
+        }
 
         if (error == null) {
             responseSpeakCompleted();
@@ -136,6 +139,12 @@ public class IflySpeakService extends SpeechService implements ISpeak {
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 showNormalEmotion(true);
+                //do nothing
+                break;
+            case DataConfig.SPEAK_TYPE_SHOW_QRCODE://显示二维码的图片
+                //do nothing
+                break;
+            case DataConfig.SPEAK_TYPE_NO_SOUND_TIPS://没有提示音
                 //do nothing
                 break;
             case DataConfig.SPEAK_TYPE_SLEEP://睡觉

@@ -202,7 +202,7 @@ public class MatchSceneHandler {
                 // 拍照时手抬起来
                 BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
                 // 说提示音
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，3,2,1，茄子");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_NO_SOUND_TIPS, "好的，三，二，一，茄子");
                 // 开始自动拍照
                 Intent intent = new Intent();
                 intent.setClass(context, TakePhotoActivity.class);

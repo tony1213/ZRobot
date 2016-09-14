@@ -73,32 +73,16 @@ public class HardwareReceiverService extends Service {
                 // 获取触摸的位置
                 int touchId = intent.getIntExtra("touchId", 0);
                 if (touchId != 0) {
-                    // 如果正在音视频的话什么也不处理
-                    if (DataConfig.isVideoOrVoice) {
-                        return;
-                    }
-                    //唤醒状态不去人脸识别
-                    if (!DataConfig.isSleep) {
-                        return;
-                    }
-                    // 停止掉听,唱歌,说话
-                    SpeechImpl.getInstance().cancelSpeak();
-                    SpeechImpl.getInstance().cancelListen();
-                    BroadcastEnclosure.stopMusic(HardwareReceiverService.this);
+                    // 响应之前的处理
+                    beginHandle();
                     // 响应触摸
                     touch(touchId);
                 }
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_BODY_DETECTION)) {// 人体检测
                 Log.i(TAG, "HardwareReceiverService 人体检测");
-                // 如果正在音视频的话什么也不处理
-                if (DataConfig.isVideoOrVoice) {
-                    return;
-                }
-                // 检测到人时，可能在听,唱歌或者在说话，要停止掉，避免影响其它功能
-                SpeechImpl.getInstance().cancelSpeak();
-                SpeechImpl.getInstance().cancelListen();
-                BroadcastEnclosure.stopMusic(HardwareReceiverService.this);
+                // 响应之前的处理
+                beginHandle();
                 // 获取当前的时间
                 int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
                 // 如果早上6点-9点，问早安,不识别人
@@ -129,10 +113,7 @@ public class HardwareReceiverService extends Service {
 
                         return;
                     }
-                    //唤醒状态不去人脸识别
-                    if (!DataConfig.isSleep) {
-                        return;
-                    }
+
                     // 开启脸部识别
                     BroadcastEnclosure.openFaceRecognise(HardwareReceiverService.this);
                 }
@@ -140,6 +121,22 @@ public class HardwareReceiverService extends Service {
 
         }
     };
+
+    // 响应之前的处理
+    private void beginHandle() {
+        // 如果正在音视频的话什么也不处理
+        if (DataConfig.isVideoOrVoice) {
+            return;
+        }
+        //唤醒状态不处理
+        if (!DataConfig.isSleep) {
+            return;
+        }
+        // 可能在听,唱歌或者在说话，要停止掉，避免影响其它功能
+        SpeechImpl.getInstance().cancelSpeak();
+        SpeechImpl.getInstance().cancelListen();
+        BroadcastEnclosure.stopMusic(HardwareReceiverService.this);
+    }
 
     // 接受到唤醒后的处理
     private void responseAwaken() {
@@ -156,6 +153,7 @@ public class HardwareReceiverService extends Service {
         DataConfig.isStartTime = false;
         DataConfig.isControlToyCar = false;
         DataConfig.isLookPhoto = false;
+        DataConfig.isShowLoadPicQRCode = false;
 
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
     }

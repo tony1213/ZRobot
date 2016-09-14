@@ -165,8 +165,6 @@ public class MsgReceiverService extends Service implements IMusic {
                 byte[] photoData = intent.getByteArrayExtra("photoData");
                 if (photoData != null && photoData.length > 0) {
                     String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
-                    // 把数据写到内存卡上
-                    FileUtils.writeToFile(photoData, "photo.png");
                     // 把byte数组转化为Bitmap
                     Bitmap bitmap = BitmapUtil.byte2Bitmap(photoData);
                     // 上传图片到服务器
@@ -284,6 +282,7 @@ public class MsgReceiverService extends Service implements IMusic {
         music.destroy();
         TimerManager.cancelTimer(timer);
         timer = null;
+        DataConfig.isShowLoadPicQRCode = false;
     }
 
     // 上传图片
@@ -291,7 +290,7 @@ public class MsgReceiverService extends Service implements IMusic {
         // 设置上传图片的key值
         String[] fileKeys = new String[]{"file"};
         // 设置图片路径名字
-        String fileName = robotNum + "_" + System.currentTimeMillis() + ".png";
+        final String fileName = robotNum + "_" + System.currentTimeMillis() + ".png";
         // 保存图片路径
         FileUtils.saveFilePath(bitmap, fileName);
         // 获取上传图片路径
@@ -302,20 +301,48 @@ public class MsgReceiverService extends Service implements IMusic {
             @Override
             public void getPicInfo(PictureInfo info) {
                 if (info != null) {
-                    // 根据下载链接加图片名字生成二维码
-                    String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName();
-                    Bitmap qrCode = Utilities.createQRCode(url);
-                    // 显示二维码图片
-                    if (qrCode != null) {
-                        ViewCommon.initView();
-                        OneImgManager.showImg(qrCode);
-                        SpeechImpl.getInstance().cancelListen();
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "扫描二维码可以下载照片哦");
-                    }
+                    // 上传成功后把保存的图片删掉
+                    FileUtils.deleteFile(fileName);
+                    Message msg = handler.obtainMessage();
+                    msg.obj = info;
+                    picHandler.sendMessage(msg);
                 }
             }
         });
     }
+
+    // 主线程处理拍照的图片
+    private Handler picHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Log.i(TAG, "MsgReceiverService  显示下载图片二维码");
+            PictureInfo info = (PictureInfo) msg.obj;
+            if (info != null) {
+                // 根据下载链接加图片名字生成二维码
+                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName();
+                Bitmap qrCode = Utilities.createQRCode(url);
+                // 显示二维码图片
+                if (qrCode != null) {
+                    ViewCommon.initView();
+                    OneImgManager.showImg(qrCode, true);
+                    DataConfig.isShowLoadPicQRCode = true;
+                    SpeechImpl.getInstance().cancelListen();
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "扫描二维码可以下载照片哦");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (DataConfig.isShowLoadPicQRCode) {
+                                DataConfig.isShowLoadPicQRCode = false;
+                                ViewCommon.initView();
+                                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                            }
+                        }
+                    }, 30 * 1000);// 30s 后待机
+                }
+            }
+        }
+    };
 
     //播放APP推送来的下一首
     private void playAppLower(String musicName) {
