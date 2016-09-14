@@ -223,6 +223,8 @@ public class MainActivity extends RosActivity {
                     for (int i = 0; i < availableAppsCache.size(); i++) {
                         Log.e(TAG, "DisplayName" + availableAppsCache.get(i).getDisplayName());
                     }
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化成功，正在加载地图");
+                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
                 } else {
                     // TODO: maybe I should notify the user... he will think something is wrong!
                     Log.e(TAG, "No interactions available for the '" + roconDescription.getCurrentRole() + "' role.");
@@ -370,7 +372,7 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, TuRingService.class));
         //唤醒
         startService(new Intent(this, WakeUpServices.class));
-        //接受发来的消息
+//        接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, IflySpeakService.class));
@@ -681,7 +683,7 @@ public class MainActivity extends RosActivity {
     }
 
     protected void doRappControlerAction(final ArrayList<Interaction> apps, final String role, final String displayName) {
-        doStopAction();
+//        doStopAction();
         selectedInteraction = null;
         for (int i = 0; i < apps.size(); i++) {
             Log.e(TAG, "InteractionDisplayName:" + apps.get(i).getDisplayName());
