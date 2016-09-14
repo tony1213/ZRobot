@@ -19,8 +19,8 @@ import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;
-import com.robot.et.voice.ifly.ISpeak;
-import com.robot.et.voice.ifly.Speak;
+import com.robot.et.core.software.common.speech.voice.ifly.ISpeak;
+import com.robot.et.core.software.common.speech.voice.ifly.Speak;
 
 // 语音合成
 public class IflySpeakService extends SpeechService implements ISpeak {

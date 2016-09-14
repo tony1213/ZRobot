@@ -22,8 +22,8 @@ import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.TimerManager;
-import com.robot.et.voice.ifly.IVoiceDictate;
-import com.robot.et.voice.ifly.VoiceDictate;
+import com.robot.et.core.software.common.speech.voice.ifly.IVoiceDictate;
+import com.robot.et.core.software.common.speech.voice.ifly.VoiceDictate;
 
 import java.util.Timer;
 import java.util.TimerTask;
