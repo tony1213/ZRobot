@@ -26,7 +26,6 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
-import com.robot.et.core.hardware.wakeup.WakeUpServices;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -369,9 +368,7 @@ public class MainActivity extends RosActivity {
         startService(new Intent(this, IflyTextUnderstanderService.class));
         //图灵
         startService(new Intent(this, TuRingService.class));
-        //唤醒
-        startService(new Intent(this, WakeUpServices.class));
-//        接受发来的消息
+        //接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, IflySpeakService.class));
@@ -532,24 +529,24 @@ public class MainActivity extends RosActivity {
                     doStopAction();
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)) {
-                String direction=String.valueOf(intent.getIntExtra("direction",5));
+                String direction = String.valueOf(intent.getIntExtra("direction", 5));
 
-                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
-                if (null==direction|| TextUtils.equals("", direction)) {
+                Log.i("ROS_MOVE", "语音控制时，得到的direction参数：" + direction);
+                if (null == direction || TextUtils.equals("", direction)) {
                     return;
                 }
-                if (TextUtils.equals("1",direction)){
-                    moveClient=new MoveClient("base_link",1.0f,0.0f,0.0f);
-                }else if (TextUtils.equals("2",direction)){
-                    moveClient=new MoveClient("base_link",-1.0f,0.0f,0.0f);
-                }else if (TextUtils.equals("3",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,90.0f*2*CIRCLE/360.0f);
-                }else if (TextUtils.equals("4",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,-90.0f*2*CIRCLE/360.0f);
-                } else if (TextUtils.equals("5",direction)){
-                    moveClient=new MoveClient("base_link",0.0f,0.0f,0.0f);
+                if (TextUtils.equals("1", direction)) {
+                    moveClient = new MoveClient("base_link", 1.0f, 0.0f, 0.0f);
+                } else if (TextUtils.equals("2", direction)) {
+                    moveClient = new MoveClient("base_link", -1.0f, 0.0f, 0.0f);
+                } else if (TextUtils.equals("3", direction)) {
+                    moveClient = new MoveClient("base_link", 0.0f, 0.0f, 90.0f * 2 * CIRCLE / 360.0f);
+                } else if (TextUtils.equals("4", direction)) {
+                    moveClient = new MoveClient("base_link", 0.0f, 0.0f, -90.0f * 2 * CIRCLE / 360.0f);
+                } else if (TextUtils.equals("5", direction)) {
+                    moveClient = new MoveClient("base_link", 0.0f, 0.0f, 0.0f);
                 }
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                nodeMainExecutorService.execute(moveClient, nodeConfiguration.setNodeName("moveClient"));
 
 //                String direction = String.valueOf(intent.getIntExtra("direction", 5));
 //                Log.i("ControlMove", "MainActivity语音控制时，得到的direction参数：" + direction);
@@ -608,30 +605,30 @@ public class MainActivity extends RosActivity {
 //                    doMoveAction(direction);
 //                }
                 float d = Float.valueOf(digit);
-                if (TextUtils.equals("1",direction)){
-                    moveClient=new MoveClient("base_link",d,0,0);
-                }else if (TextUtils.equals("2",direction)){
-                    moveClient=new MoveClient("base_link",-d,0,0);
-                }else if (TextUtils.equals("3",direction)){
-                    moveClient=new MoveClient("base_link",0,0,d*2*CIRCLE/360.0f);
-                }else if (TextUtils.equals("4",direction)){
-                    moveClient=new MoveClient("base_link",0,0,-d*2*CIRCLE/360.0f);
-                }else if (TextUtils.equals("5",direction)){
-                    moveClient=new MoveClient("base_link",0,0,0);
+                if (TextUtils.equals("1", direction)) {
+                    moveClient = new MoveClient("base_link", d, 0, 0);
+                } else if (TextUtils.equals("2", direction)) {
+                    moveClient = new MoveClient("base_link", -d, 0, 0);
+                } else if (TextUtils.equals("3", direction)) {
+                    moveClient = new MoveClient("base_link", 0, 0, d * 2 * CIRCLE / 360.0f);
+                } else if (TextUtils.equals("4", direction)) {
+                    moveClient = new MoveClient("base_link", 0, 0, -d * 2 * CIRCLE / 360.0f);
+                } else if (TextUtils.equals("5", direction)) {
+                    moveClient = new MoveClient("base_link", 0, 0, 0);
                 }
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                nodeMainExecutorService.execute(moveClient, nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)) {
                 Log.e("ROS_Client", "Service：Get WakeUp Degree");
 
                 float d = (float) intent.getIntExtra("degree", 0);
 //                doTrunAction(mover.getCurrentDegree(), d);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
-                moveClient=new MoveClient("base_link",0,0,2*CIRCLE-d*2*CIRCLE/360);
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
+                moveClient = new MoveClient("base_link", 0, 0, 2 * CIRCLE - d * 2 * CIRCLE / 360);
+                nodeMainExecutorService.execute(moveClient, nodeConfiguration.setNodeName("moveClient"));
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)) {
 //                doMoveAction("5");
-                moveClient=new MoveClient("base_link",0,0,0);
-                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
+                moveClient = new MoveClient("base_link", 0, 0, 0);
+                nodeMainExecutorService.execute(moveClient, nodeConfiguration.setNodeName("moveClient"));
             }
         }
     };
@@ -724,7 +721,6 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflySpeakService.class));
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
-        stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
 //        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));

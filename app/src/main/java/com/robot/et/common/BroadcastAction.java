@@ -21,8 +21,8 @@ public class BroadcastAction {
     public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
     //唤醒后转身
     public static String ACTION_WAKE_UP_TURN_BY_DEGREE = "action.wake.up.turn.by.degree";
-    //重置语音板的广播
-    public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
+    //机器人沉睡的广播
+    public static String ACTION_ROBOT_SLEEP = "action.robot.sleep";
     //人体监测的广播
     public static String ACTION_BODY_DETECTION = "action.body.detection";
     //硬件触摸的广播

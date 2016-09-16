@@ -330,9 +330,9 @@ public class MatchSceneHandler {
     //让机器人睡觉
     public void sleep() {
         DataConfig.isSleep = true;
-        // 唤醒后重置
+        // 告诉机器人沉睡了
         Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_WAKE_UP_RESET);
+        intent.setAction(BroadcastAction.ACTION_ROBOT_SLEEP);
         context.sendBroadcast(intent);
         // 显示睡觉表情
         ViewCommon.initView();
