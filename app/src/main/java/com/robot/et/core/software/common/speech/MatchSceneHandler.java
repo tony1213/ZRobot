@@ -15,7 +15,7 @@ import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -152,13 +152,13 @@ public class MatchSceneHandler {
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
                 flag = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("开", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
+                HttpManager.pushMsgToApp("开", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new PushResultHandler(context));
 
                 break;
             case CLOSE_HOUSEHOLD_SCENE:// 关闭家电
                 flag = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("关", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new NettyClientHandler(context));
+                HttpManager.pushMsgToApp("关", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new PushResultHandler(context));
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称

@@ -13,7 +13,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -245,7 +245,7 @@ public class CommandHandler {
                         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
                         mInfo.setAnswer("");
                         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
+                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
 
                         doAppRemindNoResponse();
                     }
@@ -266,7 +266,7 @@ public class CommandHandler {
         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
         mInfo.setAnswer(result);
         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
+        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
 
         if (!TextUtils.isEmpty(result)) {
             String answer = AlarmRemindManager.getRequireAnswer();

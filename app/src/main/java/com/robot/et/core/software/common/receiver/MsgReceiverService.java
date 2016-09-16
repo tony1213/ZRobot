@@ -19,7 +19,7 @@ import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -353,7 +353,7 @@ public class MsgReceiverService extends Service implements IMusic {
             Log.i(TAG, "MusicPlayerService musicSrc ===" + musicSrc);
             MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
             // 通知app当前播放状态
-            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new NettyClientHandler(this));
+            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new PushResultHandler(this));
             // 开始播放音乐
             BroadcastEnclosure.startPlayMusic(this, musicSrc);
         }

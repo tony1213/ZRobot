@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -28,10 +29,24 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.READ_LOGS"/>
+    <uses-permission android:name="android.permission.READ_LOGS" />
 
     <!-- 显示音乐频谱的权限 -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- 阿里移动推送相关权限 -->
+    <!-- 选举使用，当应用有删除或者更新时需要重新选举，复用推送通道 -->
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_CHANGED" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REPLACED" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
+    <!-- 补偿通道小米PUSH使用，不用可去除 -->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <!-- 补偿通道GCM使用，不使用可去除 -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- 允许访问震动器 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 允许task重排序 -->
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
 
     <application
         android:name=".main.CustomApplication"
@@ -40,13 +55,13 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         tools:replace="icon, label">
-        <activity android:name=".main.MainActivity"
+        <activity
+            android:name=".main.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             android:screenOrientation="landscape"
-            >
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -58,31 +73,31 @@
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
-        <activity android:name=".core.software.face.iflytek.FaceDistinguishActivity"
+        <activity
+            android:name=".core.software.face.iflytek.FaceDistinguishActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-            />
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
-        <activity android:name=".core.software.camera.TakePhotoActivity"
+        <activity
+            android:name=".core.software.camera.TakePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-            />
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
         <service android:name=".core.software.voice.iflytek.IflySpeakService" />
         <service android:name=".core.software.voice.iflytek.IflyTextUnderstanderService" />
         <service android:name=".core.software.voice.iflytek.IflyVoiceToTextService" />
         <service android:name=".core.software.voice.turing.TuRingService" />
-        <service android:name=".core.hardware.wakeup.WakeUpServices"/>
-        <service android:name=".core.software.common.receiver.MsgReceiverService"/>
-        <service android:name=".core.software.common.push.netty.NettyService"/>
-        <service android:name=".core.hardware.move.ControlMoveService"/>
-        <service android:name=".core.software.video.agora.AgoraService"/>
-        <service android:name=".core.software.common.receiver.HardwareReceiverService"/>
+        <service android:name=".core.hardware.wakeup.WakeUpServices" />
+        <service android:name=".core.software.common.receiver.MsgReceiverService" />
+        <service android:name=".core.software.common.push.netty.NettyService" />
+        <service android:name=".core.hardware.move.ControlMoveService" />
+        <service android:name=".core.software.video.agora.AgoraService" />
+        <service android:name=".core.software.common.receiver.HardwareReceiverService" />
 
         <!--ROS service dont modify-->
-        <service android:name=".core.software.ros.MasterChooserService"/>
+        <service android:name=".core.software.ros.MasterChooserService" />
 
         <service android:name="org.ros.android.NodeMainExecutorService">
             <intent-filter>
@@ -95,6 +110,83 @@
         <receiver android:name=".core.software.common.receiver.SystemReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 阿里移动推送 -->
+        <meta-data
+            android:name="com.alibaba.app.appkey"
+            android:value="23448575" /> <!-- 请填写你自己的- appKey -->
+        <meta-data
+            android:name="com.alibaba.app.appsecret"
+            android:value="d8bc03450ecc34dc75f71096dbaf475e" /> <!-- 请填写你自己的appSecret -->
+        <!-- 通道保持服务（幽灵进程自动保活该服务） -->
+
+        <service
+            android:name="com.alibaba.sdk.android.push.ChannelService"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.SERVICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.agoo.android.intent.action.PING_V4" />
+
+                <category android:name="taobao" />
+            </intent-filter>
+        </service>
+
+        <!-- 消息接收服务 -->
+        <service
+            android:name="com.alibaba.sdk.android.push.MsgService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <!-- 消息接收增强服务（可提高消息/通知到达率） -->
+        <service
+            android:name="com.alibaba.sdk.android.push.channel.TaobaoRecvService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="org.android.agoo.client.MessageReceiverService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".core.software.common.push.ali.ALiMsgReceiver"
+            android:exported="true">
+            <intent-filter>
+                 
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />
+            </intent-filter>
+            <intent-filter>
+                     
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_REMOVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.COMMAND" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.taobao.taobao.intent.action.COMMAND" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="org.agoo.android.intent.action.RECEIVE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
