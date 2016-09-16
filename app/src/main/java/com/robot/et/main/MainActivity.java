@@ -27,7 +27,6 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -124,6 +123,7 @@ public class MainActivity extends RosActivity {
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
+        filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS);
         registerReceiver(receiver, filter);
         prepareAppManager();
 
@@ -222,6 +222,8 @@ public class MainActivity extends RosActivity {
                     for (int i = 0; i < availableAppsCache.size(); i++) {
                         Log.e(TAG, "DisplayName" + availableAppsCache.get(i).getDisplayName());
                     }
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化成功，正在加载地图");
+                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
                 } else {
                     // TODO: maybe I should notify the user... he will think something is wrong!
                     Log.e(TAG, "No interactions available for the '" + roconDescription.getCurrentRole() + "' role.");
@@ -360,7 +362,7 @@ public class MainActivity extends RosActivity {
 
     private void initService() {
         //netty
-        startService(new Intent(this, NettyService.class));
+//        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, IflyVoiceToTextService.class));
         //文本理解
@@ -368,8 +370,8 @@ public class MainActivity extends RosActivity {
         //图灵
         startService(new Intent(this, TuRingService.class));
         //唤醒
-//        startService(new Intent(this, WakeUpServices.class));
-        //接受发来的消息
+        startService(new Intent(this, WakeUpServices.class));
+//        接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, IflySpeakService.class));
@@ -378,7 +380,7 @@ public class MainActivity extends RosActivity {
         //agora
         startService(new Intent(this, AgoraService.class));
         //接受硬件消息
-//        startService(new Intent(this, HardwareReceiverService.class));
+        startService(new Intent(this, HardwareReceiverService.class));
     }
 
     @Override
@@ -680,7 +682,7 @@ public class MainActivity extends RosActivity {
     }
 
     protected void doRappControlerAction(final ArrayList<Interaction> apps, final String role, final String displayName) {
-        doStopAction();
+//        doStopAction();
         selectedInteraction = null;
         for (int i = 0; i < apps.size(); i++) {
             Log.e(TAG, "InteractionDisplayName:" + apps.get(i).getDisplayName());
@@ -722,12 +724,12 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflySpeakService.class));
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
-//        stopService(new Intent(this, WakeUpServices.class));
+        stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
-        stopService(new Intent(this, NettyService.class));
+//        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
         stopService(new Intent(this, MasterChooserService.class));
-//        stopService(new Intent(this, HardwareReceiverService.class));
+        stopService(new Intent(this, HardwareReceiverService.class));
     }
 }

@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.ShellUtils;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WakeUpServices extends Service {
-
     private int voiceFd;
     private int faceFd;
     private Intent interruptIntent, turnIntent;
@@ -42,7 +42,7 @@ public class WakeUpServices extends Service {
         faceFd = WakeUp.faceWakeUpInit();
         Log.i("wakeup", "face faceFd==" + faceFd);
         // 没隔3秒去检测一次人体感应
-        faceWakeUp();
+//        faceWakeUp();
 
         // 打开串口
         openI2C();
@@ -111,8 +111,11 @@ public class WakeUpServices extends Service {
                                     turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
                                     turnIntent.putExtra("degree", degree);
                                     sendBroadcast(turnIntent);
+                                    // 耳朵的灯光在运动的时候进行闪烁
+                                    BroadcastEnclosure.controlEarsLED(WakeUpServices.this, EarsLightConfig.EARS_BLINK);
                                     // 摆手
                                     BroadcastEnclosure.controlWaving(WakeUpServices.this, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
+
                                 }
                             }
                         } else {
@@ -132,6 +135,11 @@ public class WakeUpServices extends Service {
             @Override
             public void run() {
                 while (true) {
+                    // 唤醒状态下不去读人体监测
+                    if (!DataConfig.isSleep) {
+                        continue;
+                    }
+
                     if (faceFd > 0) {
                         // 获取人体检测的状态值，1代表检测到人体，0代表没有检测到人体
                         int faceWakeUpState = WakeUp.getFaceWakeUpState();

@@ -49,9 +49,10 @@ public class SerialPortUtil {
             mOutputStream = mSerialPort.getOutputStream();
             mInputStream = mSerialPort.getInputStream();
 
-            mReadThread = new ReadThread();
-            isStop = false;
-            mReadThread.start();
+            // 不接受硬件返回来的信息
+//            mReadThread = new ReadThread();
+//            isStop = false;
+//            mReadThread.start();
         } catch (Exception e) {
             Log.i("SerialPort", "onCreate() Exception==" + e.getMessage());
         }

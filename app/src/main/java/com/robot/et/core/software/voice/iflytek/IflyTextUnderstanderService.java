@@ -19,8 +19,8 @@ import com.robot.et.entity.RemindInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.MusicManager;
-import com.robot.et.voice.ifly.ITextUnderstand;
-import com.robot.et.voice.ifly.TextUnderstand;
+import com.robot.et.core.software.common.speech.voice.ifly.ITextUnderstand;
+import com.robot.et.core.software.common.speech.voice.ifly.TextUnderstand;
 
 import org.json.JSONObject;
 

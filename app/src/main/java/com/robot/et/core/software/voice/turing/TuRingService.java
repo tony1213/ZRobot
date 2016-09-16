@@ -8,8 +8,8 @@ import android.util.Log;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.voice.SpeechService;
-import com.robot.et.voice.turing.ITuring;
-import com.robot.et.voice.turing.Turing;
+import com.robot.et.core.software.common.speech.voice.turing.ITuring;
+import com.robot.et.core.software.common.speech.voice.turing.Turing;
 
 import turing.os.http.core.ErrorMessage;
 

@@ -8,8 +8,8 @@ import android.util.Log;
 import com.iflytek.cloud.SpeechError;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -19,8 +19,8 @@ import com.robot.et.core.software.voice.SpeechService;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.MusicManager;
-import com.robot.et.voice.ifly.ISpeak;
-import com.robot.et.voice.ifly.Speak;
+import com.robot.et.core.software.common.speech.voice.ifly.ISpeak;
+import com.robot.et.core.software.common.speech.voice.ifly.Speak;
 
 // 语音合成
 public class IflySpeakService extends SpeechService implements ISpeak {
@@ -98,7 +98,8 @@ public class IflySpeakService extends SpeechService implements ISpeak {
     @Override
     public void onSpeakBegin() {
         Log.i("ifly", "IflySpeakService  onSpeakBegin()");
-        BroadcastEnclosure.controlMouthLED(IflySpeakService.this, ScriptConfig.LED_BLINK);
+        // 回答的时候耳朵灯光闪烁
+        BroadcastEnclosure.controlEarsLED(IflySpeakService.this, EarsLightConfig.EARS_BLINK);
     }
 
     /**
@@ -110,9 +111,13 @@ public class IflySpeakService extends SpeechService implements ISpeak {
     @Override
     public void onCompleted(SpeechError error) {
         Log.i("ifly", "IflySpeakService  onCompleted()");
-        BroadcastEnclosure.controlMouthLED(IflySpeakService.this, ScriptConfig.LED_OFF);
-        // 说话结束播放声音提示
-        BroadcastEnclosure.playSoundTips(IflySpeakService.this, Sound.SOUND_SPEAK_OVER);
+        // 回答完毕灯光灭
+        BroadcastEnclosure.controlEarsLED(IflySpeakService.this, EarsLightConfig.EARS_CLOSE);
+
+        if (currentType != DataConfig.SPEAK_TYPE_NO_SOUND_TIPS) {
+            // 说话结束播放声音提示
+            BroadcastEnclosure.playSoundTips(IflySpeakService.this, Sound.SOUND_SPEAK_OVER);
+        }
 
         if (error == null) {
             responseSpeakCompleted();
@@ -136,13 +141,16 @@ public class IflySpeakService extends SpeechService implements ISpeak {
                 showNormalEmotion(true);
                 //do nothing
                 break;
+            case DataConfig.SPEAK_TYPE_SHOW_QRCODE://显示二维码的图片
+                //do nothing
+                break;
+            case DataConfig.SPEAK_TYPE_NO_SOUND_TIPS://没有提示音
+                //do nothing
+                break;
             case DataConfig.SPEAK_TYPE_SLEEP://睡觉
                 showNormalEmotion(false);
                 EmotionManager.showEmotion(R.mipmap.emotion_blink);//睡觉状态
                 //do nothing
-                break;
-            case DataConfig.SPEAK_TYPE_SHOW_QRCODE://显示二维码的图片
-                SpeechImpl.getInstance().startListen();
                 break;
             case DataConfig.SPEAK_TYPE_REMIND_TIPS://闹铃提醒
                 showNormalEmotion(true);

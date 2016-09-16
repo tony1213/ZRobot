@@ -8,6 +8,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.okhttp.HttpEngine;
 import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.entity.PictureInfo;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 import com.squareup.okhttp.Call;
@@ -216,14 +217,14 @@ public class HttpManager {
     }
 
     //上传自动拍照的图片
-    public static void uploadFile(String robotNum, String[] fileKeys, File[] files) {
+    public static void uploadFile(String robotNum, String[] fileKeys, File[] files, final Gallery.IPicInfo callBack) {
         HttpEngine.Param[] params = new HttpEngine.Param[]{
                 new HttpEngine.Param("robotNumber", robotNum)
         };
         try {
             HttpEngine httpEngine = HttpEngine.getInstance();
             Request request = httpEngine.createRequest(UrlConfig.UPLOAD_PHOTOGRAPH_FILE_PATH, files, fileKeys, params);
-            Call call = httpEngine.createRequestCall(request);
+            final Call call = httpEngine.createRequestCall(request);
             call.enqueue(new Callback() {
 
                 @Override
@@ -234,9 +235,11 @@ public class HttpManager {
                 public void onResponse(Response response) throws IOException {
                     String result = response.body().string();
                     Log.i(TAG, "result====" + result);
-                    if (NetResultParse.isSuccess(result)) {
+                    PictureInfo info = NetResultParse.getPicInfo(result);
+                    if (info != null) {
                         Log.i(TAG, "上传成功");
                     }
+                    callBack.getPicInfo(info);
                 }
 
             });

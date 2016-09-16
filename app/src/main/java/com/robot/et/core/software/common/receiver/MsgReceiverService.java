@@ -15,10 +15,13 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.netty.NettyClientHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.speech.Gallery;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -28,6 +31,7 @@ import com.robot.et.core.software.system.media.IMusic;
 import com.robot.et.core.software.system.media.Music;
 import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.db.RobotDB;
+import com.robot.et.entity.PictureInfo;
 import com.robot.et.util.BitmapUtil;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.FileUtils;
@@ -102,6 +106,9 @@ public class MsgReceiverService extends Service implements IMusic {
                 Log.i(TAG, "MsgReceiverService  停止音乐播放");
                 // 停止播放音乐
                 music.stopPlay();
+                // 耳朵灯光灭
+                BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
+
             } else if (intent.getAction().equals(BroadcastAction.ACTION_FACE_DISTINGUISH)) {//脸部识别之后要说的话
                 Log.i(TAG, "MsgReceiverService  脸部识别之后要说的话");
                 // 显示正常表情
@@ -158,21 +165,11 @@ public class MsgReceiverService extends Service implements IMusic {
                 byte[] photoData = intent.getByteArrayExtra("photoData");
                 if (photoData != null && photoData.length > 0) {
                     String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
-                    Bitmap qrCode = Utilities.createQRCode(robotNum);
-                    // 显示二维码图片
-                    if (qrCode != null) {
-                        ViewCommon.initView();
-                        OneImgManager.showImg(qrCode);
-                    }
-                    // 把数据写到内存卡上
-                    FileUtils.writeToFile(photoData, "photo.png");
                     // 把byte数组转化为Bitmap
                     Bitmap bitmap = BitmapUtil.byte2Bitmap(photoData);
                     // 上传图片到服务器
                     upLoadFile(bitmap, robotNum);
                 }
-                SpeechImpl.getInstance().cancelListen();
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "扫描二维码可以下载照片哦");
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP)) {//app控制头
                 directionTurn = intent.getIntExtra("directionTurn", 0);
@@ -285,6 +282,7 @@ public class MsgReceiverService extends Service implements IMusic {
         music.destroy();
         TimerManager.cancelTimer(timer);
         timer = null;
+        DataConfig.isShowLoadPicQRCode = false;
     }
 
     // 上传图片
@@ -292,15 +290,59 @@ public class MsgReceiverService extends Service implements IMusic {
         // 设置上传图片的key值
         String[] fileKeys = new String[]{"file"};
         // 设置图片路径名字
-        String fileName = robotNum + "_" + System.currentTimeMillis() + ".png";
+        final String fileName = robotNum + "_" + System.currentTimeMillis() + ".png";
         // 保存图片路径
         FileUtils.saveFilePath(bitmap, fileName);
         // 获取上传图片路径
         File[] files = FileUtils.getFiles(FileUtils.getFilePath(fileName));
         Log.i(TAG, "filePath====" + FileUtils.getFilePath(fileName));
         // 上传图片到服务器
-        HttpManager.uploadFile(robotNum, fileKeys, files);
+        HttpManager.uploadFile(robotNum, fileKeys, files, new Gallery.IPicInfo() {
+            @Override
+            public void getPicInfo(PictureInfo info) {
+                if (info != null) {
+                    // 上传成功后把保存的图片删掉
+                    FileUtils.deleteFile(fileName);
+                    Message msg = handler.obtainMessage();
+                    msg.obj = info;
+                    picHandler.sendMessage(msg);
+                }
+            }
+        });
     }
+
+    // 主线程处理拍照的图片
+    private Handler picHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Log.i(TAG, "MsgReceiverService  显示下载图片二维码");
+            PictureInfo info = (PictureInfo) msg.obj;
+            if (info != null) {
+                // 根据下载链接加图片名字生成二维码
+                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName();
+                Bitmap qrCode = Utilities.createQRCode(url);
+                // 显示二维码图片
+                if (qrCode != null) {
+                    ViewCommon.initView();
+                    OneImgManager.showImg(qrCode, true);
+                    DataConfig.isShowLoadPicQRCode = true;
+                    SpeechImpl.getInstance().cancelListen();
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "扫描二维码可以下载照片哦");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (DataConfig.isShowLoadPicQRCode) {
+                                DataConfig.isShowLoadPicQRCode = false;
+                                ViewCommon.initView();
+                                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                            }
+                        }
+                    }, 30 * 1000);// 30s 后待机
+                }
+            }
+        }
+    };
 
     //播放APP推送来的下一首
     private void playAppLower(String musicName) {
@@ -322,6 +364,8 @@ public class MsgReceiverService extends Service implements IMusic {
     public void startPlayMusic() {
         Log.i(TAG, "音乐开始播放");
         DataConfig.isPlayMusic = true;
+        // 耳朵灯光闪烁
+        BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_BLINK);
         // 来自app推送来的音乐，判断是否有动作
         if (DataConfig.isJpushPlayMusic) {
             new ScriptHandler().scriptPlayMusic(MsgReceiverService.this, true);
@@ -334,6 +378,8 @@ public class MsgReceiverService extends Service implements IMusic {
         Log.i(TAG, "音乐播放完成");
         DataConfig.isPlayMusic = false;
 //        SpectrumManager.hideSpectrum();
+        // 耳朵灯光灭
+        BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
 
         //播放的是APP推送来的歌曲，继续播放下一首
         if (DataConfig.isJpushPlayMusic) {

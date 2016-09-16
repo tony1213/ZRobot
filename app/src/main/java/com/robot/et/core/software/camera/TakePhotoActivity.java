@@ -10,6 +10,8 @@ import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
@@ -45,6 +47,7 @@ public class TakePhotoActivity extends Activity {
     private Accelerometer mAcc;
     private boolean mStopTrack;
     private final String TAG = "camera";
+    private boolean isFirst;// 是否是第一次拍
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class TakePhotoActivity extends Activity {
         nv21 = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
         buffer = new byte[PREVIEW_WIDTH * PREVIEW_HEIGHT * 2];
         mAcc = new Accelerometer(this);
+
     }
 
     // SurfaceView预览监听器
@@ -159,9 +163,14 @@ public class TakePhotoActivity extends Activity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         Log.i(TAG, "onWindowFocusChanged");
-        // 2s之后拍照
-        SystemClock.sleep(2000);
-        takePicture();
+        // 拍照后会再次调用onWindowFocusChanged方法，只拍一次
+        if (!isFirst) {
+            Log.i(TAG, "takePicture()");
+            isFirst = true;
+            // 3s之后拍照
+            SystemClock.sleep(3000);
+            takePicture();
+        }
     }
 
     // 拍照
@@ -183,37 +192,64 @@ public class TakePhotoActivity extends Activity {
                     }
                     synchronized (nv21) {
                         System.arraycopy(nv21, 0, buffer, 0, nv21.length);
+                        Log.i(TAG, "synchronized()");
                     }
+
+                    Log.i(TAG, "synchronized() complect");
 
                     byte[] tmp = new byte[nv21.length];
                     System.arraycopy(nv21, 0, tmp, 0, nv21.length);
 
                     mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+                    Log.i(TAG, "synchronized() mImageData.length==" + mImageData.length);
+                    // 此时图片是绿色继续拍，小于10k的全部作为绿色处理
+                    if (mImageData.length < 1024 * 10) {
+                        Log.i(TAG, "此时图片是绿色");
+                        continue;
+                    }
 
                     mStopTrack = true;
 
+                    if (mStopTrack) {
+                        handler.sendEmptyMessage(1);
+                    }
                 }
             }
         }).start();
+    }
 
-        // 播放拍照提示音
-        BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA);
-        // 发送图片数据
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
-        intent.putExtra("photoData", mImageData);
-        sendBroadcast(intent);
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                // 播放拍照提示音
+                BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA);
+                finish();
+                // 发送图片数据
+                Intent intent = new Intent();
+                intent.setAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
+                intent.putExtra("photoData", mImageData);
+                sendBroadcast(intent);
+            }
+        }
+    };
 
-        finish();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "onStop()");
+        closeCamera();
+        if (null != mAcc) {
+            mAcc.stop();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        closeCamera();
-        if (null != mAcc) {
-            mAcc.stop();
-        }
+        Log.i(TAG, "onDestroy()");
+        isFirst = false;
     }
 }
 
