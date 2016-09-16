@@ -18,7 +18,6 @@ import com.robot.et.entity.JpushInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
-import com.xsj.crasheye.Crasheye;
 
 public class AgoraService extends Service {
 
@@ -31,8 +30,6 @@ public class AgoraService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i("agora", "AgoraService  onCreate()");
-        Crasheye.initWithNativeHandle(this, DataConfig.AGORA_CRASHEYE_KEY);
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CONNECT_AGORA);
         filter.addAction(BroadcastAction.ACTION_JOIN_AGORA_ROOM);

@@ -31,8 +31,8 @@ public enum EmotionEnum {
 
     EMOTION_TEAR(R.drawable.emotion_sorry, "流泪", ""),
 
-    EMOTION_SLEEP(R.drawable.emotion_dead_eye, "睡觉", ""),
-    EMOTION_SLEEP2(R.drawable.emotion_dead_eye, "睡觉表情", ""),
+    EMOTION_SLEEP(R.drawable.emotion_rest, "睡觉", ""),
+    EMOTION_SLEEP2(R.drawable.emotion_rest, "睡觉表情", ""),
 
     EMOTION_SURPRISED(R.drawable.emotion_dead_eye, "惊讶", ""),
 

@@ -336,7 +336,7 @@ public class MatchSceneHandler {
         context.sendBroadcast(intent);
         // 显示睡觉表情
         ViewCommon.initView();
-        EmotionManager.showEmotion(R.mipmap.emotion_blink);
+        EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
         // 耳朵灯灭
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
