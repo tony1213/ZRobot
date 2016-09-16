@@ -1,7 +1,6 @@
 package com.robot.et.core.software.ros;
 
 import android.util.Log;
-import android.widget.Switch;
 
 import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
@@ -111,7 +110,14 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
         heading = Math.atan2(2 * y * w - 2 * x * z, x * x - y * y - z * z + w * w) * 180 / Math.PI;
         currentOrientation = (float) -heading;
         //第一种计算方案
-        if (Math.abs(currentOrientation-degree) < 40){
+
+        //第一种计算方案
+        if (Math.abs(currentOrientation-degree)<20){
+            publishVelocity=false;
+            Log.i("ROS_STOP_DEGREE","ROS_STOP_DEGREE:"+currentOrientation);
+        }
+
+        /*if (Math.abs(currentOrientation-degree) < 40){
             this.turnRightSpeed=this.turnLeftSpeed=0.3;
         }else if (Math.abs(currentOrientation-degree) < 20){
             this.turnRightSpeed=this.turnLeftSpeed=0.2;
@@ -119,7 +125,7 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
             this.turnRightSpeed=this.turnLeftSpeed=0.1;
         }else if (Math.abs(currentOrientation-degree) < 5){
             publishVelocity=false;
-        }
+        }*/
     }
     /**
      * Publish the velocity as a ROS Twist message.
