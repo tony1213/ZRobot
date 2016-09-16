@@ -42,7 +42,7 @@ public class WakeUpServices extends Service {
         faceFd = WakeUp.faceWakeUpInit();
         Log.i("wakeup", "face faceFd==" + faceFd);
         // 没隔3秒去检测一次人体感应
-        faceWakeUp();
+//        faceWakeUp();
 
         // 打开串口
         openI2C();
@@ -135,6 +135,11 @@ public class WakeUpServices extends Service {
             @Override
             public void run() {
                 while (true) {
+                    // 唤醒状态下不去读人体监测
+                    if (!DataConfig.isSleep) {
+                        continue;
+                    }
+
                     if (faceFd > 0) {
                         // 获取人体检测的状态值，1代表检测到人体，0代表没有检测到人体
                         int faceWakeUpState = WakeUp.getFaceWakeUpState();
@@ -142,7 +147,7 @@ public class WakeUpServices extends Service {
                             //有人影进入范围
                             Log.i("wakeup", "检测到人影");
                             // 发送人体感应的广播
-//                            BroadcastEnclosure.bodyDetection(WakeUpServices.this);
+                            BroadcastEnclosure.bodyDetection(WakeUpServices.this);
                         } else {
                             //没有人影进入范围
 //                            Log.i("wakeup", "未检测到人影");

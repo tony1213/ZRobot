@@ -27,7 +27,6 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
-import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -363,7 +362,7 @@ public class MainActivity extends RosActivity {
 
     private void initService() {
         //netty
-        startService(new Intent(this, NettyService.class));
+//        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, IflyVoiceToTextService.class));
         //文本理解
@@ -727,7 +726,7 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, TuRingService.class));
         stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, MsgReceiverService.class));
-        stopService(new Intent(this, NettyService.class));
+//        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
         stopService(new Intent(this, MasterChooserService.class));
