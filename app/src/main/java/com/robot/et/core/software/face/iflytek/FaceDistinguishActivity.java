@@ -108,7 +108,7 @@ public class FaceDistinguishActivity extends Activity {
         // 获取已注册人脸的数据
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
         // 开始人脸识别的时候头稍微向后转
-        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "10");
+        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "15");
 
     }
 
@@ -175,26 +175,26 @@ public class FaceDistinguishActivity extends Activity {
             } else {
                 Log.i("face", "后置摄像头已开启，点击可切换");
             }
+            // 设置相机Parameters参数
+            Parameters params = mCamera.getParameters();
+            params.setPreviewFormat(ImageFormat.NV21);
+            params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            mCamera.setParameters(params);
+            // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
+//        mCamera.setDisplayOrientation(90);
+            mCamera.setPreviewCallback(new PreviewCallback() {
+
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    System.arraycopy(data, 0, nv21, 0, data.length);
+                }
+            });
         } catch (Exception e) {
             Log.i("face", "Camera Exception==" + e.getMessage());
             // 关闭相机
             closeCamera();
             return;
         }
-        // 设置相机Parameters参数
-        Parameters params = mCamera.getParameters();
-        params.setPreviewFormat(ImageFormat.NV21);
-        params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        mCamera.setParameters(params);
-        // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
-//        mCamera.setDisplayOrientation(90);
-        mCamera.setPreviewCallback(new PreviewCallback() {
-
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                System.arraycopy(data, 0, nv21, 0, data.length);
-            }
-        });
 
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
@@ -216,8 +216,7 @@ public class FaceDistinguishActivity extends Activity {
 
     // 检查相机权限
     private boolean checkCameraPermission() {
-        int status = checkPermission(permission.CAMERA, Process.myPid(),
-                Process.myUid());
+        int status = checkPermission(permission.CAMERA, Process.myPid(), Process.myUid());
         if (PackageManager.PERMISSION_GRANTED == status) {
             return true;
         }
@@ -392,7 +391,7 @@ public class FaceDistinguishActivity extends Activity {
         // 提示灯关闭
         BroadcastEnclosure.controlEarsLED(this, EarsLightConfig.EARS_CLOSE);
         // 通知头部复位
-        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
+//        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
     }
 
     @Override
@@ -517,7 +516,7 @@ public class FaceDistinguishActivity extends Activity {
             Log.i("face", "注册成功");
             FaceManager.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
-            sendMsg("你好，我叫小黄人，我能认识你吗？", true);
+            sendMsg("你好，我叫小黄人，请问你叫什么名字呢？", true);
         } else {
             Log.i("face", "注册失败");
             sendMsg("可以靠近点，让我再认识你一次吗？", false);

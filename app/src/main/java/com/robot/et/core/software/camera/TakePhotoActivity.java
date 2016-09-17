@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.Parameters;
-import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -111,26 +109,27 @@ public class TakePhotoActivity extends Activity {
             } else {
                 Log.i(TAG, "后置摄像头已开启，点击可切换");
             }
+            // 设置相机Parameters参数
+            Camera.Parameters params = mCamera.getParameters();
+            params.setPreviewFormat(ImageFormat.NV21);
+            params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            mCamera.setParameters(params);
+            // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
+//        mCamera.setDisplayOrientation(90);
+            mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    System.arraycopy(data, 0, nv21, 0, data.length);
+                }
+            });
+
         } catch (Exception e) {
             Log.i(TAG, "Camera Exception==" + e.getMessage());
             // 关闭相机
             closeCamera();
             return;
         }
-        // 设置相机Parameters参数
-        Parameters params = mCamera.getParameters();
-        params.setPreviewFormat(ImageFormat.NV21);
-        params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        mCamera.setParameters(params);
-        // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
-//        mCamera.setDisplayOrientation(90);
-        mCamera.setPreviewCallback(new PreviewCallback() {
-
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                System.arraycopy(data, 0, nv21, 0, data.length);
-            }
-        });
 
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
