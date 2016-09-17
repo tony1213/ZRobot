@@ -29,10 +29,11 @@ public class SpeechService extends Service {
 
     }
 
-    /*
-    开始说话
-    speakType  说话的类型
-    speakContent  说话的内容
+    /**
+     * 开始说话
+     *
+     * @param speakType    说话的类型
+     * @param speakContent 说话的内容
      */
     public void startSpeak(int speakType, String speakContent) {
 
@@ -53,19 +54,12 @@ public class SpeechService extends Service {
 
     }
 
-    /*
-    科大讯飞文本理解
-    content 要理解的内容
+    /**
+     * 文本理解
+     *
+     * @param content 要理解的内容
      */
-    public void understanderTextByIfly(String content) {
-
-    }
-
-    /*
-    图灵文本理解
-    content 要理解的内容
-     */
-    public void understanderTextByTuring(String content) {
+    public void understanderText(String content) {
 
     }
 }

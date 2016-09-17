@@ -26,7 +26,7 @@ import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.voice.iflytek.util.PhoneManager;
+import com.robot.et.core.software.voice.util.PhoneManager;
 import com.robot.et.entity.RobotInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;

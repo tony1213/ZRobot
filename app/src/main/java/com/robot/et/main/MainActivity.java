@@ -45,10 +45,9 @@ import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.position.PositionControler;
 import com.robot.et.core.software.video.agora.AgoraService;
-import com.robot.et.core.software.voice.iflytek.IflySpeakService;
-import com.robot.et.core.software.voice.iflytek.IflyTextUnderstanderService;
-import com.robot.et.core.software.voice.iflytek.IflyVoiceToTextService;
-import com.robot.et.core.software.voice.turing.TuRingService;
+import com.robot.et.core.software.voice.TextToVoiceService;
+import com.robot.et.core.software.voice.TextUnderstanderService;
+import com.robot.et.core.software.voice.VoiceToTextService;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
 import com.robot.et.util.SharedPreferencesKeys;
@@ -363,20 +362,18 @@ public class MainActivity extends RosActivity {
         //netty
 //        startService(new Intent(this, NettyService.class));
         //语音听写
-        startService(new Intent(this, IflyVoiceToTextService.class));
+        startService(new Intent(this, VoiceToTextService.class));
         //文本理解
-        startService(new Intent(this, IflyTextUnderstanderService.class));
-        //图灵
-        startService(new Intent(this, TuRingService.class));
+        startService(new Intent(this, TextUnderstanderService.class));
         //接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
-        startService(new Intent(this, IflySpeakService.class));
+        startService(new Intent(this, TextToVoiceService.class));
         //控制动
         startService(new Intent(this, ControlMoveService.class));
         //agora
         startService(new Intent(this, AgoraService.class));
-        //接受硬件消息
+        //接受与硬件相关消息
         startService(new Intent(this, HardwareReceiverService.class));
     }
 
@@ -717,10 +714,9 @@ public class MainActivity extends RosActivity {
     }
 
     private void destroyService() {
-        stopService(new Intent(this, IflyVoiceToTextService.class));
-        stopService(new Intent(this, IflySpeakService.class));
-        stopService(new Intent(this, IflyTextUnderstanderService.class));
-        stopService(new Intent(this, TuRingService.class));
+        stopService(new Intent(this, VoiceToTextService.class));
+        stopService(new Intent(this, TextToVoiceService.class));
+        stopService(new Intent(this, TextUnderstanderService.class));
         stopService(new Intent(this, MsgReceiverService.class));
 //        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));

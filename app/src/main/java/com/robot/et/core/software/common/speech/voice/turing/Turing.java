@@ -83,13 +83,13 @@ public class Turing {
                     Log.i(TAG, "图灵JSONException====" + e.getMessage());
                 }
             }
-            iTuring.onResult(content);
+            iTuring.onTuringResult(content);
         }
 
         @Override
         public void onError(ErrorMessage errorMessage) {// 理解失败
             Log.i(TAG, "图灵errorMessage.getMessage()====" + errorMessage.getMessage());
-            iTuring.onError(errorMessage);
+            iTuring.onTuringError(errorMessage);
         }
     };
 }
