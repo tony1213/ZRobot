@@ -6,7 +6,7 @@ import android.util.Log;
  * Created by houdeming on 2016/9/18.
  */
 public class EarsLightManager {
-    private final String TAG = "light";
+    private static final String TAG = "light";
 
     static {
         int lightFd = EarsLight.initEarsLight();
