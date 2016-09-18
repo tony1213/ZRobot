@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.util.BitmapUtil;
 import com.robot.et.util.BroadcastEnclosure;
@@ -223,7 +224,7 @@ public class TakePhotoActivity extends Activity {
             super.handleMessage(msg);
             if (msg.what == 1) {
                 // 播放拍照提示音
-                BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA);
+                BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA, DataConfig.PLAY);
                 finish();
                 // 发送图片数据
                 Intent intent = new Intent();

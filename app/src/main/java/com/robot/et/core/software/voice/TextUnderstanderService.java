@@ -220,6 +220,15 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
                                     speakContent(question, answer);
 
                                     break;
+                                case RADIO://电台
+                                    answer = ResultParse.getRadioName(jObject);
+                                    if (!TextUtils.isEmpty(answer)) {
+
+                                    } else {
+                                        speakContent(question, answer);
+                                    }
+
+                                    break;
 
                                 default:
                                     speakContent(question, answer);

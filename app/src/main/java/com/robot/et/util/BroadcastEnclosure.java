@@ -46,9 +46,10 @@ public class BroadcastEnclosure {
     }
 
     //开始播放音乐
-    public static void startPlayMusic(Context context, String musicUrl) {
+    public static void startPlayMusic(Context context, String musicUrl, int playType) {
         intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
         intent.putExtra("musicUrl", musicUrl);
+        intent.putExtra("playType", playType);
         context.sendBroadcast(intent);
     }
 
@@ -157,7 +158,8 @@ public class BroadcastEnclosure {
     }
 
     //播放声音提示的广播
-    public static void playSoundTips(Context context, int soundId) {
+    public static void playSoundTips(Context context, int soundId, int playType) {
+        intent.putExtra("playType", playType);
         intent.putExtra("soundId", soundId);
         intent.setAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
         context.sendBroadcast(intent);

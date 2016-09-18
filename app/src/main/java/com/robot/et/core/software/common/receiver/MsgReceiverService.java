@@ -78,7 +78,6 @@ public class MsgReceiverService extends Service implements IMusic {
         filter.addAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
         filter.addAction(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP);
         filter.addAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
-        filter.addAction(BroadcastAction.ACTION_STOP_SOUND_TIPS);
         registerReceiver(receiver, filter);
 
     }
@@ -86,7 +85,21 @@ public class MsgReceiverService extends Service implements IMusic {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
+            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_SOUND_TIPS)) {//播放声音提示
+                int playType = intent.getIntExtra("playType", 0);
+                if (playType == DataConfig.PLAY) {// 播放
+                    int soundId = intent.getIntExtra("soundId", 0);
+                    Log.i(TAG, "MsgReceiverService  播放声音提示soundId==" + soundId);
+                    // 播放声音提示
+                    if (soundId != 0) {
+                        sound.play(soundId);
+                    }
+                } else {// 停止播放
+                    Log.i(TAG, "MsgReceiverService  停止播放声音提示");
+                    // 停止播放声音提示
+                    sound.stopSound();
+                }
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
                 Log.i(TAG, "MsgReceiverService  开启音乐");
                 // 获取播放的音乐路径
                 String musicUrl = intent.getStringExtra("musicUrl");
@@ -148,7 +161,7 @@ public class MsgReceiverService extends Service implements IMusic {
                 Log.i(TAG, "MsgReceiverService  查看时电话挂断");
                 // 显示睡觉表情
                 ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                EmotionManager.showEmotion(R.mipmap.emotion_rest_6);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION)) {//机器人表情
                 Log.i(TAG, "MsgReceiverService  机器人表情");
                 int emotionKey = intent.getIntExtra("emotion", 0);
@@ -183,17 +196,6 @@ public class MsgReceiverService extends Service implements IMusic {
                         handler.sendEmptyMessage(1);
                     }
                 }, 0, 1000);
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_SOUND_TIPS)) {//播放声音提示
-                int soundId = intent.getIntExtra("soundId", 0);
-                Log.i(TAG, "MsgReceiverService  播放声音提示soundId==" + soundId);
-                // 播放声音提示
-                if (soundId != 0) {
-                    sound.play(soundId);
-                }
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_SOUND_TIPS)) {//停止播放声音提示
-                Log.i(TAG, "MsgReceiverService  停止播放声音提示");
-                // 停止播放声音提示
-                sound.stopSound();
             }
         }
     };
@@ -355,7 +357,7 @@ public class MsgReceiverService extends Service implements IMusic {
             // 通知app当前播放状态
             HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new PushResultHandler(this));
             // 开始播放音乐
-            BroadcastEnclosure.startPlayMusic(this, musicSrc);
+            BroadcastEnclosure.startPlayMusic(this, musicSrc, DataConfig.PLAY_MUSIC);
         }
     }
 

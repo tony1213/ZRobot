@@ -19,6 +19,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.UrlConfig;
+import com.robot.et.core.hardware.light.EarsLightManager;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
 import com.robot.et.core.software.common.network.HttpManager;
@@ -61,6 +62,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_ROBOT_SLEEP);
+        filter.addAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
         registerReceiver(receiver, filter);
     }
 
@@ -71,6 +73,10 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_SLEEP)) {// 机器人沉睡
                 Log.i(TAG, "HardwareReceiverService 机器人沉睡");
                 wakeUpHandler.faceWakeUp();
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_EARS_LED)) {// 耳朵灯
+                Log.i(TAG, "HardwareReceiverService 耳朵灯");
+                int LEDState = intent.getIntExtra("LEDState", 0);
+                EarsLightManager.setLight(LEDState);
             }
         }
     };

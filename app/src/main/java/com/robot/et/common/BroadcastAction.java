@@ -81,7 +81,5 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_HEAD_BY_APP = "com.robot.et.control.head.by.app";
     //播放声音提示（说话结束、拍照、打电话等）
     public static String ACTION_PLAY_SOUND_TIPS = "com.robot.et.play.sound.tips";
-    //停止播放声音提示（说话结束、拍照、打电话等）
-    public static String ACTION_STOP_SOUND_TIPS = "com.robot.et.stop.sound.tips";
 
 }

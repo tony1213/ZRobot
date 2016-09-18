@@ -173,4 +173,12 @@ public class DataConfig {
     // 是否是显示下载图片的二维码
     public static boolean isShowLoadPicQRCode = false;
 
+    //播放 0：播放  1：停止
+    public static final int PLAY = 0;
+    public static final int STOP = 1;
+
+    //播放类型 0：播放音乐  1：播放电台
+    public static final int PLAY_MUSIC = 0;
+    public static final int PLAY_RADIO = 1;
+
 }

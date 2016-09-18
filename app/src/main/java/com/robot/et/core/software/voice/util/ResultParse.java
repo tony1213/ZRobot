@@ -233,13 +233,11 @@ public class ResultParse {
         try {
             JSONObject jsonObject = jObject.getJSONObject("semantic");
             JSONObject object = jsonObject.getJSONObject("slots");
-            String name = "";
             if (object.has("name")) {
-                name = object.getString("name");// 拨打电话的人名
+                json = object.getString("name");// 拨打电话的人名
             } else if (object.has("code")) {
-                name = object.getString("code");// 拨打电话的号码
+                json = object.getString("code");// 拨打电话的号码
             }
-            json = name;
         } catch (JSONException e) {
             Log.i(TAG, "getPhoneData  JSONException");
         }
@@ -292,4 +290,18 @@ public class ResultParse {
         return content;
     }
 
+    //获取电台
+    public static String getRadioName(JSONObject jObject) {
+        String json = "";
+        try {
+            JSONObject jsonObject = jObject.getJSONObject("semantic");
+            JSONObject object = jsonObject.getJSONObject("slots");
+            if (object.has("name")) {
+                json = object.getString("name");// 电台名字
+            }
+        } catch (JSONException e) {
+            Log.i(TAG, "getRadioName  JSONException");
+        }
+        return json;
+    }
 }

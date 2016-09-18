@@ -25,7 +25,7 @@ public class MatchStringUtil {
     //免打扰关
     public static String disturbCloseRegex = "^" + baseRegex + "*(((免打扰)+" + baseRegex + "*关+)|(关+" + baseRegex + "*(免打扰)+))" + baseRegex + "*$";
     //闭嘴
-    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息)|(睡觉)+))" + baseRegex + "*$";
+    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息)|(睡觉)|(静音)|(别说话)+))" + baseRegex + "*$";
     //做动作
     public static String doActionRegex = "^" + baseRegex + "*我+" + baseRegex + "*((问)|(说))+" + baseRegex + "*你+" + baseRegex + "+(萌|(卖个萌))+" + baseRegex + "*$";
     //控制机器人周围的玩具车走

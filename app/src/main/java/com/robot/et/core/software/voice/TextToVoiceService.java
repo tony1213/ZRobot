@@ -115,7 +115,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
 
         if (currentType != DataConfig.SPEAK_TYPE_NO_SOUND_TIPS) {
             // 说话结束播放声音提示
-            BroadcastEnclosure.playSoundTips(TextToVoiceService.this, Sound.SOUND_SPEAK_OVER);
+            BroadcastEnclosure.playSoundTips(TextToVoiceService.this, Sound.SOUND_SPEAK_OVER, DataConfig.PLAY);
         }
 
         if (error == null) {
@@ -134,7 +134,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
                 showNormalEmotion(true);
-                BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc());
+                BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc(), DataConfig.PLAY_MUSIC);
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 showNormalEmotion(true);
