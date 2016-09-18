@@ -107,7 +107,7 @@ public class MainActivity extends RosActivity {
 
     private void initService() {
         //netty
-//        startService(new Intent(this, NettyService.class));
+        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, IflyVoiceToTextService.class));
         //文本理解
@@ -117,13 +117,13 @@ public class MainActivity extends RosActivity {
         //唤醒
         startService(new Intent(this, WakeUpServices.class));
         //接受发来的消息
-//        startService(new Intent(this, MsgReceiverService.class));
+        startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, IflySpeakService.class));
         //控制动
-//        startService(new Intent(this, ControlMoveService.class));
+        startService(new Intent(this, ControlMoveService.class));
         //agora
-//        startService(new Intent(this, AgoraService.class));
+        startService(new Intent(this, AgoraService.class));
         //接受硬件消息
         startService(new Intent(this, HardwareReceiverService.class));
     }
@@ -153,13 +153,13 @@ public class MainActivity extends RosActivity {
                 }
                 if (TextUtils.equals("1", direction) || TextUtils.equals("2", direction)) {
                     doMoveAction(direction);
-                    try {
-                        Thread.sleep(1500);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    doMoveAction("5");
+//                    try {
+//                        Thread.sleep(1500);
+//
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    doMoveAction("5");
                 } else if (TextUtils.equals("3", direction)) {
                     doTrunAction(mover.getCurrentDegree(), 270);
                 } else if (TextUtils.equals("4", direction)) {
@@ -169,6 +169,8 @@ public class MainActivity extends RosActivity {
                 }
 
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
+                //中断运动控制
+                doMoveAction("5");
                 //唤醒控制运动
                 double d = (double) intent.getIntExtra("degree", 0);
                 Log.i("ControlMove", "MainActivity语音控制时，得到的唤醒角度" + d);
@@ -195,8 +197,7 @@ public class MainActivity extends RosActivity {
             mover.execTurnRight();
         } else if (TextUtils.equals("5", message)) {
             Log.i("ROS_MOVE", "机器人移动方向:停止");
-            mover.isPublishVelocity(false);
-//            mover.execStop();
+            mover.execStop();
         }
     }
     public void doTrunAction(double currentDegree,double degree){
