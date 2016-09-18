@@ -11,6 +11,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.push.ali.ALiPush;
+import com.squareup.leakcanary.LeakCanary;
 
 public class CustomApplication extends Application {
 
@@ -24,6 +25,9 @@ public class CustomApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        // 初始化监听内存泄漏
+        LeakCanary.install(this);
+        // 初始化科大讯飞
         initVoice();
         // 初始化云推送
         initCloudChannel(this);

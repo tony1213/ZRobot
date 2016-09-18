@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.robot.et.main.MainActivity;
+
 /**
  * Created by houdeming on 2016/7/28.
  * 接受系统广播类
