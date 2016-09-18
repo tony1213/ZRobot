@@ -15,10 +15,13 @@ import android.widget.LinearLayout;
 
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
 import com.robot.et.core.hardware.wakeup.WakeUpServices;
 import com.robot.et.core.software.common.push.netty.NettyService;
+import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.CustomTextView;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -122,7 +125,7 @@ public class MainActivity extends RosActivity {
         //agora
 //        startService(new Intent(this, AgoraService.class));
         //接受硬件消息
-//        startService(new Intent(this, HardwareReceiverService.class));
+        startService(new Intent(this, HardwareReceiverService.class));
     }
 
     @Override
@@ -132,6 +135,7 @@ public class MainActivity extends RosActivity {
         nodeConfiguration = NodeConfiguration.newPublic(getRosHostname());
         nodeConfiguration.setMasterUri(getMasterUri());
         nodeMainExecutor.execute(mover, nodeConfiguration);
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化");
     }
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -143,6 +147,7 @@ public class MainActivity extends RosActivity {
                 //语音控制运动
                 String direction = String.valueOf(intent.getIntExtra("direction", 5));
                 Log.i("ControlMove", "MainActivity语音控制时，得到的direction参数：" + direction);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的运动方向是："+direction);
                 if (null == direction || TextUtils.equals("", direction)) {
                     return;
                 }
@@ -166,6 +171,8 @@ public class MainActivity extends RosActivity {
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)){
                 //唤醒控制运动
                 double d = (double) intent.getIntExtra("degree", 0);
+                Log.i("ControlMove", "MainActivity语音控制时，得到的唤醒角度" + d);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
                 doTrunAction(mover.getCurrentDegree(), d);
             }
         }
@@ -218,5 +225,6 @@ public class MainActivity extends RosActivity {
         stopService(new Intent(this, IflySpeakService.class));
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));
+        stopService(new Intent(this, HardwareReceiverService.class));
     }
 }
