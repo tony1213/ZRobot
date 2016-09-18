@@ -98,6 +98,8 @@ public class MusicManager {
                     if (datas != null && datas.length > 0) {
                         //歌手+歌名 + 歌曲src
                         setMusicSrc(datas[2]);
+                        setMusicName(datas[1]);
+                        setMusicType(DataConfig.PLAY_MUSIC);
                         buffer.append("好的，").append(playPrompt).append(datas[0]).append("：").append(datas[1]);
                         content = buffer.toString();
                     }
@@ -140,6 +142,10 @@ public class MusicManager {
     private static String currentPlayName;
     //音乐src
     private static String musicSrc;
+    //音乐名字
+    private static String musicName;
+    //音乐类型
+    private static int musicType;
 
     public static String getMusicSrc() {
         return musicSrc;
@@ -173,4 +179,19 @@ public class MusicManager {
         return currentMediaName;
     }
 
+    public static String getMusicName() {
+        return musicName;
+    }
+
+    public static void setMusicName(String musicName) {
+        MusicManager.musicName = musicName;
+    }
+
+    public static int getMusicType() {
+        return musicType;
+    }
+
+    public static void setMusicType(int musicType) {
+        MusicManager.musicType = musicType;
+    }
 }

@@ -48,6 +48,8 @@ public class DataConfig {
     //Port
     public static final int PORT = 9999;
 
+    //喜马拉雅AppSecret
+    public static final String XIMALAYA_APPSECRET = "4d8e605fa7ed546c4bcb33dee1381179";
 
     //说话类型
     //对话

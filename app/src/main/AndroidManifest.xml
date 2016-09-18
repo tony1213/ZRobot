@@ -30,6 +30,7 @@
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
 
     <!-- 显示音乐频谱的权限 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -187,6 +188,34 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
+        <!-- ximalaya  begin -->
+        <meta-data
+            android:name="app_key"
+            android:value="b617866c20482d133d5de66fceb37da3" />
+
+        <meta-data
+            android:name="pack_id"
+            android:value="com.app.test.android" />
+
+        <service android:name="com.ximalaya.ting.android.opensdk.player.service.XmPlayerService" />
+
+        <receiver
+            android:name="com.ximalaya.ting.android.opensdk.player.receive.PlayerReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ximalaya.ting.android.ACTION_CONTROL_START_PAUSE" />
+                <action android:name="com.ximalaya.ting.android.ACTION_CONTROL_PLAY_PRE" />
+                <action android:name="com.ximalaya.ting.android.ACTION_CONTROL_PLAY_NEXT" />
+                <action android:name="com.ximalaya.ting.android.ACTION_CLOSE" />
+                <action android:name="com.ximalaya.ting.android.ACTION_CONTROL_RELEASE_SERVICE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.ximalaya.ting.android.opensdk.player.receive.WireControlReceiver"
+            android:exported="true"></receiver>
+        <!-- ximalaya  end -->
 
     </application>
 

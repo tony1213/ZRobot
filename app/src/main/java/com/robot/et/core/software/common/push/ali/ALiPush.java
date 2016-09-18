@@ -39,6 +39,7 @@ public class ALiPush implements RobotInfoCallBack {
 
     // 设置别名
     private void setAlia(String robotNum) {
+        Log.i(TAG, "robotNum===" + robotNum);
         PushServiceFactory.getCloudPushService().addAlias(robotNum, new CommonCallback() {
             @Override
             public void onSuccess(String response) {
