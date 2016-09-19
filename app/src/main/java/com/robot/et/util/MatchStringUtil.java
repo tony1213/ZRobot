@@ -59,9 +59,9 @@ public class MatchStringUtil {
     // 看看照片的标志
     public static String lookPhotoRegex = "^" + baseRegex + "*看+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
     // 上一张照片
-    public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个))+" + baseRegex + "*$";
+    public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个)|(上一章))+" + baseRegex + "*$";
     // 下一张照片
-    public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个))+" + baseRegex + "*$";
+    public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个)|(下一章))+" + baseRegex + "*$";
     // 进入安保场景的标志
     public static String openSecuritySignRegex = "^" + baseRegex + "*((进入)|(打开)|(开启))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
     // 解除安保场景的标志

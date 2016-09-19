@@ -122,7 +122,7 @@ public class MatchSceneHandler {
             case SHUT_UP_SCENE:// 闭嘴
                 flag = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
-                sleep();
+                sleep(context);
 
                 break;
             case DO_ACTION_SCENE:// 智能学习做动作
@@ -170,7 +170,20 @@ public class MatchSceneHandler {
                         FaceManager.addFaceInfo(faceName);
                         ViewCommon.initView();
                         OneImgManager.showImg(R.mipmap.robot_qr_code);
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了，请扫描二维码和我聊天");
+                        DataConfig.isShowChatQRCode = true;
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "好的，我记住了，请扫描二维码和我聊天");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (DataConfig.isShowChatQRCode) {
+                                    DataConfig.isShowChatQRCode = false;
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "我休息去了");
+                                    // 沉睡
+                                    sleep(context);
+                                }
+                            }
+                        }, 30 * 1000);// 30s 后沉睡
+
                     }
                 }
 
@@ -328,7 +341,7 @@ public class MatchSceneHandler {
     }
 
     //让机器人睡觉
-    public void sleep() {
+    public static void sleep(Context context) {
         DataConfig.isSleep = true;
         // 告诉机器人沉睡了
         Intent intent = new Intent();

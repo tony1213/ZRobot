@@ -200,7 +200,7 @@ public class TakePhotoActivity extends Activity {
                     byte[] tmp = new byte[nv21.length];
                     System.arraycopy(nv21, 0, tmp, 0, nv21.length);
 
-                    mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+                    mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT, 100));
                     Log.i(TAG, "synchronized() mImageData.length==" + mImageData.length);
                     // 此时图片是绿色继续拍，小于10k的全部作为绿色处理
                     if (mImageData.length < 1024 * 10) {

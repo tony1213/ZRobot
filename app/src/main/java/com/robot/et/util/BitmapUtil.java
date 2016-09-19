@@ -32,12 +32,12 @@ public class BitmapUtil {
     }
 
     // 压缩图片
-    public static Bitmap decodeToBitMap(byte[] data, int width, int height) {
+    public static Bitmap decodeToBitMap(byte[] data, int width, int height, int compressValue) {
         try {
             YuvImage image = new YuvImage(data, ImageFormat.NV21, width, height, null);
             if (image != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                image.compressToJpeg(new Rect(0, 0, width, height), 80, stream);
+                image.compressToJpeg(new Rect(0, 0, width, height), compressValue, stream);
                 Bitmap bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
                 stream.close();
                 return bmp;

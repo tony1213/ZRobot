@@ -10,6 +10,7 @@ import android.util.Log;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.network.okhttp.HttpEngine;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.entity.PictureInfo;
@@ -40,7 +41,11 @@ public class Gallery {
 
     // 获取所有图片 第一次去请求图片时，可以不带参数
     public static void getShowPic() {
-        HttpManager.getPic("", "", new PicInfoCallBack() {
+        // 设置参数 第一次只传机器编号
+        HttpEngine.Param[] params = new HttpEngine.Param[]{
+                new HttpEngine.Param("robotNumber", SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "")),
+        };
+        HttpManager.getPic(params, new PicInfoCallBack() {
             @Override
             public void getPicInfos(List<PictureInfo> infos) {
                 Log.i(TAG, "getPicInfos.size==" + infos.size());
@@ -89,7 +94,13 @@ public class Gallery {
             if (CURRENT_INDEX < mInfos.size() && CURRENT_INDEX >= 0) {
                 showPic(mInfos.get(CURRENT_INDEX));
             } else {// 如果当前是最后一张的话，去查新的
-                HttpManager.getPic("down", createTime, new PicInfoCallBack() {
+                // 设置参数
+                HttpEngine.Param[] params = new HttpEngine.Param[]{
+                        new HttpEngine.Param("robotNumber", SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "")),
+                        new HttpEngine.Param("updateType", "down"),
+                        new HttpEngine.Param("createTime", createTime)
+                };
+                HttpManager.getPic(params, new PicInfoCallBack() {
                     @Override
                     public void getPicInfos(List<PictureInfo> infos) {
                         if (infos != null && infos.size() > 0) {
@@ -136,7 +147,7 @@ public class Gallery {
             Bitmap bitmap = (Bitmap) msg.obj;
             if (bitmap != null) {
                 ViewCommon.initView();
-                OneImgManager.showImg(bitmap, false);
+                OneImgManager.showPhoto(bitmap);
             }
         }
     };

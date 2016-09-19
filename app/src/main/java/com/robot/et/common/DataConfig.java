@@ -49,7 +49,7 @@ public class DataConfig {
     public static final int PORT = 9999;
 
     //喜马拉雅AppSecret
-    public static final String XIMALAYA_APPSECRET = "4d8e605fa7ed546c4bcb33dee1381179";
+    public static final String XIMALAYA_APPSECRET = "7fd5f74a6f3a86fe4a2266b653aa6522";
 
     //说话类型
     //对话
@@ -174,6 +174,8 @@ public class DataConfig {
 
     // 是否是显示下载图片的二维码
     public static boolean isShowLoadPicQRCode = false;
+    // 是否是显示聊天二维码
+    public static boolean isShowChatQRCode = false;
 
     //播放 0：播放  1：停止
     public static final int PLAY = 0;

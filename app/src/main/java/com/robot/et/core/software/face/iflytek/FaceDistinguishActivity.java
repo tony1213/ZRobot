@@ -320,7 +320,7 @@ public class FaceDistinguishActivity extends Activity {
                             byte[] tmp = new byte[nv21.length];
                             System.arraycopy(nv21, 0, tmp, 0, nv21.length);
 
-                            mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+                            mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT, 80));
                             noFaceCount = 0;
                             //转身  多次检测的时候只转一次头
                             if (!isSendAngle) {

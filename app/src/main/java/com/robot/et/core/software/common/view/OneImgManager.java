@@ -12,12 +12,14 @@ import android.widget.LinearLayout;
 public class OneImgManager {
     private static ImageView imageView;
     private static ImageView imageBitmap;
+    private static ImageView imagePhoto;
     private static LinearLayout showLinearLayout;
 
-    public static void setView(LinearLayout showLinearLayout, ImageView imageView, ImageView imageBitmap) {
+    public static void setView(LinearLayout showLinearLayout, ImageView imageView, ImageView imageBitmap, ImageView imagePhoto) {
         OneImgManager.showLinearLayout = showLinearLayout;
         OneImgManager.imageView = imageView;
         OneImgManager.imageBitmap = imageBitmap;
+        OneImgManager.imagePhoto = imagePhoto;
     }
 
     //显示图片
@@ -26,6 +28,7 @@ public class OneImgManager {
             showImgLinearLayout(true);
             if (imageBitmap != null) {
                 imageBitmap.setVisibility(View.GONE);
+                imagePhoto.setVisibility(View.GONE);
                 showLinearLayout.setBackgroundColor(Color.BLACK);
             }
             imageView.setVisibility(View.VISIBLE);
@@ -39,6 +42,7 @@ public class OneImgManager {
             showImgLinearLayout(true);
             if (imageView != null) {
                 imageView.setVisibility(View.GONE);
+                imagePhoto.setVisibility(View.GONE);
                 if (isWhite) {
                     showLinearLayout.setBackgroundColor(Color.WHITE);
                 } else {
@@ -47,6 +51,20 @@ public class OneImgManager {
             }
             imageBitmap.setVisibility(View.VISIBLE);
             imageBitmap.setImageBitmap(bitmap);
+        }
+    }
+
+    //显示拍的照片
+    public static void showPhoto(Bitmap bitmap) {
+        if (imagePhoto != null) {
+            showImgLinearLayout(true);
+            if (imageBitmap != null) {
+                imageBitmap.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
+                showLinearLayout.setBackgroundColor(Color.BLACK);
+            }
+            imagePhoto.setVisibility(View.VISIBLE);
+            imagePhoto.setImageBitmap(bitmap);
         }
     }
 

@@ -27,6 +27,8 @@ import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
+import com.robot.et.core.software.common.view.EmotionManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.voice.util.PhoneManager;
 import com.robot.et.entity.RobotInfo;
 import com.robot.et.util.BroadcastEnclosure;
@@ -114,6 +116,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isControlToyCar = false;
         DataConfig.isLookPhoto = false;
         DataConfig.isShowLoadPicQRCode = false;
+        DataConfig.isShowChatQRCode = false;
 
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
     }
@@ -169,6 +172,13 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         if (isHandle()) {
             return;
         }
+
+        // 为防止不停的人体检测触发，设置为已唤醒状态
+        DataConfig.isSleep = false;
+        // 显示正常表情
+        ViewCommon.initView();
+        EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
         // 获取当前的时间
         int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
         // 如果早上6点-9点，问早安,不识别人

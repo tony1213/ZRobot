@@ -192,11 +192,11 @@
         <!-- ximalaya  begin -->
         <meta-data
             android:name="app_key"
-            android:value="b617866c20482d133d5de66fceb37da3" />
+            android:value="3be9bd072d195e5deff619ab4a48601a" />
 
         <meta-data
             android:name="pack_id"
-            android:value="com.app.test.android" />
+            android:value="com.robot.et" />
 
         <service android:name="com.ximalaya.ting.android.opensdk.player.service.XmPlayerService" />
 

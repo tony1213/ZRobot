@@ -86,6 +86,7 @@ public class MainActivity extends RosActivity {
         LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
         ImageView imageView = (ImageView) findViewById(R.id.img_one);
         ImageView imageBitmap = (ImageView) findViewById(R.id.img_one_bitmap);
+        ImageView imagePhoto = (ImageView) findViewById(R.id.img_photo);
 
         TextManager.setView(showText, tvText);
         EmotionManager.setView(showEmotion, imgLeft, imgRight);
@@ -100,7 +101,7 @@ public class MainActivity extends RosActivity {
         ));
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
-        OneImgManager.setView(showOneImg, imageView, imageBitmap);
+        OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
     }
 
     private void initService() {

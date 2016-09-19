@@ -120,7 +120,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
             timer = null;
             voiceDictate.stopListen();
             // 沉睡
-            matchSceneHandler.sleep();
+            MatchSceneHandler.sleep(VoiceToTextService.this);
         }
     };
 

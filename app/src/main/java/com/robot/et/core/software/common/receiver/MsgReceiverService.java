@@ -22,6 +22,7 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -333,7 +334,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
     }
 
     // 上传图片
-    private void upLoadFile(Bitmap bitmap, String robotNum) {
+    private void upLoadFile(Bitmap bitmap, final String robotNum) {
         // 设置上传图片的key值
         String[] fileKeys = new String[]{"file"};
         // 设置图片路径名字
@@ -347,13 +348,14 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         HttpManager.uploadFile(robotNum, fileKeys, files, new Gallery.IPicInfo() {
             @Override
             public void getPicInfo(PictureInfo info) {
+                // 上传成功后把保存的图片删掉
+                FileUtils.deleteFile(fileName);
                 if (info != null) {
-                    // 上传成功后把保存的图片删掉
-                    FileUtils.deleteFile(fileName);
-                    Message msg = handler.obtainMessage();
-                    msg.obj = info;
-                    picHandler.sendMessage(msg);
+                    info.setRobotNum(robotNum);
                 }
+                Message msg = handler.obtainMessage();
+                msg.obj = info;
+                picHandler.sendMessage(msg);
             }
         });
     }
@@ -367,7 +369,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
             PictureInfo info = (PictureInfo) msg.obj;
             if (info != null) {
                 // 根据下载链接加图片名字生成二维码
-                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName();
+                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName() + "&robotNumber=" + info.getRobotNum();
                 Bitmap qrCode = Utilities.createQRCode(url);
                 // 显示二维码图片
                 if (qrCode != null) {
@@ -381,12 +383,14 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                         public void run() {
                             if (DataConfig.isShowLoadPicQRCode) {
                                 DataConfig.isShowLoadPicQRCode = false;
-                                ViewCommon.initView();
-                                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                                // 沉睡
+                                MatchSceneHandler.sleep(MsgReceiverService.this);
                             }
                         }
-                    }, 30 * 1000);// 30s 后待机
+                    }, 30 * 1000);// 30s 后沉睡
                 }
+            } else {
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，图片上传失败，再试一次吧");
             }
         }
     };

@@ -15,4 +15,6 @@ public class EarsLightConfig {
     public static final int EARS_CLOCKWISE_TURN = 3;
     // 逆时针旋转
     public static final int EARS_ANTI_CLOCKWISE_TURN = 4;
+    // 跑马灯
+    public static final int EARS_HORSE_RACE_LAMP = 5;
 }

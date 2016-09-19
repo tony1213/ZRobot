@@ -14,7 +14,7 @@ public class SystemReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {//开机自启动服务
-            openMainActivity(context);
+//            openMainActivity(context);
         }
 
     }
