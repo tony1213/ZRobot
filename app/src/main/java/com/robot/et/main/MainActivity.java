@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.baidu.location.BDLocation;
 import com.github.rosjava.android_remocons.common_tools.master.ConcertChecker;
 import com.github.rosjava.android_remocons.common_tools.master.MasterId;
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
@@ -26,6 +27,8 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
+import com.robot.et.core.software.common.baidumap.IMap;
+import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -49,9 +52,9 @@ import com.robot.et.core.software.voice.TextToVoiceService;
 import com.robot.et.core.software.voice.TextUnderstanderService;
 import com.robot.et.core.software.voice.VoiceToTextService;
 import com.robot.et.db.RobotDB;
+import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
+import com.robot.et.util.LocationManager;
 
 import org.ros.android.RosActivity;
 import org.ros.exception.RemoteException;
@@ -85,6 +88,8 @@ public class MainActivity extends RosActivity {
     private PairSubscriber pairSubscriber;
     private NodeConfiguration nodeConfiguration;
     private boolean validatedConcert;
+    private Map map;
+    private String city;
 
     private VisualClient visualClient;//ROS 视觉识别的Client（Service：learn_to_recognize_ros_server）
     private RmapClient rmapClient;   //ROS 地图保存的Client（Service：/turtlebot/save_only_map）
@@ -108,13 +113,9 @@ public class MainActivity extends RosActivity {
         setContentView(R.layout.activity_main);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //记录城市、区域位置
-        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-        share.putString(SharedPreferencesKeys.CITY_KEY, "上海市");
-        share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
-        share.commitValue();
         initView();
         initService();
+        initBaiDuMap();
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
@@ -161,6 +162,29 @@ public class MainActivity extends RosActivity {
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
         OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
+    }
+
+    // 初始化百度地图
+    private void initBaiDuMap() {
+        map = new Map(this, new IMap() {
+            @Override
+            public void getLocationInfo(BDLocation location) {
+                if (location != null) {
+                    city = location.getCity();
+                    String area = location.getDistrict();
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    // city=上海市,area=浦东新区,latitude=31.217769,longitude=121.603934
+                    Log.i("map", "city=" + city + ",area=" + area + ",longitude=" + longitude + ",latitude=" + latitude);
+                    LocationInfo info = new LocationInfo();
+                    info.setCity(city);
+                    info.setArea(area);
+                    info.setLongitude(String.valueOf(longitude));
+                    info.setLatitude(String.valueOf(latitude));
+                    LocationManager.setInfo(info);
+                }
+            }
+        });
     }
 
     void init2(RoconDescription roconDescription) {
@@ -710,6 +734,10 @@ public class MainActivity extends RosActivity {
         destroyService();
         this.nodeMainExecutorService.forceShutdown();
         unregisterReceiver(receiver);
+        // 如果city为空，代表没有定位成功，要把定位关掉
+        if (TextUtils.isEmpty(city)) {
+            map.destroyMap();
+        }
     }
 
     private void destroyService() {

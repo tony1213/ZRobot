@@ -19,6 +19,7 @@ import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
+import com.robot.et.util.LocationManager;
 import com.robot.et.util.MusicManager;
 
 // 语音合成
@@ -134,7 +135,11 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
                 showNormalEmotion(true);
-                BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicName(), MusicManager.getMusicType());
+                if (DataConfig.isJpushPlayMusic) {// app推送
+                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc(), MusicManager.getMusicType());
+                } else {// 第三方
+                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicName(), MusicManager.getMusicType());
+                }
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 showNormalEmotion(true);
@@ -160,7 +165,8 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                 startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                 break;
             case DataConfig.SPEAK_TYPE_WEATHER:// 天气
-                String weatherContent = new StringBuffer(1024).append("今天").append(city).append(area).append("的天气").toString();
+                String weatherContent = new StringBuffer(1024).append("今天").append(LocationManager.getInfo().getCity()).
+                        append(LocationManager.getInfo().getArea()).append("的天气").toString();
                 SpeechImpl.getInstance().understanderText(weatherContent);
 
                 break;

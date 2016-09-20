@@ -70,7 +70,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         Log.i("accept", "MsgReceiverService  onCreate()");
         // 初始化声音池
         sound = new Sound(this);
-        // 初始化音乐媒体
+        // 初始化音乐媒体（app推送的歌曲暂时用系统播放器）
         music = new Music(this);
         // 初始化喜马拉雅
         xiMaLaYa = new XiMaLaYa(this, DataConfig.XIMALAYA_APPSECRET, this);
@@ -108,45 +108,49 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
                 Log.i(TAG, "MsgReceiverService  开启音乐");
-                // 播放类型
-                int playType = intent.getIntExtra("playType", 0);
                 // 获取播放的音乐路径
                 String musicName = intent.getStringExtra("musicUrl");
-                Log.i(TAG, "MsgReceiverService  playType==" + playType);
                 Log.i(TAG, "MsgReceiverService  musicUrl==" + musicName);
                 if (!TextUtils.isEmpty(musicName)) {
                     // 播放音乐
-//                    boolean isSuccess = music.play(musicUrl);
-//                    // 播放音乐失败
-//                    if (!isSuccess) {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
-//                    }
-                    if (playType == DataConfig.PLAY_MUSIC) {// 播放音乐
-                        xiMaLaYa.playMusic(musicName, new IPlayer() {
-                            @Override
-                            public void playSuccess() {
-                                Log.i(TAG, "MsgReceiverService  播放成功");
-                            }
+                    if (DataConfig.isJpushPlayMusic) {// app推送
+                        boolean isSuccess = music.play(musicName);
+                        // 播放音乐失败
+                        if (!isSuccess) {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
+                        }
+                    } else {// 第三方
+                        // 播放类型
+                        int playType = intent.getIntExtra("playType", 0);
+                        Log.i(TAG, "MsgReceiverService  playType==" + playType);
 
-                            @Override
-                            public void playFail() {
-                                Log.i(TAG, "MsgReceiverService  播放失败");
-                                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
-                            }
-                        });
-                    } else {// 播放电台
-                        xiMaLaYa.playRadio(musicName, new IPlayer() {
-                            @Override
-                            public void playSuccess() {
-                                Log.i(TAG, "MsgReceiverService  播放成功");
-                            }
+                        if (playType == DataConfig.PLAY_MUSIC) {// 播放音乐
+                            xiMaLaYa.playMusic(musicName, new IPlayer() {
+                                @Override
+                                public void playSuccess() {
+                                    Log.i(TAG, "MsgReceiverService  播放成功");
+                                }
 
-                            @Override
-                            public void playFail() {
-                                Log.i(TAG, "MsgReceiverService  播放失败");
-                                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
-                            }
-                        });
+                                @Override
+                                public void playFail() {
+                                    Log.i(TAG, "MsgReceiverService  播放失败");
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+                                }
+                            });
+                        } else {// 播放电台
+                            xiMaLaYa.playRadio(musicName, new IPlayer() {
+                                @Override
+                                public void playSuccess() {
+                                    Log.i(TAG, "MsgReceiverService  播放成功");
+                                }
+
+                                @Override
+                                public void playFail() {
+                                    Log.i(TAG, "MsgReceiverService  播放失败");
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+                                }
+                            });
+                        }
                     }
                     return;
                 }
@@ -156,9 +160,12 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_MUSIC)) {//停止音乐播放
                 Log.i(TAG, "MsgReceiverService  停止音乐播放");
                 // 停止播放音乐
-//                music.stopPlay();
-                if (xiMaLaYa != null) {
-                    xiMaLaYa.stopPlay();
+                if (DataConfig.isJpushPlayMusic) {// app推送
+                    music.stopPlay();
+                } else {// 第三方
+                    if (xiMaLaYa != null) {
+                        xiMaLaYa.stopPlay();
+                    }
                 }
                 // 耳朵灯光灭
                 BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
@@ -387,7 +394,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                                 MatchSceneHandler.sleep(MsgReceiverService.this);
                             }
                         }
-                    }, 30 * 1000);// 30s 后沉睡
+                    }, 15 * 1000);// 15s 后沉睡
                 }
             } else {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，图片上传失败，再试一次吧");

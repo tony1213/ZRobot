@@ -1,7 +1,5 @@
 package com.robot.et.core.hardware.wakeup;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
@@ -11,9 +9,6 @@ import com.robot.et.common.DataConfig;
  * 与唤醒相关的处理
  */
 public class WakeUpHandler {
-    private final int VOICE_WAKEUP = 1;
-    private final int BODY_DETECTION = 2;
-    private final int ROBOT_TOUCH = 3;
     private IWakeUp iWakeUp;
     private int voiceFd;
     private int faceFd;
@@ -44,10 +39,7 @@ public class WakeUpHandler {
                             int degree = WakeUp.getWakeUpDegree();
                             Log.i("wakeup", "degree==" + degree);
                             WakeUp.setGainDirection(0);// 设置麦克0为主麦
-                            Message msg = handler.obtainMessage();
-                            msg.what = VOICE_WAKEUP;
-                            msg.arg1 = degree;
-                            handler.sendMessage(msg);
+                            iWakeUp.getVoiceWakeUpDegree(degree);
                         }
                         // 每20ms读一次
                         try {
@@ -75,7 +67,7 @@ public class WakeUpHandler {
                             //有人影进入范围
                             Log.i("wakeup", "检测到人影");
                             // 发送人体感应
-                            handler.sendEmptyMessage(BODY_DETECTION);
+                            iWakeUp.bodyDetection();
                         }
                     }
                     // 每1s读一次
@@ -88,21 +80,4 @@ public class WakeUpHandler {
             }
         }).start();
     }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case VOICE_WAKEUP:// 语音唤醒
-                    iWakeUp.getVoiceWakeUpDegree(msg.arg1);
-                    break;
-                case BODY_DETECTION:// 检测到人影
-                    iWakeUp.bodyDetection();
-                    break;
-                case ROBOT_TOUCH:// 机器触摸
-                    break;
-            }
-        }
-    };
 }

@@ -50,6 +50,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private final String TAG = "Receiver";
     private Timer timer;
     private WakeUpHandler wakeUpHandler;
+    private final int CALL_PHONE = 1;
+    private final int UPDATE_VIEW = 2;
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -76,8 +79,8 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 Log.i(TAG, "HardwareReceiverService 机器人沉睡");
                 wakeUpHandler.faceWakeUp();
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_EARS_LED)) {// 耳朵灯
-                Log.i(TAG, "HardwareReceiverService 耳朵灯");
                 int LEDState = intent.getIntExtra("LEDState", 0);
+                Log.i(TAG, "HardwareReceiverService 耳朵灯LEDState==" + LEDState);
                 EarsLightManager.setLight(LEDState);
             }
         }
@@ -176,8 +179,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         // 为防止不停的人体检测触发，设置为已唤醒状态
         DataConfig.isSleep = false;
         // 显示正常表情
-        ViewCommon.initView();
-        EmotionManager.showEmotion(R.mipmap.emotion_normal);
+        handler.sendEmptyMessage(UPDATE_VIEW);
 
         // 获取当前的时间
         int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
@@ -203,7 +205,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        handler.sendEmptyMessage(1);
+                        handler.sendEmptyMessage(CALL_PHONE);
                     }
                 }, 30 * 1000);
 
@@ -275,36 +277,43 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            // 拨打用户手机视频
-            if (DataConfig.isSecuritySign) {// 安保模式
-                TimerManager.cancelTimer(timer);
-                timer = null;
-                // 获取管理员手机号
-                final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-                String adminPhone = share.getString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, "");
-                if (TextUtils.isEmpty(adminPhone)) {
-                    HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, new DeviceUuidFactory(HardwareReceiverService.this).getDeviceUuid(), new RobotInfoCallBack() {
-                        @Override
-                        public void onSuccess(RobotInfo info) {
-                            if (info != null) {
-                                String phone = info.getAdminPhone();
-                                if (!TextUtils.isEmpty(phone)) {
-                                    share.putString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, phone);
-                                    share.commitValue();
-                                    callPhone(phone);
+            if (msg.what == CALL_PHONE) {
+                // 拨打用户手机视频
+                if (DataConfig.isSecuritySign) {// 安保模式
+                    TimerManager.cancelTimer(timer);
+                    timer = null;
+                    // 获取管理员手机号
+                    final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+                    String adminPhone = share.getString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, "");
+                    if (TextUtils.isEmpty(adminPhone)) {
+                        HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, new DeviceUuidFactory(HardwareReceiverService.this).getDeviceUuid(), new RobotInfoCallBack() {
+                            @Override
+                            public void onSuccess(RobotInfo info) {
+                                if (info != null) {
+                                    String phone = info.getAdminPhone();
+                                    if (!TextUtils.isEmpty(phone)) {
+                                        share.putString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, phone);
+                                        share.commitValue();
+                                        callPhone(phone);
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onFail(String errorMsg) {
+                            @Override
+                            public void onFail(String errorMsg) {
 
-                        }
-                    });
+                            }
+                        });
 
-                } else {
-                    callPhone(adminPhone);
+                    } else {
+                        callPhone(adminPhone);
+                    }
                 }
+
+            } else {
+                // 显示正常表情
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
             }
         }
     };

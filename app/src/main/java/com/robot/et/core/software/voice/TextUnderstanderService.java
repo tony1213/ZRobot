@@ -21,6 +21,7 @@ import com.robot.et.core.software.voice.util.ResultParse;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.EnumManager;
+import com.robot.et.util.LocationManager;
 import com.robot.et.util.MusicManager;
 
 import org.json.JSONObject;
@@ -164,6 +165,8 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
 
                                     break;
                                 case WEATHER://天气查询
+                                    String city = LocationManager.getInfo().getCity();
+                                    String area = LocationManager.getInfo().getArea();
                                     answer = ResultParse.getWeatherData(jObject, city, area);
                                     if (!TextUtils.isEmpty(answer)) {
                                         if (answer.contains("空气质量")) {
@@ -216,13 +219,14 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
 
                                     break;
                                 case PM25://空气质量
-                                    answer = ResultParse.getPm25Data(jObject, city, area);
+                                    answer = ResultParse.getPm25Data(jObject, LocationManager.getInfo().getCity(), LocationManager.getInfo().getArea());
                                     speakContent(question, answer);
 
                                     break;
                                 case RADIO://电台
                                     answer = ResultParse.getRadioName(jObject);
                                     if (!TextUtils.isEmpty(answer)) {
+                                        DataConfig.isJpushPlayMusic = false;
                                         MusicManager.setMusicType(DataConfig.PLAY_RADIO);
                                         MusicManager.setMusicName(answer);
                                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");

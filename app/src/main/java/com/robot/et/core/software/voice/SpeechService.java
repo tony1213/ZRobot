@@ -4,16 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
-
 /**
  * Created by houdeming on 2016/8/8.
  */
 public class SpeechService extends Service {
-    public SharedPreferencesUtils share;
-    public String city;// 当前城市
-    public String area;// 当前区域
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -23,10 +17,6 @@ public class SpeechService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        share = SharedPreferencesUtils.getInstance();
-        city = share.getString(SharedPreferencesKeys.CITY_KEY, "");
-        area = share.getString(SharedPreferencesKeys.AREA_KEY, "");
-
     }
 
     /**

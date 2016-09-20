@@ -13,10 +13,13 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.baidu.location.BDLocation;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
+import com.robot.et.core.software.common.baidumap.IMap;
+import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -32,8 +35,8 @@ import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.TextToVoiceService;
 import com.robot.et.core.software.voice.TextUnderstanderService;
 import com.robot.et.core.software.voice.VoiceToTextService;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
+import com.robot.et.entity.LocationInfo;
+import com.robot.et.util.LocationManager;
 
 import org.ros.android.RosActivity;
 import org.ros.node.NodeConfiguration;
@@ -47,6 +50,8 @@ public class MainActivity extends RosActivity {
     private NodeConfiguration nodeConfiguration;//ROS节点
 
     private final float VISUALIZER_HEIGHT_DIP = 150f;//频谱View高度
+    private Map map;
+    private String city;
 
 
     public MainActivity() {
@@ -60,13 +65,10 @@ public class MainActivity extends RosActivity {
         setContentView(R.layout.activity_main);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //记录城市、区域位置
-        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-        share.putString(SharedPreferencesKeys.CITY_KEY, "上海市");
-        share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
-        share.commitValue();
+
         initView();
         initService();
+        initBaiDuMap();
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
@@ -102,6 +104,29 @@ public class MainActivity extends RosActivity {
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
         OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
+    }
+
+    // 初始化百度地图
+    private void initBaiDuMap() {
+        map = new Map(this, new IMap() {
+            @Override
+            public void getLocationInfo(BDLocation location) {
+                if (location != null) {
+                    city = location.getCity();
+                    String area = location.getDistrict();
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    // city=上海市,area=浦东新区,latitude=31.217769,longitude=121.603934
+                    Log.i("map", "city=" + city + ",area=" + area + ",longitude=" + longitude + ",latitude=" + latitude);
+                    LocationInfo info = new LocationInfo();
+                    info.setCity(city);
+                    info.setArea(area);
+                    info.setLongitude(String.valueOf(longitude));
+                    info.setLatitude(String.valueOf(latitude));
+                    LocationManager.setInfo(info);
+                }
+            }
+        });
     }
 
     private void initService() {
@@ -216,6 +241,11 @@ public class MainActivity extends RosActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 如果city为空，代表没有定位成功，要把定位关掉
+        if (TextUtils.isEmpty(city)) {
+            map.destroyMap();
+        }
+        unregisterReceiver(receiver);
         stopService(new Intent(this, VoiceToTextService.class));
         stopService(new Intent(this, TextToVoiceService.class));
         stopService(new Intent(this, TextUnderstanderService.class));

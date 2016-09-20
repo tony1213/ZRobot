@@ -182,7 +182,7 @@ public class MatchSceneHandler {
                                     sleep(context);
                                 }
                             }
-                        }, 30 * 1000);// 30s 后沉睡
+                        }, 15 * 1000);// 15s 后沉睡
 
                     }
                 }
