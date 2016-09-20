@@ -7,6 +7,7 @@ import android.util.Log;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.baidu.mapapi.SDKInitializer;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
@@ -31,6 +32,8 @@ public class CustomApplication extends Application {
         initVoice();
         // 初始化云推送
         initCloudChannel(this);
+        // 初始化百度地图
+        initBaiDuMap();
     }
 
     // 初始化科大讯飞
@@ -70,5 +73,11 @@ public class CustomApplication extends Application {
                 Log.e("alipush", "init cloudchannel failed -- errorcode:" + errorCode + " -- errorMessage:" + errorMessage);
             }
         });
+    }
+
+    // 初始化百度地图
+    private void initBaiDuMap() {
+        // 初始化sdk，上下文必须要是application的，最好放在这里初始化sdk
+        SDKInitializer.initialize(this);
     }
 }

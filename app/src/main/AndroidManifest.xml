@@ -35,6 +35,8 @@
     <!-- 显示音乐频谱的权限 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <!-- 阿里移动推送相关权限 -->
     <!-- 选举使用，当应用有删除或者更新时需要重新选举，复用推送通道 -->
     <uses-permission android:name="android.permission.BROADCAST_PACKAGE_CHANGED" />
@@ -216,6 +218,20 @@
             android:name="com.ximalaya.ting.android.opensdk.player.receive.WireControlReceiver"
             android:exported="true"></receiver>
         <!-- ximalaya  end -->
+
+        <!-- baidumap  begin -->
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.baidu.location.service_v2.2"></action>
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="loxNgsR7p0R3oGvcsV5INicup7n5X69v" />  <!--请自行申请key,填写到此处-->
+        <!-- baidumap  end -->
 
     </application>
 
