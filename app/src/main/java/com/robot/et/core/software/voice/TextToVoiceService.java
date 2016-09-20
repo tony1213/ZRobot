@@ -27,6 +27,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
     private int currentType;
     private boolean isFirstSetParam = true;
     private Speak speak;
+    private int speakCount;// 提醒说话的次数
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -161,8 +162,26 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                     return;
                 }
 
-                String alarmContent = AlarmRemindManager.getMoreAlarmContent();
-                startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
+                // 设置的闹铃说3遍
+                if (speakCount < 2) {
+                    // 单次闹铃
+                    String alarmContent = AlarmRemindManager.getSpeakRemindContent();
+                    if (!TextUtils.isEmpty(alarmContent)) {
+                        speakCount ++;
+                        startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
+                    } else {
+                        // 同一时间内的多个提醒
+                        String alarmMoreContent = AlarmRemindManager.getMoreAlarmContent();
+                        startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmMoreContent);
+                    }
+                    return;
+                } else {
+                    speakCount = 0;
+                    //  单次闹铃说完之后要设置空
+                    AlarmRemindManager.setSpeakRemindContent("");
+                    startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, "重要的事情说三遍");
+                }
+
                 break;
             case DataConfig.SPEAK_TYPE_WEATHER:// 天气
                 String weatherContent = new StringBuffer(1024).append("今天").append(LocationManager.getInfo().getCity()).

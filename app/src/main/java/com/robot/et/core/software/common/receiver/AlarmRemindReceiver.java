@@ -108,6 +108,7 @@ public class AlarmRemindReceiver extends BroadcastReceiver {
             } else {
                 //闹铃
                 content = "主人，要" + remindContent + "了";
+                AlarmRemindManager.setSpeakRemindContent(content);
             }
 
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, content);
