@@ -353,6 +353,7 @@ public class MatchSceneHandler {
         // 耳朵灯灭
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
+        BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_BLINK);
     }
 
     //增加视觉环境学习到数据库

@@ -22,7 +22,6 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
-import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -390,11 +389,10 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                         public void run() {
                             if (DataConfig.isShowLoadPicQRCode) {
                                 DataConfig.isShowLoadPicQRCode = false;
-                                // 沉睡
-                                MatchSceneHandler.sleep(MsgReceiverService.this);
+                                SpeechImpl.getInstance().startListen();
                             }
                         }
-                    }, 15 * 1000);// 15s 后沉睡
+                    }, 15 * 1000);// 15s 后待机
                 }
             } else {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，图片上传失败，再试一次吧");

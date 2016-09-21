@@ -132,6 +132,8 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
     private void responseSpeakCompleted() {
         switch (currentType) {
             case DataConfig.SPEAK_TYPE_CHAT://对话
+                // 说提醒的时候，中间唤醒打断，造成下次提醒影响
+                speakCount = 0;
                 SpeechImpl.getInstance().startListen();
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
@@ -167,7 +169,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                     // 单次闹铃
                     String alarmContent = AlarmRemindManager.getSpeakRemindContent();
                     if (!TextUtils.isEmpty(alarmContent)) {
-                        speakCount ++;
+                        speakCount++;
                         startSpeak(DataConfig.SPEAK_TYPE_REMIND_TIPS, alarmContent);
                     } else {
                         // 同一时间内的多个提醒

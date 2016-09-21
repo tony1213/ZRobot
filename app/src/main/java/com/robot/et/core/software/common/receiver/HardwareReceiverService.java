@@ -19,7 +19,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.UrlConfig;
-import com.robot.et.core.hardware.light.EarsLightManager;
+import com.robot.et.core.hardware.light.EarsLightHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
 import com.robot.et.core.software.common.network.HttpManager;
@@ -52,6 +52,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private WakeUpHandler wakeUpHandler;
     private final int CALL_PHONE = 1;
     private final int UPDATE_VIEW = 2;
+    private EarsLightHandler earsLightHandler;
 
 
     @Override
@@ -81,7 +82,10 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_EARS_LED)) {// 耳朵灯
                 int LEDState = intent.getIntExtra("LEDState", 0);
                 Log.i(TAG, "HardwareReceiverService 耳朵灯LEDState==" + LEDState);
-                EarsLightManager.setLight(LEDState);
+                if (earsLightHandler == null) {
+                    earsLightHandler = new EarsLightHandler();
+                }
+                earsLightHandler.setLight(LEDState);
             }
         }
     };
@@ -136,6 +140,12 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         return content;
     }
 
+    // 被唤醒
+    private void awaken() {
+        // 胸口灯常亮
+        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_ON);
+    }
+
     @Override
     public void getVoiceWakeUpDegree(int degree) {
         Log.i(TAG, "HardwareReceiverService 接受到唤醒中断的广播");
@@ -143,6 +153,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         if (!DataConfig.isFaceRecogniseIng) {
             // 相应唤醒后要做的事
             responseAwaken();
+            awaken();
             // 小于30度只头转
             if (degree >= 330 && degree <= 360) {
                 // 330-360  头向左转, 向左10度即+10
@@ -180,6 +191,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isSleep = false;
         // 显示正常表情
         handler.sendEmptyMessage(UPDATE_VIEW);
+        awaken();
 
         // 获取当前的时间
         int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
@@ -226,6 +238,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             if (isHandle()) {
                 return;
             }
+            awaken();
             // 响应触摸
             touch(touchId);
         }

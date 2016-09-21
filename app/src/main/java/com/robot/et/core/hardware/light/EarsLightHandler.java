@@ -5,6 +5,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.robot.et.common.EarsLightConfig;
+import com.robot.et.util.TimerManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,10 +13,10 @@ import java.util.TimerTask;
 /**
  * Created by houdeming on 2016/9/18.
  */
-public class EarsLightManager {
+public class EarsLightHandler {
     private static final String TAG = "light";
-    private static Timer timer;
-    private static int lightState;
+    private Timer timer;
+    private int lightState;
 
     static {
         int lightFd = EarsLight.initEarsLight();
@@ -23,18 +24,17 @@ public class EarsLightManager {
     }
 
     // 设置耳朵灯的状态
-    public static void setLight(int lightState) {
+    public void setLight(int lightState) {
         Log.i(TAG, "lightState==" + lightState);
-        EarsLightManager.lightState = lightState;
-        int lightResult = 0;
+        this.lightState = lightState;
         switch (lightState) {
             case EarsLightConfig.EARS_CLOSE:
                 stopTime();
-                lightResult = EarsLight.setLightStatus(lightState);
+                EarsLight.setLightStatus(lightState);
                 break;
             case EarsLightConfig.EARS_BRIGHT:
                 stopTime();
-                lightResult = EarsLight.setLightStatus(lightState);
+                EarsLight.setLightStatus(lightState);
                 break;
             case EarsLightConfig.EARS_BLINK:
                 startTimer();
@@ -51,12 +51,11 @@ public class EarsLightManager {
             default:
                 break;
         }
-        Log.i(TAG, "lightResult1==" + lightResult);
     }
 
-    private static void startTimer() {
+    private void startTimer() {
         stopTime();
-        timer = new Timer();
+        timer = TimerManager.createTimer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -65,20 +64,18 @@ public class EarsLightManager {
         }, 0, 5 * 1000);// 5s执行一次（时间太短的话可能会造成影响）
     }
 
-    private static void stopTime() {
+    private void stopTime() {
         if (timer != null) {
-            timer.cancel();
-            timer.purge();
+            TimerManager.cancelTimer(timer);
             timer = null;
         }
     }
 
-    private static Handler handler = new Handler() {
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            int lightResult = EarsLight.setLightStatus(lightState);
-            Log.i(TAG, "lightResult2==" + lightResult);
+            EarsLight.setLightStatus(lightState);
         }
     };
 }
