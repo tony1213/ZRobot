@@ -1,4 +1,4 @@
-package com.robot.et.core.software.ros;
+package com.robot.et.core.software.ros.connect.first;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -108,12 +108,13 @@ public class MasterChooserService extends Service {
                         discoveredMasters.add(discovered_service);
                         Log.e("MasterChooserService", "size:" + discoveredMasters.size());
                         if (discoveredMasters.size() == 0) {
-                            return;
+                            Log.e("MasterChooserService","discoveredMasters.size() == 0");
+//                            return;
                         }
                         for (int i = 0; i < discoveredMasters.size(); i++) {
                             Log.e("MasterChooserService", "name:" + discoveredMasters.get(i).name + ",Type:" + discoveredMasters.get(i).type + ",domain:" + discoveredMasters.get(i).domain + ",description:" + discoveredMasters.get(i).description + ",hostname:" + discoveredMasters.get(i).hostname + ",port:" + discoveredMasters.get(i).port + ",ipv4:" + discoveredMasters.get(i).ipv4_addresses);
-                            if ("192.168.2.157".equals(discoveredMasters.get(i).ipv4_addresses.get(0))){
-                                Log.e("MasterChooserService","找到：192.168.2.157");
+                            if ("192.168.2.158".equals(discoveredMasters.get(i).ipv4_addresses.get(0))){
+                                Log.e("MasterChooserService","找到：192.168.2.158");
                                 enterMasterInfo(discoveredMasters.get(i));
                             }
                         }
@@ -242,6 +243,7 @@ public class MasterChooserService extends Service {
         }
     }
     private void onMastersChanged() {
+
         masterItems = new ArrayList<MasterItem>();
         if (masters != null) {
             for (int i = 0; i < masters.size(); i++) {
