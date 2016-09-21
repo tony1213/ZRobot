@@ -4,11 +4,10 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.ros.map.RmapRequest;
-import com.robot.et.core.software.ros.map.RmapResponse;
+import com.robot.et.core.software.ros.client.map.RmapRequest;
+import com.robot.et.core.software.ros.client.map.RmapResponse;
 
 import org.ros.exception.RemoteException;
-import org.ros.exception.RosRuntimeException;
 import org.ros.exception.ServiceNotFoundException;
 import org.ros.namespace.GraphName;
 import org.ros.node.AbstractNodeMain;
@@ -37,7 +36,7 @@ public class RmapClient extends AbstractNodeMain {
     public void onStart(final ConnectedNode connectedNode) {
         ServiceClient<RmapRequest, RmapResponse> serviceClient =null;
         try {
-            serviceClient = connectedNode.newServiceClient("/turtlebot/save_only_map", com.robot.et.core.software.ros.map.Rmap._TYPE);
+            serviceClient = connectedNode.newServiceClient("/turtlebot/save_only_map", com.robot.et.core.software.ros.client.map.Rmap._TYPE);
         } catch (ServiceNotFoundException e) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化地图服务");
             return;

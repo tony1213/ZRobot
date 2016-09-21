@@ -17,7 +17,6 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
-import com.robot.et.core.hardware.wakeup.WakeUpServices;
 import com.robot.et.core.software.common.push.netty.NettyService;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
@@ -28,7 +27,7 @@ import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.VisualizerView;
-import com.robot.et.core.software.ros.MoveControler;
+import com.robot.et.core.software.ros.move.MoveControler;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.iflytek.IflySpeakService;
 import com.robot.et.core.software.voice.iflytek.IflyTextUnderstanderService;
@@ -115,7 +114,7 @@ public class MainActivity extends RosActivity {
         //图灵
         startService(new Intent(this, TuRingService.class));
         //唤醒
-        startService(new Intent(this, WakeUpServices.class));
+//        startService(new Intent(this, WakeUpServices.class));
         //接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
@@ -222,7 +221,7 @@ public class MainActivity extends RosActivity {
         super.onDestroy();
         unregisterReceiver(receiver);
         stopService(new Intent(this, IflyVoiceToTextService.class));
-        stopService(new Intent(this, WakeUpServices.class));
+//        stopService(new Intent(this, WakeUpServices.class));
         stopService(new Intent(this, IflySpeakService.class));
         stopService(new Intent(this, IflyTextUnderstanderService.class));
         stopService(new Intent(this, TuRingService.class));

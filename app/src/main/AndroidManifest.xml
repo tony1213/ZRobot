@@ -41,7 +41,7 @@
         android:largeHeap="true"
         tools:replace="icon, label">
         <activity
-            android:name=".app.MainActivity"
+            android:name=".app.MainAppActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
@@ -79,7 +79,7 @@
         <service android:name=".core.software.common.receiver.HardwareReceiverService" />
 
         <!-- ROS service dont modify -->
-        <service android:name=".core.software.ros.MasterChooserService" />
+        <service android:name=".core.software.ros.connect.first.MasterChooserService" />
         <service android:name="org.ros.android.NodeMainExecutorService">
             <intent-filter>
                 <action android:name="org.ros.android.NodeMainExecutorService" />
@@ -93,7 +93,10 @@
             </intent-filter>
         </receiver>
 
-        <!--<activity android:name=".app.MainActivity"></activity>-->
+        <!-- <activity android:name=".app.MainActivity"></activity> -->
+        <!-- <activity android:name=".app.MainAppActivity" /> -->
+
+        <activity android:name=".core.software.ros.connect.second.MasterFactory"/>
     </application>
 
 </manifest>

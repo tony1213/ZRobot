@@ -1,4 +1,4 @@
-package com.robot.et.core.software.ros;
+package com.robot.et.core.software.ros.connect.first;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -243,6 +243,7 @@ public class MasterChooserService extends Service {
         }
     }
     private void onMastersChanged() {
+
         masterItems = new ArrayList<MasterItem>();
         if (masters != null) {
             for (int i = 0; i < masters.size(); i++) {

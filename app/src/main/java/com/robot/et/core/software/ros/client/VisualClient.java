@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.ros.visual.VisualRequest;
-import com.robot.et.core.software.ros.visual.VisualResponse;
+import com.robot.et.core.software.ros.client.visual.VisualRequest;
+import com.robot.et.core.software.ros.client.visual.VisualResponse;
 
 import org.ros.exception.RemoteException;
 import org.ros.exception.ServiceNotFoundException;
@@ -34,7 +34,7 @@ public class VisualClient extends AbstractNodeMain {
     public void onStart(final ConnectedNode connectedNode) {
         ServiceClient<VisualRequest, VisualResponse> serviceClient =null;
         try {
-            serviceClient = connectedNode.newServiceClient("rai_learning", com.robot.et.core.software.ros.visual.Visual._TYPE);
+            serviceClient = connectedNode.newServiceClient("rai_learning", com.robot.et.core.software.ros.client.visual.Visual._TYPE);
         } catch (ServiceNotFoundException e) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
             return;

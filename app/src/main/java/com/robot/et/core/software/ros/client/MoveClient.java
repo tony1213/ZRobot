@@ -21,11 +21,10 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.ros.move.MoveRequest;
-import com.robot.et.core.software.ros.move.MoveResponse;
+import com.robot.et.core.software.ros.client.move.MoveRequest;
+import com.robot.et.core.software.ros.client.move.MoveResponse;
 
 import org.ros.exception.RemoteException;
-import org.ros.exception.RosRuntimeException;
 import org.ros.exception.ServiceNotFoundException;
 import org.ros.namespace.GraphName;
 import org.ros.node.AbstractNodeMain;
@@ -56,7 +55,7 @@ public class MoveClient extends AbstractNodeMain {
     public void onStart(final ConnectedNode connectedNode) {
         ServiceClient<MoveRequest, MoveResponse> serviceClient=null;
         try {
-            serviceClient = connectedNode.newServiceClient("set_goal", com.robot.et.core.software.ros.move.Move._TYPE);
+            serviceClient = connectedNode.newServiceClient("set_goal", com.robot.et.core.software.ros.client.move.Move._TYPE);
         } catch (ServiceNotFoundException e) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化移动服务");
             return;
