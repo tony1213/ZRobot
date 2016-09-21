@@ -22,6 +22,7 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -206,9 +207,8 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PHONE_HANGUP)) {//查看时电话挂断
                 Log.i(TAG, "MsgReceiverService  查看时电话挂断");
-                // 显示睡觉表情
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_rest_6);
+                // 沉睡
+                MatchSceneHandler.sleep(MsgReceiverService.this);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION)) {//机器人表情
                 Log.i(TAG, "MsgReceiverService  机器人表情");
                 int emotionKey = intent.getIntExtra("emotion", 0);
@@ -380,7 +380,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 // 显示二维码图片
                 if (qrCode != null) {
                     ViewCommon.initView();
-                    OneImgManager.showImg(qrCode, true);
+                    OneImgManager.showImg(qrCode);
                     DataConfig.isShowLoadPicQRCode = true;
                     SpeechImpl.getInstance().cancelListen();
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "扫描二维码可以下载照片哦");
@@ -395,6 +395,8 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     }, 15 * 1000);// 15s 后待机
                 }
             } else {
+                // 又是可能还没显示被唤醒，造成语音说话不完整
+                SpeechImpl.getInstance().cancelListen();
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，图片上传失败，再试一次吧");
             }
         }

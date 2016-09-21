@@ -9,24 +9,20 @@ import android.widget.LinearLayout;
  * Created by houdeming on 2016/8/17.
  */
 public class EmotionManager {
-    private static ImageView imgLeft;
-    private static ImageView imgRight;
+    private static ImageView img;
     private static LinearLayout showLinearLayout;
 
-    public static void setView(LinearLayout showLinearLayout, ImageView imgLeft, ImageView imgRight) {
+    public static void setView(LinearLayout showLinearLayout, ImageView img) {
         EmotionManager.showLinearLayout = showLinearLayout;
-        EmotionManager.imgLeft = imgLeft;
-        EmotionManager.imgRight = imgRight;
+        EmotionManager.img = img;
     }
 
     //显示表情
     public static void showEmotionAnim(int resId) {
-        if (imgLeft != null && imgRight != null) {
+        if (img != null) {
             showEmotionLinearLayout(true);
-            AnimationDrawable animLeft = getAnimationDrawable(imgLeft, resId);
-            AnimationDrawable animRight = getAnimationDrawable(imgRight, resId);
-            playEmotionAnim(animLeft);
-            playEmotionAnim(animRight);
+            AnimationDrawable imgAnim = getAnimationDrawable(img, resId);
+            playEmotionAnim(imgAnim);
         }
     }
 
@@ -43,10 +39,9 @@ public class EmotionManager {
 
     //显示正常表情
     public static void showEmotion(int resId) {
-        if (imgLeft != null && imgRight != null) {
+        if (img != null) {
             showEmotionLinearLayout(true);
-            setEmotion(imgLeft, resId);
-            setEmotion(imgRight, resId);
+            setEmotion(img, resId);
         }
     }
 

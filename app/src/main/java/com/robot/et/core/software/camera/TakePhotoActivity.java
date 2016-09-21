@@ -47,6 +47,7 @@ public class TakePhotoActivity extends Activity {
     private boolean mStopTrack;
     private final String TAG = "camera";
     private boolean isFirst;// 是否是第一次拍
+    private int takeCount;// 拍照持续的时间
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +130,7 @@ public class TakePhotoActivity extends Activity {
             Log.i(TAG, "Camera Exception==" + e.getMessage());
             // 关闭相机
             closeCamera();
+            finish();
             return;
         }
 
@@ -205,7 +207,15 @@ public class TakePhotoActivity extends Activity {
                     // 此时图片是绿色继续拍，小于10k的全部作为绿色处理
                     if (mImageData.length < 1024 * 10) {
                         Log.i(TAG, "此时图片是绿色");
-                        continue;
+                        // 连续5次都是绿色代表相机有异常了
+                        if (takeCount < 5) {
+                            takeCount++;
+                            continue;
+                        } else {
+                            mStopTrack = true;
+                            handler.sendEmptyMessage(0);
+                            return;
+                        }
                     }
 
                     mStopTrack = true;
@@ -231,6 +241,8 @@ public class TakePhotoActivity extends Activity {
                 intent.setAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
                 intent.putExtra("photoData", mImageData);
                 sendBroadcast(intent);
+            } else {
+                finish();
             }
         }
     };

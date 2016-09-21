@@ -1,7 +1,6 @@
 package com.robot.et.core.software.common.view;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,7 +28,6 @@ public class OneImgManager {
             if (imageBitmap != null) {
                 imageBitmap.setVisibility(View.GONE);
                 imagePhoto.setVisibility(View.GONE);
-                showLinearLayout.setBackgroundColor(Color.BLACK);
             }
             imageView.setVisibility(View.VISIBLE);
             imageView.setBackgroundResource(resId);
@@ -37,17 +35,12 @@ public class OneImgManager {
     }
 
     //显示图片
-    public static void showImg(Bitmap bitmap, boolean isWhite) {
+    public static void showImg(Bitmap bitmap) {
         if (imageBitmap != null) {
             showImgLinearLayout(true);
             if (imageView != null) {
                 imageView.setVisibility(View.GONE);
                 imagePhoto.setVisibility(View.GONE);
-                if (isWhite) {
-                    showLinearLayout.setBackgroundColor(Color.WHITE);
-                } else {
-                    showLinearLayout.setBackgroundColor(Color.BLACK);
-                }
             }
             imageBitmap.setVisibility(View.VISIBLE);
             imageBitmap.setImageBitmap(bitmap);
@@ -61,7 +54,6 @@ public class OneImgManager {
             if (imageBitmap != null) {
                 imageBitmap.setVisibility(View.GONE);
                 imageView.setVisibility(View.GONE);
-                showLinearLayout.setBackgroundColor(Color.BLACK);
             }
             imagePhoto.setVisibility(View.VISIBLE);
             imagePhoto.setImageBitmap(bitmap);

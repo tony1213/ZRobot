@@ -82,8 +82,7 @@ public class MainActivity extends RosActivity {
         LinearLayout showText = (LinearLayout) findViewById(R.id.ll_show_text);
         LinearLayout showEmotion = (LinearLayout) findViewById(R.id.ll_show_emotion);
         CustomTextView tvText = (CustomTextView) findViewById(R.id.tv_text);
-        ImageView imgLeft = (ImageView) findViewById(R.id.img_left);
-        ImageView imgRight = (ImageView) findViewById(R.id.img_right);
+        ImageView imgEmotion = (ImageView) findViewById(R.id.img_emotion);
         LinearLayout showMusicView = (LinearLayout) findViewById(R.id.ll_show_music);
         LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
         ImageView imageView = (ImageView) findViewById(R.id.img_one);
@@ -91,7 +90,7 @@ public class MainActivity extends RosActivity {
         ImageView imagePhoto = (ImageView) findViewById(R.id.img_photo);
 
         TextManager.setView(showText, tvText);
-        EmotionManager.setView(showEmotion, imgLeft, imgRight);
+        EmotionManager.setView(showEmotion, imgEmotion);
 
         EmotionManager.showEmotion(R.mipmap.emotion_normal);
 

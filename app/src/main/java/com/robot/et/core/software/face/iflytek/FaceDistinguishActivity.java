@@ -193,6 +193,7 @@ public class FaceDistinguishActivity extends Activity {
             Log.i("face", "Camera Exception==" + e.getMessage());
             // 关闭相机
             closeCamera();
+            finish();
             return;
         }
 
