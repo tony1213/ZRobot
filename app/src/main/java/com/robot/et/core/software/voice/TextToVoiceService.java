@@ -8,7 +8,6 @@ import android.util.Log;
 import com.iflytek.cloud.SpeechError;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -16,7 +15,6 @@ import com.robot.et.core.software.common.speech.voice.ifly.ISpeak;
 import com.robot.et.core.software.common.speech.voice.ifly.Speak;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
-import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
@@ -100,7 +98,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
     public void onSpeakBegin() {
         Log.i("ifly", "onSpeakBegin()");
         // 回答的时候耳朵灯光闪烁
-        BroadcastEnclosure.controlEarsLED(TextToVoiceService.this, EarsLightConfig.EARS_BLINK);
+//        BroadcastEnclosure.controlEarsLED(TextToVoiceService.this, EarsLightConfig.EARS_BLINK);
     }
 
     /**
@@ -113,12 +111,12 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
     public void onCompleted(SpeechError error) {
         Log.i("ifly", "onCompleted()");
         // 回答完毕灯光灭
-        BroadcastEnclosure.controlEarsLED(TextToVoiceService.this, EarsLightConfig.EARS_CLOSE);
+//        BroadcastEnclosure.controlEarsLED(TextToVoiceService.this, EarsLightConfig.EARS_CLOSE);
 
-        if (currentType != DataConfig.SPEAK_TYPE_NO_SOUND_TIPS) {
-            // 说话结束播放声音提示
-            BroadcastEnclosure.playSoundTips(TextToVoiceService.this, Sound.SOUND_SPEAK_OVER, DataConfig.PLAY);
-        }
+//        if (currentType != DataConfig.SPEAK_TYPE_NO_SOUND_TIPS) {
+//            // 说话结束播放声音提示
+//            BroadcastEnclosure.playSoundTips(TextToVoiceService.this, Sound.SOUND_SPEAK_OVER, DataConfig.PLAY);
+//        }
 
         if (error == null) {
             responseSpeakCompleted();
