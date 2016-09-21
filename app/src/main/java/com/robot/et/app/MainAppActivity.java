@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.baidu.location.BDLocation;
 import com.github.rosjava.android_remocons.common_tools.master.ConcertChecker;
 import com.github.rosjava.android_remocons.common_tools.master.MasterId;
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
@@ -26,7 +27,8 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.move.ControlMoveService;
-import com.robot.et.core.software.common.push.netty.NettyService;
+import com.robot.et.core.software.common.baidumap.IMap;
+import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -36,25 +38,24 @@ import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.VisualizerView;
-import com.robot.et.core.software.ros.connect.first.MasterChooserService;
-import com.robot.et.core.software.ros.move.MoveControler;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.FollowClient;
 import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
-import com.robot.et.core.software.ros.position.PositionControler;
+import com.robot.et.core.software.ros.connect.first.MasterChooserService;
 import com.robot.et.core.software.ros.connect.second.MasterFactory;
+import com.robot.et.core.software.ros.move.MoveControler;
+import com.robot.et.core.software.ros.position.PositionControler;
 import com.robot.et.core.software.video.agora.AgoraService;
-import com.robot.et.core.software.voice.iflytek.IflySpeakService;
-import com.robot.et.core.software.voice.iflytek.IflyTextUnderstanderService;
-import com.robot.et.core.software.voice.iflytek.IflyVoiceToTextService;
-import com.robot.et.core.software.voice.turing.TuRingService;
+import com.robot.et.core.software.voice.TextToVoiceService;
+import com.robot.et.core.software.voice.TextUnderstanderService;
+import com.robot.et.core.software.voice.VoiceToTextService;
 import com.robot.et.db.RobotDB;
+import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
+import com.robot.et.util.LocationManager;
 
 import org.ros.android.RosActivity;
 import org.ros.exception.RemoteException;
@@ -73,7 +74,6 @@ import rocon_interaction_msgs.GetInteractionsResponse;
 import rocon_interaction_msgs.Interaction;
 
 public class MainAppActivity extends RosActivity {
-
     /* startActivityForResult Request Codes */
     private static final int CONCERT_MASTER_CHOOSER_REQUEST_CODE = 1;
 
@@ -91,6 +91,8 @@ public class MainAppActivity extends RosActivity {
     private PairSubscriber pairSubscriber;
     private NodeConfiguration nodeConfiguration;
     private boolean validatedConcert;
+    private Map map;
+    private String city;
 
     private VisualClient visualClient;//ROS 视觉识别的Client（Service：learn_to_recognize_ros_server）
     private RmapClient rmapClient;   //ROS 地图保存的Client（Service：/turtlebot/save_only_map）
@@ -114,13 +116,9 @@ public class MainAppActivity extends RosActivity {
         setContentView(R.layout.activity_main);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //记录城市、区域位置
-        SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-        share.putString(SharedPreferencesKeys.CITY_KEY, "上海市");
-        share.putString(SharedPreferencesKeys.AREA_KEY, "浦东新区");
-        share.commitValue();
         initView();
         initService();
+        initBaiDuMap();
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
@@ -139,7 +137,7 @@ public class MainAppActivity extends RosActivity {
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "机器人初始化中，请等待。");
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
-        super.startActivityForResult(new Intent(this, MasterFactory.class),CONCERT_MASTER_CHOOSER_REQUEST_CODE);
+        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
     }
 
     // 初始化UI
@@ -147,15 +145,15 @@ public class MainAppActivity extends RosActivity {
         LinearLayout showText = (LinearLayout) findViewById(R.id.ll_show_text);
         LinearLayout showEmotion = (LinearLayout) findViewById(R.id.ll_show_emotion);
         CustomTextView tvText = (CustomTextView) findViewById(R.id.tv_text);
-        ImageView imgLeft = (ImageView) findViewById(R.id.img_left);
-        ImageView imgRight = (ImageView) findViewById(R.id.img_right);
+        ImageView imgEmotion = (ImageView) findViewById(R.id.img_emotion);
         LinearLayout showMusicView = (LinearLayout) findViewById(R.id.ll_show_music);
         LinearLayout showOneImg = (LinearLayout) findViewById(R.id.ll_show_one_img);
         ImageView imageView = (ImageView) findViewById(R.id.img_one);
         ImageView imageBitmap = (ImageView) findViewById(R.id.img_one_bitmap);
+        ImageView imagePhoto = (ImageView) findViewById(R.id.img_photo);
 
         TextManager.setView(showText, tvText);
-        EmotionManager.setView(showEmotion, imgLeft, imgRight);
+        EmotionManager.setView(showEmotion, imgEmotion);
 
         EmotionManager.showEmotion(R.mipmap.emotion_normal);
 
@@ -167,7 +165,30 @@ public class MainAppActivity extends RosActivity {
         ));
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
-        OneImgManager.setView(showOneImg, imageView, imageBitmap);
+        OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
+    }
+
+    // 初始化百度地图
+    private void initBaiDuMap() {
+        map = new Map(this, new IMap() {
+            @Override
+            public void getLocationInfo(BDLocation location) {
+                if (location != null) {
+                    city = location.getCity();
+                    String area = location.getDistrict();
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    // city=上海市,area=浦东新区,latitude=31.217769,longitude=121.603934
+                    Log.i("map", "city=" + city + ",area=" + area + ",longitude=" + longitude + ",latitude=" + latitude);
+                    LocationInfo info = new LocationInfo();
+                    info.setCity(city);
+                    info.setArea(area);
+                    info.setLongitude(String.valueOf(longitude));
+                    info.setLatitude(String.valueOf(latitude));
+                    LocationManager.setInfo(info);
+                }
+            }
+        });
     }
 
     void init(Intent intent) {
@@ -194,14 +215,17 @@ public class MainAppActivity extends RosActivity {
         // is unavailable inbetween validating and init'ing.
         if (roconDescription.getCurrentRole() == null) {
             chooseRole();
-        }
-        else {
+        } else {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
                     while (!validatedConcert) {
                         // should use a sleep here to avoid burnout
-                        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     Log.i("Remocon", "init(Intent) passing control back to init(nodeMainExecutorService)");
                     MainAppActivity.this.init(nodeMainExecutorService);
@@ -409,24 +433,20 @@ public class MainAppActivity extends RosActivity {
 
     private void initService() {
         //netty
-        startService(new Intent(this, NettyService.class));
+//        startService(new Intent(this, NettyService.class));
         //语音听写
-        startService(new Intent(this, IflyVoiceToTextService.class));
+        startService(new Intent(this, VoiceToTextService.class));
         //文本理解
-        startService(new Intent(this, IflyTextUnderstanderService.class));
-        //图灵
-        startService(new Intent(this, TuRingService.class));
-        //唤醒
-//        startService(new Intent(this, WakeUpServices.class));
+        startService(new Intent(this, TextUnderstanderService.class));
         //接受发来的消息
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
-        startService(new Intent(this, IflySpeakService.class));
+        startService(new Intent(this, TextToVoiceService.class));
         //控制动
         startService(new Intent(this, ControlMoveService.class));
         //agora
         startService(new Intent(this, AgoraService.class));
-        //接受硬件消息
+        //接受与硬件相关消息
         startService(new Intent(this, HardwareReceiverService.class));
     }
 
@@ -667,8 +687,8 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 //方案二（直接控制Twist）
                 double d = (double) intent.getIntExtra("degree", 0);
-                Log.e("wakeup", "Twist：语音控制时，得到的唤醒角度"+d);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是："+d);
+                Log.e("wakeup", "Twist：语音控制时，得到的唤醒角度" + d);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
                 doTrunAction(mover.getCurrentDegree(), d);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)) {
                 //方案一：（基于ROS地图服务）
@@ -778,6 +798,10 @@ public class MainAppActivity extends RosActivity {
     protected void onDestroy() {
         super.onDestroy();
         destroyService();
+        // 如果city为空，代表没有定位成功，要把定位关掉
+        if (TextUtils.isEmpty(city)) {
+            map.destroyMap();
+        }
         availableAppsCache.clear();
         nodeMainExecutorService.shutdownNodeMain(statusPublisher);
         nodeMainExecutorService.shutdownNodeMain(pairSubscriber);
@@ -787,16 +811,14 @@ public class MainAppActivity extends RosActivity {
     }
 
     private void destroyService() {
-        stopService(new Intent(this, IflyVoiceToTextService.class));
-        stopService(new Intent(this, IflySpeakService.class));
-        stopService(new Intent(this, IflyTextUnderstanderService.class));
-        stopService(new Intent(this, TuRingService.class));
-//        stopService(new Intent(this, WakeUpServices.class));
+        stopService(new Intent(this, VoiceToTextService.class));
+        stopService(new Intent(this, TextToVoiceService.class));
+        stopService(new Intent(this, TextUnderstanderService.class));
         stopService(new Intent(this, MsgReceiverService.class));
-        stopService(new Intent(this, NettyService.class));
+//        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
-        stopService(new Intent(this, MasterChooserService.class));
         stopService(new Intent(this, HardwareReceiverService.class));
+        stopService(new Intent(this, MasterChooserService.class));
     }
 }

@@ -4,8 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.robot.et.main.MainActivity;
-
 /**
  * Created by houdeming on 2016/7/28.
  * 接受系统广播类
@@ -21,10 +19,10 @@ public class SystemReceiver extends BroadcastReceiver {
 
     // 打开app
     private void openMainActivity(Context context) {
-        Intent intent = new Intent();
-        intent.setClass(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+//        Intent intent = new Intent();
+//        intent.setClass(context, MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
     }
 
 }
