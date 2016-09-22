@@ -130,12 +130,11 @@ public class DataConfig {
     //是否控制机器人移动
     public static boolean isControlRobotMove = false;
 
-    //是否进入认识环境场景
-    public static boolean isIntoKnowEnvironment = false;
     //是否开启漫游
     public static boolean isStartRoam = false;
-    //是否完成识别
-    public static boolean isRecogniseComplected = false;
+
+    //是否开始识别物体
+    public static boolean isStartDistinguish = false;
 
     //是否是语音打开人脸识别
     public static boolean isVoiceFaceRecognise = false;

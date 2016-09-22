@@ -107,16 +107,16 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.photographRegex);
         }
     },
-    VISION_LEARN_SCENE {// 视觉学习
-
-        public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.visionLearnRegex);
-        }
-    },
     ENVIRONMENT_LEARN_SCENE {// 认识环境学习
 
         public boolean isScene(String str) {
             return MatchStringUtil.matchString(str, MatchStringUtil.environmentLearnRegex);
+        }
+    },
+    VISION_LEARN_SCENE {// 视觉学习
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.visionLearnRegex);
         }
     },
     GO_WHERE_SCENE {// 去哪里的指令
@@ -125,22 +125,28 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.goWhereRegex);
         }
     },
-    VISION_LEARN_SIGN_SCENE {// 进入视觉学习的标志
+    START_DISTINGUISH_SCENE {// 进入物体识别
 
         public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.visionLearnSignRegex);
+            return MatchStringUtil.matchString(str, MatchStringUtil.startDistinguishRegex);
         }
     },
-    START_RECOGNISE_ENVIRONMENT_SCENE {// 开始识别环境的标志
+    CLOSE_DISTINGUISH_SCENE {// 退出物体识别
 
         public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.startRecogniseEnvRegex);
+            return MatchStringUtil.matchString(str, MatchStringUtil.closeDistinguishRegex);
         }
     },
-    RECOGNISE_COMPLECTED_SCENE {// 识别环境完成
+    FORGET_LEARN_SCENE {// 忘记学习内容
 
         public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.recogniseComplectedEnvRegex);
+            return MatchStringUtil.matchString(str, MatchStringUtil.forgetLearnRegex);
+        }
+    },
+    NAVIGATION_SCENE {// 导航到
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.navigationRegex);
         }
     },
     LOOK_PHOTO_SCENE {// 看看照片的标志

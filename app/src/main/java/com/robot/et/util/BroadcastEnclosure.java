@@ -177,4 +177,22 @@ public class BroadcastEnclosure {
         intent.setAction(BroadcastAction.ACTION_BODY_DETECTION);
         context.sendBroadcast(intent);
     }
+
+    //ros的广播
+    public static void sendRos(Context context, String rosKey, String name) {
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        intent.putExtra("name", name);
+        context.sendBroadcast(intent);
+    }
+
+    //ros移动的广播
+    private void sendRosMove(Context context, String rosKey, String x, String y, String angle) {
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        intent.putExtra("dotX", x);
+        intent.putExtra("dotY", y);
+        intent.putExtra("angle", angle);
+        context.sendBroadcast(intent);
+    }
 }

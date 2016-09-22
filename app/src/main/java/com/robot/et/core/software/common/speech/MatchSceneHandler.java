@@ -11,6 +11,7 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
@@ -28,8 +29,6 @@ import com.robot.et.util.EnumManager;
 import com.robot.et.util.FaceManager;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.RobotLearnManager;
-import com.robot.et.util.SharedPreferencesKeys;
-import com.robot.et.util.SharedPreferencesUtils;
 
 /**
  * Created by houdeming on 2016/9/9.
@@ -223,47 +222,28 @@ public class MatchSceneHandler {
                 context.startActivity(intent);
 
                 break;
-            /*case VISION_LEARN_SCENE:// 视觉学习
-
-                flag = true;
-                String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
-                Log.i("ifly", "visionContent=====" + visionContent);
-                String speakContent = "";
-                if (TextUtils.isEmpty(visionContent)) {//问题：这是什么？
-                    //从底层视觉学习库中查找答案
-                    // do thing
-                    String learnAnswer = "";
-
-
-                    if (TextUtils.isEmpty(learnAnswer)) {
-                        speakContent = "不知道，您能告诉我吗？";
-                    } else {
-                        speakContent = "这是" + learnAnswer;
-                    }
-                } else {//告诉答案：例如：这是玩具车
-                    //告诉底层视觉学习的答案
-                    // do thing
-
-
-                    speakContent = "好的，我记住了";
-                }
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, speakContent);
-
-                break;
             case ENVIRONMENT_LEARN_SCENE:// 环境认识学习
                 //这里是xxx
                 String environmentContent = MatchStringUtil.getEnvironmentLearnAnswer(result);
                 Log.i("ifly", "environmentContent=====" + environmentContent);
                 if (!TextUtils.isEmpty(environmentContent)) {
                     flag = true;
-                    //通知视觉学习记住内容 获取物体坐标
-                    // do  thing
-                    addVisionRecogniseInfo(environmentContent, "", "");
-
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，我记住了");
+                    BroadcastEnclosure.sendRos(context, RosConfig.POSITION, environmentContent);
                 }
 
-                break;*/
+                break;
+            case VISION_LEARN_SCENE:// 视觉学习
+                if (DataConfig.isStartDistinguish) {
+                    flag = true;
+                    String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
+                    if (TextUtils.isEmpty(visionContent)) {// 这是什么？
+                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
+                    } else {// 这是手机
+                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
+                    }
+                }
+
+                break;
             case GO_WHERE_SCENE:// 去哪里的指令
                 String whereContent = MatchStringUtil.getGoWhereAnswer(result);
                 Log.i("ifly", "whereContent=====" + whereContent);
@@ -279,44 +259,34 @@ public class MatchSceneHandler {
                 }
 
                 break;
-            case VISION_LEARN_SIGN_SCENE:// 进入视觉学习的标志
+            case START_DISTINGUISH_SCENE:// 进入物体识别
                 flag = true;
-                String knowContent = "";
-                if (!DataConfig.isIntoKnowEnvironment) {
-                    DataConfig.isIntoKnowEnvironment = true;
-                    DataConfig.isStartRoam = true;
-                    DataConfig.isRecogniseComplected = true;
-                    knowContent = "我会的可多了，但是这是个新环境，我可以走一圈认识一下吗？";
-                } else {
-                    DataConfig.isIntoKnowEnvironment = false;
-                    DataConfig.isStartRoam = false;
-                    DataConfig.isRecogniseComplected = false;
-                    knowContent = "我会记住我见过的所有东西，你想考考我吗？";
-                }
-
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, knowContent);
+                DataConfig.isStartDistinguish = true;
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，已开启视觉服务");
+                // 开启视觉
+                BroadcastEnclosure.sendRos(context, RosConfig.START_DISTINGUISH, "");
 
                 break;
-            case START_RECOGNISE_ENVIRONMENT_SCENE:// 进入识别环境的标志
-                if (DataConfig.isStartRoam) {
-                    flag = true;
-                    DataConfig.isStartRoam = false;
-                    SpeechImpl.getInstance().startListen();
-                    Log.i("ifly", "通知本体开始漫游并识别物体");
-                    //通知本体开始漫游并识别物体
-                    //do thing
-                }
+            case CLOSE_DISTINGUISH_SCENE:// 退出物体识别
+                flag = true;
+                DataConfig.isStartDistinguish = false;
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，视觉服务已关闭");
+                // 关闭视觉
+                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE, "");
 
                 break;
-            case RECOGNISE_COMPLECTED_SCENE:// 识别环境完成
-                if (DataConfig.isRecogniseComplected) {
-                    DataConfig.isRecogniseComplected = false;
+            case FORGET_LEARN_SCENE:// 忘记学习内容
+                flag = true;
+                // 忘记学习内容
+                BroadcastEnclosure.sendRos(context, RosConfig.FORGET_LEARN_CONTENT, "");
+
+                break;
+            case NAVIGATION_SCENE:// 导航到
+                String area = MatchStringUtil.getNavigationArea(result);
+                if (!TextUtils.isEmpty(area)) {
                     flag = true;
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我认识好了，你可以叫我去厨房、客厅，我就会去那儿");
-                    //通知本体回到原位
-                    //do thing
-
-
+                    // 导航到
+                    BroadcastEnclosure.sendRos(context, RosConfig.NAVIGATION, area);
                 }
 
                 break;
@@ -347,29 +317,12 @@ public class MatchSceneHandler {
         Intent intent = new Intent();
         intent.setAction(BroadcastAction.ACTION_ROBOT_SLEEP);
         context.sendBroadcast(intent);
-        // 显示睡觉表情
-        ViewCommon.initView();
-        EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
         // 耳朵灯灭
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
         BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_BLINK);
-    }
-
-    //增加视觉环境学习到数据库
-    private void addVisionRecogniseInfo(String positionName, String positionX, String positionY) {
-        RobotDB mDb = RobotDB.getInstance();
-        VisionRecogniseEnvironmentInfo info = mDb.getVisionRecogniseEnvironmentInfo(positionName);
-        if (info != null) {//已经存在
-            mDb.updateVisionPositionXY(positionName, positionX, positionY);
-        } else {//不存在
-            VisionRecogniseEnvironmentInfo mInfo = new VisionRecogniseEnvironmentInfo();
-            String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
-            mInfo.setRobotNum(robotNum);
-            mInfo.setPositionName(positionName);
-            mInfo.setPositionX(positionX);
-            mInfo.setPositionY(positionY);
-            mDb.addVisionRecogniseEnvironment(mInfo);
-        }
+        // 显示睡觉表情
+        ViewCommon.initView();
+        EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
     }
 }

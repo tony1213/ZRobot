@@ -235,12 +235,10 @@
             android:value="loxNgsR7p0R3oGvcsV5INicup7n5X69v" />  <!--请自行申请key,填写到此处-->
         <!-- baidumap  end -->
 
-        =======
         <!-- <activity android:name=".app.MainActivity"></activity> -->
         <!-- <activity android:name=".app.MainAppActivity" /> -->
 
         <activity android:name=".core.software.ros.connect.second.MasterFactory" />
-        >>>>>>> remotes/origin/develop-for-ros-new-connection
     </application>
 
 </manifest>
