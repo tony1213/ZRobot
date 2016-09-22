@@ -87,13 +87,7 @@ public class CommandHandler {
                     int digit = getIntNum(result);
                     Log.i("ControlMove", "result===" + result);
                     Log.i("ControlMove", "digit===" + digit);
-                    if (digit != 0) {
-                        Log.e("ControlMove", "数字不为空");
-                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
-                    } else {
-                        Log.e("ControlMove", "数字为空");
-                        BroadcastEnclosure.controlRobotMove(context, moveKey);
-                    }
+                    BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
                 }
                 return true;
             }

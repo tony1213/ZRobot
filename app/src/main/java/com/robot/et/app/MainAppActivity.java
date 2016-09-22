@@ -514,7 +514,6 @@ public class MainAppActivity extends RosActivity {
                     //视觉深度学习(Rapp)
                     Log.e("ROS_Client", "Start Deep Learning");
                     doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "Deep Learning");
-                    SpeechImpl.getInstance().startListen();
                 } else if (TextUtils.equals("DeepLearnInit", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
@@ -523,7 +522,6 @@ public class MainAppActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
-                    SpeechImpl.getInstance().cancelListen();
                     visualClient = new VisualClient((short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {

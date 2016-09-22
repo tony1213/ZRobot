@@ -21,9 +21,7 @@ import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.system.media.MediaManager;
-import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LearnAnswerInfo;
-import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.FaceManager;
@@ -245,24 +243,23 @@ public class MatchSceneHandler {
 
                 break;
             case GO_WHERE_SCENE:// 去哪里的指令
-                String whereContent = MatchStringUtil.getGoWhereAnswer(result);
-                Log.i("ifly", "whereContent=====" + whereContent);
-                if (!TextUtils.isEmpty(whereContent)) {
-                    //通知机器人去哪里
-                    // do  thing
-                    flag = true;
-                    VisionRecogniseEnvironmentInfo info = RobotDB.getInstance().getVisionRecogniseEnvironmentInfo(whereContent);
-                    if (info != null) {
-
-                    }
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                }
+//                String whereContent = MatchStringUtil.getGoWhereAnswer(result);
+//                Log.i("ifly", "whereContent=====" + whereContent);
+//                if (!TextUtils.isEmpty(whereContent)) {
+//                    //通知机器人去哪里
+//                    // do  thing
+//                    flag = true;
+//                    VisionRecogniseEnvironmentInfo info = RobotDB.getInstance().getVisionRecogniseEnvironmentInfo(whereContent);
+//                    if (info != null) {
+//
+//                    }
+//                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+//                }
 
                 break;
             case START_DISTINGUISH_SCENE:// 进入物体识别
                 flag = true;
                 DataConfig.isStartDistinguish = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，已开启视觉服务");
                 // 开启视觉
                 BroadcastEnclosure.sendRos(context, RosConfig.START_DISTINGUISH, "");
 
@@ -270,7 +267,6 @@ public class MatchSceneHandler {
             case CLOSE_DISTINGUISH_SCENE:// 退出物体识别
                 flag = true;
                 DataConfig.isStartDistinguish = false;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，视觉服务已关闭");
                 // 关闭视觉
                 BroadcastEnclosure.sendRos(context, RosConfig.CLOSE, "");
 
