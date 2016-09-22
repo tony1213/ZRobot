@@ -285,16 +285,15 @@ public class MainAppActivity extends RosActivity {
             @Override
             public void onSuccess(GetInteractionsResponse response) {
                 List<Interaction> apps = response.getInteractions();
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化成功");
                 if (apps.size() > 0) {
                     availableAppsCache = (ArrayList<Interaction>) apps;
 
                     Log.e(TAG, "Interaction Publication: " + availableAppsCache.size() + " apps");
                     for (int i = 0; i < availableAppsCache.size(); i++) {
-                        Log.e(TAG, "DisplayName" + availableAppsCache.get(i).getDisplayName());
+                        Log.e(TAG, "DisplayName:" + availableAppsCache.get(i).getDisplayName());
                     }
-//                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化成功，正在加载地图");
-//                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "初始化成功");
+                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "Deep Learning");
                 } else {
                     // TODO: maybe I should notify the user... he will think something is wrong!
                     Log.e(TAG, "No interactions available for the '" + roconDescription.getCurrentRole() + "' role.");
@@ -499,7 +498,6 @@ public class MainAppActivity extends RosActivity {
                 Log.e(TAG, "下发ROS服务：Key" + flag + ",name:" + name);
                 if (TextUtils.equals("Roaming", flag)) {
                     //随便走走(Rapp)
-                    Log.e("ROS_Client", "Rapp:Start Deep Learning");
                     doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "Roaming");
                     SpeechImpl.getInstance().startListen();
                 } else if (TextUtils.equals("WORLDFOLLOWER", flag)) {
@@ -526,12 +524,13 @@ public class MainAppActivity extends RosActivity {
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearn");
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，正在学习中，请不同角度展示物体");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
                     SpeechImpl.getInstance().cancelListen();
                     visualClient = new VisualClient((short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
                     visualClient = new VisualClient((short) 3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
@@ -625,13 +624,13 @@ public class MainAppActivity extends RosActivity {
                 }
                 if (TextUtils.equals("1", direction) || TextUtils.equals("2", direction)) {
                     doMoveAction(direction);
-                    try {
-                        Thread.sleep(1500);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    doMoveAction("5");
+//                    try {
+//                        Thread.sleep(1500);
+//
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    doMoveAction("5");
                 } else if (TextUtils.equals("3", direction)) {
                     doTrunAction(mover.getCurrentDegree(), 270);
                 } else if (TextUtils.equals("4", direction)) {
