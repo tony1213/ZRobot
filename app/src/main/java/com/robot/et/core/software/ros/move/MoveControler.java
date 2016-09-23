@@ -177,6 +177,7 @@ public class MoveControler extends AbstractNodeMain implements MessageListener<n
         this.isBackWard=false;
         this.isTurnLeft=false;
         this.isTurnRight=false;
+        this.publishVelocity=false;
     }
 
     public double getCurrentDegree(){

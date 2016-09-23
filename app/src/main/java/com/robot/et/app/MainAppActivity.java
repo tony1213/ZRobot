@@ -131,7 +131,8 @@ public class MainAppActivity extends RosActivity {
     @Override
     public void startMasterChooser() {
         Log.e(TAG, "开始执行MasterChooserService");
-        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来了");
+//        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来了");
+
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
         super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
@@ -563,17 +564,21 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
 
                 String direction = String.valueOf(intent.getIntExtra("direction", 5));
-                Log.i("ROS_MOVE", "MainActivity语音控制时，得到的direction参数：" + direction);
-                if (null == direction || TextUtils.equals("", direction)) {
-                    return;
-                }
-                if (TextUtils.equals("1", direction) || TextUtils.equals("2", direction)) {
+                Log.i("ROS_MOVE", "ROS得到的direction参数：" + direction);
+                if (TextUtils.equals("1", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：前进");
+                    doMoveAction(direction);
+                }else if (TextUtils.equals("2", direction)){
+                    Log.e("ROS_MOVE","开始执行运动，方向：后退");
                     doMoveAction(direction);
                 } else if (TextUtils.equals("3", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：向左转");
                     doTrunAction(mover.getCurrentDegree(), 270);
                 } else if (TextUtils.equals("4", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：向右转");
                     doTrunAction(mover.getCurrentDegree(), 90);
                 } else if (TextUtils.equals("5", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：停止");
                     doMoveAction(direction);
                 }
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)) {
@@ -585,7 +590,7 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 //方案二（直接控制Twist）
                 double d = (double) intent.getIntExtra("degree", 0);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
+//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
                 doTrunAction(mover.getCurrentDegree(), d);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)) {
                 //方案一：（基于ROS地图服务）
