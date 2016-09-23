@@ -70,6 +70,8 @@ public class DataConfig {
     public static final int SPEAK_TYPE_SLEEP = 8;
     //没有提示音
     public static final int SPEAK_TYPE_NO_SOUND_TIPS = 9;
+    //电话挂断没有提示音
+    public static final int SPEAK_TYPE_PHONE_NO_TIPS = 10;
 
 
     //歌曲信息连接符

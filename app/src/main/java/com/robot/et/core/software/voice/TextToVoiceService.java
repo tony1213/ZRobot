@@ -10,6 +10,7 @@ import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.core.software.common.script.ScriptHandler;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.speech.voice.ifly.ISpeak;
 import com.robot.et.core.software.common.speech.voice.ifly.Speak;
@@ -76,6 +77,14 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                 SpeechImpl.getInstance().startListen();
             }
         } else {
+            // 电话查看时或者安保场景挂断没有提示音
+            if (currentType == DataConfig.SPEAK_TYPE_PHONE_NO_TIPS) {
+                Log.i("ifly", "查看时电话挂断");
+                // 沉睡
+                MatchSceneHandler.sleep(TextToVoiceService.this);
+                return;
+            }
+
             SpeechImpl.getInstance().startListen();
         }
     }
@@ -198,8 +207,8 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
 
                 break;
             case RequestConfig.JPUSH_CALL_CLOSE://视频或语音时电话挂断
-                showNormalEmotion(true);
-                // do nothing
+                // 电话结束后让机器人沉睡
+                MatchSceneHandler.sleep(this);
                 break;
             case RequestConfig.JPUSH_CALL_VIDEO://视频通话
                 showNormalEmotion(true);

@@ -59,7 +59,7 @@ public class MatchStringUtil {
     //忘记学习内容
     public static String forgetLearnRegex = "^" + baseRegex + "*(忘|删)+" + baseRegex + "*(学习)+" + baseRegex + "*$";
     //导航到
-    public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*到+" + baseRegex + "+$";
+    public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*(到|去)+" + baseRegex + "+$";
 
     // 看看照片的标志
     public static String lookPhotoRegex = "^" + baseRegex + "*看+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
@@ -210,6 +210,9 @@ public class MatchStringUtil {
         if (!TextUtils.isEmpty(str)) {
             if (str.contains("到")) {
                 int start = str.indexOf("到");
+                content = str.substring(start + 1, str.length());
+            } else if (str.contains("去")) {
+                int start = str.indexOf("去");
                 content = str.substring(start + 1, str.length());
             }
         }

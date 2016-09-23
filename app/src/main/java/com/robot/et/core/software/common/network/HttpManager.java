@@ -273,4 +273,32 @@ public class HttpManager {
 
         });
     }
+
+    //本体给所有绑定的用户发送消息
+    public static void pushMsgToBindApp(String sendContent, String remindCode) {
+        HttpEngine.Param[] params = new HttpEngine.Param[]{
+                new HttpEngine.Param("robotNumber", share.getString(SharedPreferencesKeys.ROBOT_NUM, "")),
+                new HttpEngine.Param("msgType", remindCode),
+                new HttpEngine.Param("msgContent", sendContent)
+        };
+        HttpEngine httpEngine = HttpEngine.getInstance();
+        Request request = httpEngine.createRequest(UrlConfig.PUSH_MSG_TO_APP_PATH, params);
+        Call call = httpEngine.createRequestCall(request);
+        call.enqueue(new Callback() {
+
+            @Override
+            public void onFailure(Request arg0, IOException arg1) {
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String result = response.body().string();
+                Log.i(TAG, "result====" + result);
+                if (NetResultParse.isSuccess(result)) {
+                    Log.i(TAG, "向APP推送消息成功");
+                }
+            }
+
+        });
+    }
 }

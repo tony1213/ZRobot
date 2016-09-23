@@ -195,7 +195,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         if (isLook || isNetWorkNotGood) { // 查看
             Log.i("agoravideo", "查看");
             if (isLook) {
-                hangUpPhone();
+                speakContent(DataConfig.SPEAK_TYPE_PHONE_NO_TIPS, "");
             } else {
                 isNetWorkNotGood = false;
                 speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，网络不给力，已断开");
@@ -575,16 +575,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     // 说内容
     private void speakContent(int speakType, String content) {
         if (DataConfig.isSecurityCall) {// 安保模式打来的电话
-            hangUpPhone();
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_PHONE_NO_TIPS, "");
         } else {// 非安保模式
             SpeechImpl.getInstance().startSpeak(speakType, content);
         }
-    }
-
-    // 挂断电话不带声音提示
-    private void hangUpPhone() {
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_PHONE_HANGUP);
-        sendBroadcast(intent);
     }
 }

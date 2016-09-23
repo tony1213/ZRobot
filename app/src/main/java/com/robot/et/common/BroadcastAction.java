@@ -65,8 +65,6 @@ public class BroadcastAction {
     public static String ACTION_JOIN_AGORA_ROOM = "action.join.agora.room";
     //极光推送关闭声网agora
     public static String ACTION_CLOSE_AGORA = "action.close.agora";
-    //监听电话挂断的广播
-    public static String ACTION_PHONE_HANGUP = "com.robot.et.phone.hangup";
     //雷达的广播
     public static String ACTION_ROBOT_RADAR = "com.robot.et.radar";
     //转头的广播

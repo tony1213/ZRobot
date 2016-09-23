@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,7 +23,6 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
-import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -79,7 +79,6 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
         filter.addAction(BroadcastAction.ACTION_STOP_MUSIC);
         filter.addAction(BroadcastAction.ACTION_FACE_DISTINGUISH);
-        filter.addAction(BroadcastAction.ACTION_PHONE_HANGUP);
         filter.addAction(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH);
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION);
         filter.addAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
@@ -205,10 +204,6 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 intent.putParcelableArrayListExtra("faceInfo", RobotDB.getInstance().getFaceInfos());
                 startActivity(intent);
 
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_PHONE_HANGUP)) {//查看时电话挂断
-                Log.i(TAG, "MsgReceiverService  查看时电话挂断");
-                // 沉睡
-                MatchSceneHandler.sleep(MsgReceiverService.this);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION)) {//机器人表情
                 Log.i(TAG, "MsgReceiverService  机器人表情");
                 int emotionKey = intent.getIntExtra("emotion", 0);
@@ -227,6 +222,11 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     String robotNum = SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "");
                     // 把byte数组转化为Bitmap
                     Bitmap bitmap = BitmapUtil.byte2Bitmap(photoData);
+                    // 显示拍照后的图片
+                    ViewCommon.initView();
+                    OneImgManager.showPhoto(bitmap);
+                    // 1s之后显示二维码
+                    SystemClock.sleep(1000);
                     // 上传图片到服务器
                     upLoadFile(bitmap, robotNum);
                 }

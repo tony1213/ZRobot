@@ -3,6 +3,7 @@ package com.robot.et.core.software.common.network;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.core.software.common.push.IWiFiInfo;
 import com.robot.et.entity.JpushInfo;
 import com.robot.et.entity.PictureInfo;
 import com.robot.et.entity.RemindInfo;
@@ -258,4 +259,20 @@ public class NetResultParse {
         return info;
     }
 
+    // 获取推送comandContent里的json信息
+    public static void getCommandStr(String result, IWiFiInfo iWiFiInfo) {
+        String WiFiName = "";
+        String userName = "";
+        if (!TextUtils.isEmpty(result)) {
+            try {
+                JSONTokener tokener = new JSONTokener(result);
+                JSONObject object = new JSONObject(tokener);
+                WiFiName = object.getString("WiFiName");
+                userName = object.getString("userName");
+            } catch (JSONException e) {
+                Log.i("netty", "getCommandStr JSONException");
+            }
+        }
+        iWiFiInfo.getWiFi(WiFiName, userName);
+    }
 }

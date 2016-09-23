@@ -27,5 +27,7 @@ public class UrlConfig {
     public final static String GET_PIC_PATH = URL_PATH + "robotPicture/displayRobotPicture";
     //获取其他页的照片
     public final static String LOAD_PIC_PATH = URL_PATH + "robotPicture/downloadImage";
+    //本体给所有绑定的用户发送消息
+    public final static String PUSH_MSG_TO_APP_PATH = URL_PATH + "pushToApp/pushToAllBindUsersApp";
 
 }

@@ -73,8 +73,12 @@ public class RequestConfig {
     public final static int JPUSH_GRAPHIC_EDITOR = 40029;
     //嬉闹
     public final static int JPUSH_FROLIC = 40005;
-    //蓝牙控制器
-    public final static int JPUSH_BLUETOOTH_CONTROLLER = 40031;
+    //机器人坐标信息告知app
+    public final static int JPUSH_ROBOT_HOME_COORDINATE = 40033;
+    //app推送来的WiFi信息
+    public final static int JPUSH_WIFI_INFO = 40034;
+    //远程监护去哪里指令，控制机器人运动
+    public final static int JPUSH_APP_CONTROL_ROBOT_WHERE = 40035;
 
 
     //机器人本体给APP推送code信息标示
@@ -82,5 +86,6 @@ public class RequestConfig {
     public final static String TO_APP_REMIND = "REPLY_REMIND";
     //返回给APP蓝牙控制家电的情况
     public final static String TO_APP_BLUETOOTH_CONTROLLER = "BLUETOOTH_CONTROLLER";
-
+    //本体给所有绑定的用户发送坐标消息
+    public final static String ROBOT_HOME_COORDINATE = "40033";
 }
