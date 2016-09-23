@@ -56,6 +56,8 @@ public class MatchStringUtil {
     public static String startDistinguishRegex = "^" + baseRegex + "*(开|启)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
     // 退出物体识别
     public static String closeDistinguishRegex = "^" + baseRegex + "*(关|退)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
+    // 初始化视觉
+    public static String initVisionRegex = "^" + baseRegex + "*(初始)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
     //忘记学习内容
     public static String forgetLearnRegex = "^" + baseRegex + "*(忘|删)+" + baseRegex + "*(学习)+" + baseRegex + "*$";
     //导航到

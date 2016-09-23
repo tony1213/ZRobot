@@ -8,6 +8,8 @@ public class RosConfig {
     public static final String START_DISTINGUISH = "Rai Learning";
     // 关闭视觉学习
     public static final String CLOSE_DISTINGUISH = "DeepLearnClose";
+    // 初始化视觉
+    public static final String INIT_VISION = "DeepLearnInit";
     // 退出
     public static final String CLOSE = "Stop";
     // 学习物体（这是什么）

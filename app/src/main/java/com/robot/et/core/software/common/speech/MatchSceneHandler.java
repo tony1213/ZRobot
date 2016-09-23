@@ -271,6 +271,12 @@ public class MatchSceneHandler {
                 BroadcastEnclosure.sendRos(context, RosConfig.CLOSE, "");
 
                 break;
+            case INIT_VISION_SCENE:// 初始化视觉
+                flag = true;
+                // 初始化视觉
+                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+
+                break;
             case FORGET_LEARN_SCENE:// 忘记学习内容
                 flag = true;
                 // 忘记学习内容

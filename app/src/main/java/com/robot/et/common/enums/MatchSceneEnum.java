@@ -137,6 +137,12 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.closeDistinguishRegex);
         }
     },
+    INIT_VISION_SCENE {// 初始化视觉
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.initVisionRegex);
+        }
+    },
     FORGET_LEARN_SCENE {// 忘记学习内容
 
         public boolean isScene(String str) {
