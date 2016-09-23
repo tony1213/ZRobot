@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.Parameters;
-import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +21,7 @@ import android.view.WindowManager;
 import com.iflytek.cloud.util.Accelerometer;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.system.media.Sound;
 import com.robot.et.util.BitmapUtil;
 import com.robot.et.util.BroadcastEnclosure;
@@ -48,6 +47,7 @@ public class TakePhotoActivity extends Activity {
     private boolean mStopTrack;
     private final String TAG = "camera";
     private boolean isFirst;// 是否是第一次拍
+    private int takeCount;// 拍照持续的时间
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,26 +111,28 @@ public class TakePhotoActivity extends Activity {
             } else {
                 Log.i(TAG, "后置摄像头已开启，点击可切换");
             }
+            // 设置相机Parameters参数
+            Camera.Parameters params = mCamera.getParameters();
+            params.setPreviewFormat(ImageFormat.NV21);
+            params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            mCamera.setParameters(params);
+            // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
+//        mCamera.setDisplayOrientation(90);
+            mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    System.arraycopy(data, 0, nv21, 0, data.length);
+                }
+            });
+
         } catch (Exception e) {
             Log.i(TAG, "Camera Exception==" + e.getMessage());
             // 关闭相机
             closeCamera();
+            finish();
             return;
         }
-        // 设置相机Parameters参数
-        Parameters params = mCamera.getParameters();
-        params.setPreviewFormat(ImageFormat.NV21);
-        params.setPreviewSize(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-        mCamera.setParameters(params);
-        // 设置显示的偏转角度，大部分机器是顺时针90度，某些机器需要按情况设置
-//        mCamera.setDisplayOrientation(90);
-        mCamera.setPreviewCallback(new PreviewCallback() {
-
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                System.arraycopy(data, 0, nv21, 0, data.length);
-            }
-        });
 
         try {
             mCamera.setPreviewDisplay(mPreviewSurface.getHolder());
@@ -200,12 +202,20 @@ public class TakePhotoActivity extends Activity {
                     byte[] tmp = new byte[nv21.length];
                     System.arraycopy(nv21, 0, tmp, 0, nv21.length);
 
-                    mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+                    mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT, 100));
                     Log.i(TAG, "synchronized() mImageData.length==" + mImageData.length);
                     // 此时图片是绿色继续拍，小于10k的全部作为绿色处理
                     if (mImageData.length < 1024 * 10) {
                         Log.i(TAG, "此时图片是绿色");
-                        continue;
+                        // 连续5次都是绿色代表相机有异常了
+                        if (takeCount < 5) {
+                            takeCount++;
+                            continue;
+                        } else {
+                            mStopTrack = true;
+                            handler.sendEmptyMessage(0);
+                            return;
+                        }
                     }
 
                     mStopTrack = true;
@@ -224,13 +234,15 @@ public class TakePhotoActivity extends Activity {
             super.handleMessage(msg);
             if (msg.what == 1) {
                 // 播放拍照提示音
-                BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA);
+                BroadcastEnclosure.playSoundTips(TakePhotoActivity.this, Sound.SOUND_CAMERA, DataConfig.PLAY);
                 finish();
                 // 发送图片数据
                 Intent intent = new Intent();
                 intent.setAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
                 intent.putExtra("photoData", mImageData);
                 sendBroadcast(intent);
+            } else {
+                finish();
             }
         }
     };

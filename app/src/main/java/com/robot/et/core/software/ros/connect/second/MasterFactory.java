@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.github.rosjava.android_remocons.common_tools.master.MasterId;
 import com.github.rosjava.android_remocons.common_tools.master.RoconDescription;
+import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.common.speech.SpeechImpl;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -56,12 +58,16 @@ public class MasterFactory extends Activity {
             }else {
                 for (int i = 0;i<masters.size();i++){
                     RoconDescription concert=masters.get(i);
-                    if (concert == null || concert.getConnectionStatus() == null || concert.getConnectionStatus().equals(RoconDescription.ERROR)) {
-                        Log.e("Remocon","Failed: Cannot contact concert");
-                    } else if ( concert.getConnectionStatus().equals(RoconDescription.UNAVAILABLE) ) {
-                        Log.e("Remocon","Master Unavailable!   Currently busy serving another.");
-                    } else {
-                        choose(0);
+                    if (concert.getMasterUri().equals(masterUri)){
+                        if (concert == null || concert.getConnectionStatus() == null || concert.getConnectionStatus().equals(RoconDescription.ERROR)) {
+                            Log.e("Remocon","Failed: Cannot contact concert");
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码1");
+                        } else if ( concert.getConnectionStatus().equals(RoconDescription.UNAVAILABLE) ) {
+                            Log.e("Remocon","Master Unavailable!   Currently busy serving another.");
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码2");
+                        } else {
+                            choose(0);
+                        }
                     }
                 }
             }
@@ -103,7 +109,7 @@ public class MasterFactory extends Activity {
     private void addMaster(MasterId masterId, boolean connectToDuplicates) {
         Log.i("MasterChooserActivity", "adding master to the concert master chooser [" + masterId.toString() + "]");
         if (masterId == null || masterId.getMasterUri() == null) {
-
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码3");
         } else {
             for (int i = 0; i < masters.toArray().length; i++) {
                 RoconDescription concert = masters.get(i);
@@ -112,8 +118,7 @@ public class MasterFactory extends Activity {
                         choose(0);
                         return;
                     } else {
-                        Toast.makeText(this, "That concert is already listed.",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "That concert is already listed.", Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
@@ -122,19 +127,6 @@ public class MasterFactory extends Activity {
             masters.add(RoconDescription.createUnknown(masterId));
             Log.i("MasterChooserActivity", "description created");
             onMastersChanged();
-        }
-    }
-
-    private void choose(int position){
-        RoconDescription concert = masters.get(position);
-        if (concert.getMasterUri().equals("http://192.168.2.157:11311/")){
-            Log.e("Remocon","Master in database");
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra(RoconDescription.UNIQUE_KEY, concert);
-            setResult(RESULT_OK, resultIntent);
-            finish();
-        }else {
-            Log.e("Remocon","Master not in database");
         }
     }
 
@@ -147,12 +139,22 @@ public class MasterFactory extends Activity {
             }
         }
         //bug：当时没有获取到NameSpace，所以在这里面等待了5秒
-        try {
-            Thread.sleep(5000);
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }finally {
-            choose(0);
-        }
+//        try {
+//            Thread.sleep(5000);
+//        }catch (InterruptedException e){
+//            e.printStackTrace();
+//        }finally {
+//            choose(0);
+//        }
+        choose(0);
+    }
+
+    private void choose(int position){
+        RoconDescription concert = masters.get(position);
+        Log.e("Remocon","Master in database");
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(RoconDescription.UNIQUE_KEY, concert);
+        setResult(RESULT_OK, resultIntent);
+        finish();
     }
 }

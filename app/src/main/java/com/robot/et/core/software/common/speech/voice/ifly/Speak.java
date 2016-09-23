@@ -85,7 +85,7 @@ public class Speak extends Voice {
         // 开始播放
         @Override
         public void onSpeakBegin() {
-            Log.i(TAG, "IflySpeakService  onSpeakBegin()");
+            Log.i(TAG, "  onSpeakBegin()");
             iSpeak.onSpeakBegin();
         }
 
@@ -117,7 +117,7 @@ public class Speak extends Voice {
         // 合成完成
         @Override
         public void onCompleted(SpeechError error) {
-            Log.i(TAG, "IflySpeakService  onCompleted()");
+            Log.i(TAG, "  onCompleted()");
             iSpeak.onCompleted(error);
         }
 

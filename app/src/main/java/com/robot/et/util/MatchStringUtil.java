@@ -18,6 +18,7 @@ public class MatchStringUtil {
     public static String voiceLitterRegex = "^" + baseRegex + "*((((声音)|(音量))+" + baseRegex + "*(小|低)+)|((再小)|(再低)|(再减)|(再降))+)" + baseRegex + "*$";
     // 声音最小
     public static String voiceLittestRegex = "^" + baseRegex + "*((声音)|(音量))+" + baseRegex + "*((最小)|(最低))+" + baseRegex + "*$";
+
     //学习的问题与答案
     public static String questionAndAnswerRegex = "^" + baseRegex + "*我+" + baseRegex + "*((问)|(说))+" + baseRegex + "*你+" + baseRegex + "+((说)|(回答))+" + baseRegex + "+$";
     //免打扰开
@@ -25,7 +26,7 @@ public class MatchStringUtil {
     //免打扰关
     public static String disturbCloseRegex = "^" + baseRegex + "*(((免打扰)+" + baseRegex + "*关+)|(关+" + baseRegex + "*(免打扰)+))" + baseRegex + "*$";
     //闭嘴
-    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息)|(睡觉)+))" + baseRegex + "*$";
+    public static String shutUpRegex = "^" + baseRegex + "*((嘴+" + baseRegex + "*闭+)|(闭+" + baseRegex + "*嘴+)|((休息)|(睡觉)|(静音)|(别说话)+))" + baseRegex + "*$";
     //做动作
     public static String doActionRegex = "^" + baseRegex + "*我+" + baseRegex + "*((问)|(说))+" + baseRegex + "*你+" + baseRegex + "+(萌|(卖个萌))+" + baseRegex + "*$";
     //控制机器人周围的玩具车走
@@ -44,24 +45,29 @@ public class MatchStringUtil {
     public static String faceNameRegex = "^" + baseRegex + "*我+" + baseRegex + "*(叫|是)+" + baseRegex + "+$";
     // 拍照
     public static String photographRegex = "^" + baseRegex + "*((拍+" + baseRegex + "*照+)|(照+" + baseRegex + "*相+))" + baseRegex + "*$";
-    // 视觉学习
-    public static String visionLearnRegex = "^" + baseRegex + "*(这是)+" + baseRegex + "+$";
+
     // 认识环境学习
-    public static String environmentLearnRegex = "^" + baseRegex + "*(这里是)+" + baseRegex + "+$";
+    public static String environmentLearnRegex = "^" + baseRegex + "*这+" + baseRegex + "*(里|(地方))+" + baseRegex + "*是+" + baseRegex + "+$";
+    // 认识物体
+    public static String visionLearnRegex = "^" + baseRegex + "*这+" + baseRegex + "*是+" + baseRegex + "+$";
     // 去哪里
     public static String goWhereRegex = "^" + baseRegex + "*去+" + baseRegex + "+$";
-    // 进入视觉学习的标志
-    public static String visionLearnSignRegex = "^" + baseRegex + "*你+" + baseRegex + "*(做什么)+" + baseRegex + "*$";
-    //开始识别环境
-    public static String startRecogniseEnvRegex = "^" + baseRegex + "*((可以)|(好的))+" + baseRegex + "*$";
-    //识别环境完成
-    public static String recogniseComplectedEnvRegex = "^" + baseRegex + "*((识别)|(认识)|(学习))+" + baseRegex + "*(完了)+" + baseRegex + "*$";
+    // 进入物体识别
+    public static String startDistinguishRegex = "^" + baseRegex + "*(开|启)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
+    // 退出物体识别
+    public static String closeDistinguishRegex = "^" + baseRegex + "*(关|退)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
+    //忘记学习内容
+    public static String forgetLearnRegex = "^" + baseRegex + "*(忘|删)+" + baseRegex + "*(学习)+" + baseRegex + "*$";
+    //导航到
+    public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*到+" + baseRegex + "+$";
+
     // 看看照片的标志
     public static String lookPhotoRegex = "^" + baseRegex + "*看+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
     // 上一张照片
-    public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个))+" + baseRegex + "*$";
+    public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个)|(上一章))+" + baseRegex + "*$";
     // 下一张照片
-    public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个))+" + baseRegex + "*$";
+    public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个)|(下一章))+" + baseRegex + "*$";
+
     // 进入安保场景的标志
     public static String openSecuritySignRegex = "^" + baseRegex + "*((进入)|(打开)|(开启))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
     // 解除安保场景的标志
@@ -174,10 +180,10 @@ public class MatchStringUtil {
     public static String getVisionLearnAnswer(String str) {
         String content = "";
         if (!TextUtils.isEmpty(str)) {
-            if (str.contains("什么")) {
+            if (str.contains("什么") || str.contains("啥")) {
                 content = "";
             } else {
-                if (str.contains("这是")) {
+                if (str.contains("是")) {
                     int start = str.indexOf("是");
                     content = str.substring(start + 1, str.length());
                 }
@@ -190,8 +196,20 @@ public class MatchStringUtil {
     public static String getEnvironmentLearnAnswer(String str) {
         String content = "";
         if (!TextUtils.isEmpty(str)) {
-            if (str.contains("这里是")) {
+            if (str.contains("是")) {
                 int start = str.indexOf("是");
+                content = str.substring(start + 1, str.length());
+            }
+        }
+        return content;
+    }
+
+    //导航到
+    public static String getNavigationArea(String str) {
+        String content = "";
+        if (!TextUtils.isEmpty(str)) {
+            if (str.contains("到")) {
+                int start = str.indexOf("到");
                 content = str.substring(start + 1, str.length());
             }
         }

@@ -48,6 +48,8 @@ public class DataConfig {
     //Port
     public static final int PORT = 9999;
 
+    //喜马拉雅AppSecret
+    public static final String XIMALAYA_APPSECRET = "7fd5f74a6f3a86fe4a2266b653aa6522";
 
     //说话类型
     //对话
@@ -128,12 +130,11 @@ public class DataConfig {
     //是否控制机器人移动
     public static boolean isControlRobotMove = false;
 
-    //是否进入认识环境场景
-    public static boolean isIntoKnowEnvironment = false;
     //是否开启漫游
     public static boolean isStartRoam = false;
-    //是否完成识别
-    public static boolean isRecogniseComplected = false;
+
+    //是否开始识别物体
+    public static boolean isStartDistinguish = false;
 
     //是否是语音打开人脸识别
     public static boolean isVoiceFaceRecognise = false;
@@ -172,5 +173,15 @@ public class DataConfig {
 
     // 是否是显示下载图片的二维码
     public static boolean isShowLoadPicQRCode = false;
+    // 是否是显示聊天二维码
+    public static boolean isShowChatQRCode = false;
+
+    //播放 0：播放  1：停止
+    public static final int PLAY = 0;
+    public static final int STOP = 1;
+
+    //播放类型 0：播放音乐  1：播放电台
+    public static final int PLAY_MUSIC = 0;
+    public static final int PLAY_RADIO = 1;
 
 }

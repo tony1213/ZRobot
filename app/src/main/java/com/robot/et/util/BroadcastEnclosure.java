@@ -46,9 +46,10 @@ public class BroadcastEnclosure {
     }
 
     //开始播放音乐
-    public static void startPlayMusic(Context context, String musicUrl) {
+    public static void startPlayMusic(Context context, String musicUrl, int playType) {
         intent.setAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
         intent.putExtra("musicUrl", musicUrl);
+        intent.putExtra("playType", playType);
         context.sendBroadcast(intent);
     }
 
@@ -127,13 +128,6 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
-    //语音控制走小车的广播
-    public static void controlRobotMove(Context context, int direction) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
-        intent.putExtra("direction", direction);
-        context.sendBroadcast(intent);
-    }
-
     //发送雷达的广播
     public static void sendRadar(Context context) {
         intent.setAction(BroadcastAction.ACTION_ROBOT_RADAR);
@@ -142,7 +136,7 @@ public class BroadcastEnclosure {
 
     //语音控制走小车的广播
     public static void controlRobotMoveRos(Context context, int direction, String digit) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS);
+        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         intent.putExtra("direction", direction);
         intent.putExtra("digit", digit);
         context.sendBroadcast(intent);
@@ -157,7 +151,8 @@ public class BroadcastEnclosure {
     }
 
     //播放声音提示的广播
-    public static void playSoundTips(Context context, int soundId) {
+    public static void playSoundTips(Context context, int soundId, int playType) {
+        intent.putExtra("playType", playType);
         intent.putExtra("soundId", soundId);
         intent.setAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
         context.sendBroadcast(intent);
@@ -173,6 +168,24 @@ public class BroadcastEnclosure {
     //人体感应的广播
     public static void bodyDetection(Context context) {
         intent.setAction(BroadcastAction.ACTION_BODY_DETECTION);
+        context.sendBroadcast(intent);
+    }
+
+    //ros的广播
+    public static void sendRos(Context context, String rosKey, String name) {
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        intent.putExtra("name", name);
+        context.sendBroadcast(intent);
+    }
+
+    //ros移动的广播
+    private void sendRosMove(Context context, String rosKey, String x, String y, String angle) {
+        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+        intent.putExtra("rosKey", rosKey);
+        intent.putExtra("dotX", x);
+        intent.putExtra("dotY", y);
+        intent.putExtra("angle", angle);
         context.sendBroadcast(intent);
     }
 }

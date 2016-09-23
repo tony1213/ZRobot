@@ -139,7 +139,6 @@ public class VisualClient extends AbstractNodeMain {
             @Override
             public void onFailure(RemoteException e) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
-                SpeechImpl.getInstance().startListen();
                 Log.e("ROS_Client", "onFailure");
 //                throw new RosRuntimeException(e);
             }

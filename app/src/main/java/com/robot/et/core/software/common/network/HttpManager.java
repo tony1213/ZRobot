@@ -18,6 +18,8 @@ import com.squareup.okhttp.Response;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by houdeming on 2016/8/2.
@@ -229,6 +231,7 @@ public class HttpManager {
 
                 @Override
                 public void onFailure(Request arg0, IOException arg1) {
+                    callBack.getPicInfo(null);
                 }
 
                 @Override
@@ -249,12 +252,7 @@ public class HttpManager {
     }
 
     //获取要显示的图片
-    public static void getPic(String updateType, String createTime, final Gallery.PicInfoCallBack callBack) {
-        HttpEngine.Param[] params = new HttpEngine.Param[]{
-                new HttpEngine.Param("robotNumber", share.getString(SharedPreferencesKeys.ROBOT_NUM, "")),
-                new HttpEngine.Param("updateType", updateType),
-                new HttpEngine.Param("createTime", createTime)
-        };
+    public static void getPic(HttpEngine.Param[] params, final Gallery.PicInfoCallBack callBack) {
         HttpEngine httpEngine = HttpEngine.getInstance();
         Request request = httpEngine.createRequest(UrlConfig.GET_PIC_PATH, params);
         Call call = httpEngine.createRequestCall(request);
@@ -262,6 +260,8 @@ public class HttpManager {
 
             @Override
             public void onFailure(Request arg0, IOException arg1) {
+                List<PictureInfo> infos = new ArrayList<PictureInfo>();
+                callBack.getPicInfos(infos);
             }
 
             @Override

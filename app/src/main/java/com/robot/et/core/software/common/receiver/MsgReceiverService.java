@@ -19,13 +19,17 @@ import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
+import com.robot.et.core.software.common.ximalaya.IPlayer;
+import com.robot.et.core.software.common.ximalaya.IXiMaLaYa;
+import com.robot.et.core.software.common.ximalaya.XiMaLaYa;
 import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
 import com.robot.et.core.software.system.media.IMusic;
 import com.robot.et.core.software.system.media.Music;
@@ -49,10 +53,11 @@ import java.util.TimerTask;
  * Created by houdeming on 2016/7/27.
  * 接受消息的service
  */
-public class MsgReceiverService extends Service implements IMusic {
+public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
     private final String TAG = "Receiver";
     private Sound sound;
     private Music music;
+    private XiMaLaYa xiMaLaYa;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -65,8 +70,10 @@ public class MsgReceiverService extends Service implements IMusic {
         Log.i("accept", "MsgReceiverService  onCreate()");
         // 初始化声音池
         sound = new Sound(this);
-        // 初始化音乐媒体
+        // 初始化音乐媒体（app推送的歌曲暂时用系统播放器）
         music = new Music(this);
+        // 初始化喜马拉雅
+        xiMaLaYa = new XiMaLaYa(this, DataConfig.XIMALAYA_APPSECRET, this);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_PLAY_MUSIC_START);
@@ -78,7 +85,6 @@ public class MsgReceiverService extends Service implements IMusic {
         filter.addAction(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED);
         filter.addAction(BroadcastAction.ACTION_CONTROL_HEAD_BY_APP);
         filter.addAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
-        filter.addAction(BroadcastAction.ACTION_STOP_SOUND_TIPS);
         registerReceiver(receiver, filter);
 
     }
@@ -86,16 +92,65 @@ public class MsgReceiverService extends Service implements IMusic {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
+            if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_SOUND_TIPS)) {//播放声音提示
+                int playType = intent.getIntExtra("playType", 0);
+                if (playType == DataConfig.PLAY) {// 播放
+                    int soundId = intent.getIntExtra("soundId", 0);
+                    Log.i(TAG, "MsgReceiverService  播放声音提示soundId==" + soundId);
+                    // 播放声音提示
+                    if (soundId != 0) {
+                        sound.play(soundId);
+                    }
+                } else {// 停止播放
+                    Log.i(TAG, "MsgReceiverService  停止播放声音提示");
+                    // 停止播放声音提示
+                    sound.stopSound();
+                }
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_MUSIC_START)) {//音乐开始播放
                 Log.i(TAG, "MsgReceiverService  开启音乐");
                 // 获取播放的音乐路径
-                String musicUrl = intent.getStringExtra("musicUrl");
-                if (!TextUtils.isEmpty(musicUrl)) {
+                String musicName = intent.getStringExtra("musicUrl");
+                Log.i(TAG, "MsgReceiverService  musicUrl==" + musicName);
+                if (!TextUtils.isEmpty(musicName)) {
                     // 播放音乐
-                    boolean isSuccess = music.play(musicUrl);
-                    // 播放音乐失败
-                    if (!isSuccess) {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
+                    if (DataConfig.isJpushPlayMusic) {// app推送
+                        boolean isSuccess = music.play(musicName);
+                        // 播放音乐失败
+                        if (!isSuccess) {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
+                        }
+                    } else {// 第三方
+                        // 播放类型
+                        int playType = intent.getIntExtra("playType", 0);
+                        Log.i(TAG, "MsgReceiverService  playType==" + playType);
+
+                        if (playType == DataConfig.PLAY_MUSIC) {// 播放音乐
+                            xiMaLaYa.playMusic(musicName, new IPlayer() {
+                                @Override
+                                public void playSuccess() {
+                                    Log.i(TAG, "MsgReceiverService  播放成功");
+                                }
+
+                                @Override
+                                public void playFail() {
+                                    Log.i(TAG, "MsgReceiverService  播放失败");
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+                                }
+                            });
+                        } else {// 播放电台
+                            xiMaLaYa.playRadio(musicName, new IPlayer() {
+                                @Override
+                                public void playSuccess() {
+                                    Log.i(TAG, "MsgReceiverService  播放成功");
+                                }
+
+                                @Override
+                                public void playFail() {
+                                    Log.i(TAG, "MsgReceiverService  播放失败");
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+                                }
+                            });
+                        }
                     }
                     return;
                 }
@@ -105,7 +160,13 @@ public class MsgReceiverService extends Service implements IMusic {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_MUSIC)) {//停止音乐播放
                 Log.i(TAG, "MsgReceiverService  停止音乐播放");
                 // 停止播放音乐
-                music.stopPlay();
+                if (DataConfig.isJpushPlayMusic) {// app推送
+                    music.stopPlay();
+                } else {// 第三方
+                    if (xiMaLaYa != null) {
+                        xiMaLaYa.stopPlay();
+                    }
+                }
                 // 耳朵灯光灭
                 BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
 
@@ -146,9 +207,8 @@ public class MsgReceiverService extends Service implements IMusic {
 
             } else if (intent.getAction().equals(BroadcastAction.ACTION_PHONE_HANGUP)) {//查看时电话挂断
                 Log.i(TAG, "MsgReceiverService  查看时电话挂断");
-                // 显示睡觉表情
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                // 沉睡
+                MatchSceneHandler.sleep(MsgReceiverService.this);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_EMOTION)) {//机器人表情
                 Log.i(TAG, "MsgReceiverService  机器人表情");
                 int emotionKey = intent.getIntExtra("emotion", 0);
@@ -183,17 +243,6 @@ public class MsgReceiverService extends Service implements IMusic {
                         handler.sendEmptyMessage(1);
                     }
                 }, 0, 1000);
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_PLAY_SOUND_TIPS)) {//播放声音提示
-                int soundId = intent.getIntExtra("soundId", 0);
-                Log.i(TAG, "MsgReceiverService  播放声音提示soundId==" + soundId);
-                // 播放声音提示
-                if (soundId != 0) {
-                    sound.play(soundId);
-                }
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_SOUND_TIPS)) {//停止播放声音提示
-                Log.i(TAG, "MsgReceiverService  停止播放声音提示");
-                // 停止播放声音提示
-                sound.stopSound();
             }
         }
     };
@@ -279,14 +328,19 @@ public class MsgReceiverService extends Service implements IMusic {
         super.onDestroy();
         unregisterReceiver(receiver);
         sound.destroy();
-        music.destroy();
+        if (music != null) {
+            music.destroy();
+        }
         TimerManager.cancelTimer(timer);
         timer = null;
         DataConfig.isShowLoadPicQRCode = false;
+        if (xiMaLaYa != null) {
+            xiMaLaYa.destroyPlayer();
+        }
     }
 
     // 上传图片
-    private void upLoadFile(Bitmap bitmap, String robotNum) {
+    private void upLoadFile(Bitmap bitmap, final String robotNum) {
         // 设置上传图片的key值
         String[] fileKeys = new String[]{"file"};
         // 设置图片路径名字
@@ -300,13 +354,14 @@ public class MsgReceiverService extends Service implements IMusic {
         HttpManager.uploadFile(robotNum, fileKeys, files, new Gallery.IPicInfo() {
             @Override
             public void getPicInfo(PictureInfo info) {
+                // 上传成功后把保存的图片删掉
+                FileUtils.deleteFile(fileName);
                 if (info != null) {
-                    // 上传成功后把保存的图片删掉
-                    FileUtils.deleteFile(fileName);
-                    Message msg = handler.obtainMessage();
-                    msg.obj = info;
-                    picHandler.sendMessage(msg);
+                    info.setRobotNum(robotNum);
                 }
+                Message msg = handler.obtainMessage();
+                msg.obj = info;
+                picHandler.sendMessage(msg);
             }
         });
     }
@@ -320,12 +375,12 @@ public class MsgReceiverService extends Service implements IMusic {
             PictureInfo info = (PictureInfo) msg.obj;
             if (info != null) {
                 // 根据下载链接加图片名字生成二维码
-                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName();
+                String url = UrlConfig.LOAD_PIC_PATH + "?fileName=" + info.getPicName() + "&robotNumber=" + info.getRobotNum();
                 Bitmap qrCode = Utilities.createQRCode(url);
                 // 显示二维码图片
                 if (qrCode != null) {
                     ViewCommon.initView();
-                    OneImgManager.showImg(qrCode, true);
+                    OneImgManager.showImg(qrCode);
                     DataConfig.isShowLoadPicQRCode = true;
                     SpeechImpl.getInstance().cancelListen();
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SHOW_QRCODE, "扫描二维码可以下载照片哦");
@@ -334,12 +389,15 @@ public class MsgReceiverService extends Service implements IMusic {
                         public void run() {
                             if (DataConfig.isShowLoadPicQRCode) {
                                 DataConfig.isShowLoadPicQRCode = false;
-                                ViewCommon.initView();
-                                EmotionManager.showEmotion(R.mipmap.emotion_blink);
+                                SpeechImpl.getInstance().startListen();
                             }
                         }
-                    }, 30 * 1000);// 30s 后待机
+                    }, 15 * 1000);// 15s 后待机
                 }
+            } else {
+                // 又是可能还没显示被唤醒，造成语音说话不完整
+                SpeechImpl.getInstance().cancelListen();
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，图片上传失败，再试一次吧");
             }
         }
     };
@@ -353,15 +411,14 @@ public class MsgReceiverService extends Service implements IMusic {
             Log.i(TAG, "MusicPlayerService musicSrc ===" + musicSrc);
             MusicManager.setCurrentPlayName(MusicManager.getMusicNameNoMp3(musicSrc));
             // 通知app当前播放状态
-            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new NettyClientHandler(this));
+            HttpManager.pushMediaState(MusicManager.getCurrentMediaName(), "open", musicName, new PushResultHandler(this));
             // 开始播放音乐
-            BroadcastEnclosure.startPlayMusic(this, musicSrc);
+            BroadcastEnclosure.startPlayMusic(this, musicSrc, DataConfig.PLAY_MUSIC);
         }
     }
 
-    // 实现IMusic接口方法  开始播放音乐
-    @Override
-    public void startPlayMusic() {
+    // 开始播放音乐
+    private void playStart() {
         Log.i(TAG, "音乐开始播放");
         DataConfig.isPlayMusic = true;
         // 耳朵灯光闪烁
@@ -372,9 +429,8 @@ public class MsgReceiverService extends Service implements IMusic {
         }
     }
 
-    // 实现IMusic接口方法  音乐播放完成
-    @Override
-    public void musicPlayComplected() {
+    // 音乐播放完成
+    private void playEnd() {
         Log.i(TAG, "音乐播放完成");
         DataConfig.isPlayMusic = false;
 //        SpectrumManager.hideSpectrum();
@@ -391,5 +447,35 @@ public class MsgReceiverService extends Service implements IMusic {
         }
 
         SpeechImpl.getInstance().startListen();
+    }
+
+    // 实现IMusic接口方法  开始播放音乐
+    @Override
+    public void startPlayMusic() {
+        playStart();
+    }
+
+    // 实现IMusic接口方法  音乐播放完成
+    @Override
+    public void musicPlayComplected() {
+        playEnd();
+    }
+
+    // 实现IXiMaLaYa接口方法  开始播放音乐
+    @Override
+    public void onPlayStart() {
+        playStart();
+    }
+
+    // 实现IXiMaLaYa接口方法  音乐播放完成
+    @Override
+    public void onSoundPlayComplete() {
+        playEnd();
+    }
+
+    // 实现IXiMaLaYa接口方法  播放异常
+    @Override
+    public void onPlayError() {
+        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放器异常");
     }
 }

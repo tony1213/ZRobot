@@ -1,19 +1,17 @@
 package com.robot.et.core.software.common.speech;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
-import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.netty.NettyClientHandler;
+import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -41,9 +39,6 @@ public class CommandHandler {
     public boolean isCustorm(String result) {
         if (!TextUtils.isEmpty(result)) {
             if (isAppPushRemind(result)) {
-                return true;
-            }
-            if (isRosService(result)) {
                 return true;
             }
 
@@ -92,13 +87,7 @@ public class CommandHandler {
                     int digit = getIntNum(result);
                     Log.i("ControlMove", "result===" + result);
                     Log.i("ControlMove", "digit===" + digit);
-                    if (digit != 0) {
-                        Log.e("ControlMove", "数字不为空");
-                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
-                    } else {
-                        Log.e("ControlMove", "数字为空");
-                        BroadcastEnclosure.controlRobotMove(context, moveKey);
-                    }
+                    BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
                 }
                 return true;
             }
@@ -167,46 +156,6 @@ public class CommandHandler {
         return false;
     }
 
-    //是否ros服务
-    public boolean isRosService(String result) {
-        String content = "";
-        if (!TextUtils.isEmpty(result)) {
-            if (result.contains("导航到")) {
-                //获取目的地
-                int start = result.indexOf("到");
-                content = result.substring(start + 1, result.length());
-                sendRos("DestinationName", content);
-                return true;
-            } else if (result.contains("这个地方是") || result.contains("这里是")) {
-                //获取地图上面的位置坐标
-                int start = result.indexOf("是");
-                content = result.substring(start + 1, result.length());
-                sendRos("PositionName", content);
-                return true;
-            } else if (result.contains("记住这个是") || result.contains("记住这是")) {
-                int start = result.indexOf("是");
-                content = result.substring(start + 1, result.length());
-                sendRos("DeepLearn", content);
-                return true;
-            } else if (TextUtils.equals("跟着我", result)) {
-                sendRos("WORLDFOLLOWER", "1");
-                SpeechImpl.getInstance().startListen();
-            } else if (TextUtils.equals("不要跟着我", result)) {
-                sendRos("WORLDFOLLOWER", "0");
-                SpeechImpl.getInstance().startListen();
-            } else {
-                String rosKey = EnumManager.getRosServiceKey(result);
-                Log.i("ros", "rosKey===" + rosKey);
-                if (!TextUtils.isEmpty(rosKey)) {
-                    sendRos(rosKey, "");
-                    SpeechImpl.getInstance().startListen();
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     //是否是表情
     public boolean isMatchEmotion(String result) {
         EmotionEnum emotionEnum = EnumManager.getEmotionEnum(result);
@@ -245,7 +194,7 @@ public class CommandHandler {
                         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
                         mInfo.setAnswer("");
                         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
+                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
 
                         doAppRemindNoResponse();
                     }
@@ -266,7 +215,7 @@ public class CommandHandler {
         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
         mInfo.setAnswer(result);
         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new NettyClientHandler(context));
+        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
 
         if (!TextUtils.isEmpty(result)) {
             String answer = AlarmRemindManager.getRequireAnswer();
@@ -300,24 +249,5 @@ public class CommandHandler {
         } else {
             SpeechImpl.getInstance().startListen();
         }
-    }
-
-    //ros的广播
-    private void sendRos(String rosKey, String name) {
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
-        intent.putExtra("rosKey", rosKey);
-        intent.putExtra("name", name);
-        context.sendBroadcast(intent);
-    }
-
-    private void sendRosMove(String rosKey, String x, String y, String angle) {
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
-        intent.putExtra("rosKey", rosKey);
-        intent.putExtra("dotX", x);
-        intent.putExtra("dotY", y);
-        intent.putExtra("angle", angle);
-        context.sendBroadcast(intent);
     }
 }

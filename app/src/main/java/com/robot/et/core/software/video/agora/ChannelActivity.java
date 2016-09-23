@@ -119,7 +119,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
             // 不是安保模式打来的电话的话自动挂断
             if (!DataConfig.isSecurityCall) {
                 //播放打电话提示音（只在主动呼叫时播放）
-                BroadcastEnclosure.playSoundTips(this, Sound.SOUND_CALL_PHONE);
+                BroadcastEnclosure.playSoundTips(this, Sound.SOUND_CALL_PHONE, DataConfig.PLAY);
                 //15秒如果用户没有接通的话，自动挂断电话
                 new Handler().postDelayed(new Runnable() {
 
@@ -462,9 +462,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
             @Override
             public void run() {
                 // 防止声音提示还有，停止掉
-                Intent intent = new Intent();
-                intent.setAction(BroadcastAction.ACTION_STOP_SOUND_TIPS);
-                sendBroadcast(intent);
+                BroadcastEnclosure.playSoundTips(ChannelActivity.this, 0, DataConfig.STOP);
 
                 View singleRemoteUser = mRemoteUserContainer.findViewById(Math.abs(uid));
                 if (singleRemoteUser != null) {

@@ -21,8 +21,8 @@ public class BroadcastAction {
     public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
     //唤醒后转身
     public static String ACTION_WAKE_UP_TURN_BY_DEGREE = "action.wake.up.turn.by.degree";
-    //重置语音板的广播
-    public static String ACTION_WAKE_UP_RESET = "action.wake.up.reset";
+    //机器人沉睡的广播
+    public static String ACTION_ROBOT_SLEEP = "action.robot.sleep";
     //人体监测的广播
     public static String ACTION_BODY_DETECTION = "action.body.detection";
     //硬件触摸的广播
@@ -39,8 +39,6 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_ROBOT_MOVE_WITH_NETTY = "action.control.robot.move.with.netty";
     //控制机器人移动（语音控制）
     public static String ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE = "action.control.robot.move.with.voice";
-    //控制机器人移动带距离（语音控制）
-    public static String ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE_ROS = "action.control.robot.move.with.voice.ros";
     //打开netty的广播
     public static String ACTION_OPEN_NETTY = "action.open.netty";
     //控制机器人周围小车的广播
@@ -81,7 +79,5 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_HEAD_BY_APP = "com.robot.et.control.head.by.app";
     //播放声音提示（说话结束、拍照、打电话等）
     public static String ACTION_PLAY_SOUND_TIPS = "com.robot.et.play.sound.tips";
-    //停止播放声音提示（说话结束、拍照、打电话等）
-    public static String ACTION_STOP_SOUND_TIPS = "com.robot.et.stop.sound.tips";
 
 }

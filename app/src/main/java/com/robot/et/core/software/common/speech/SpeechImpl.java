@@ -1,19 +1,18 @@
 package com.robot.et.core.software.common.speech;
 
-import com.robot.et.core.software.voice.iflytek.IflySpeakService;
-import com.robot.et.core.software.voice.iflytek.IflyTextUnderstanderService;
-import com.robot.et.core.software.voice.iflytek.IflyVoiceToTextService;
-import com.robot.et.core.software.voice.turing.TuRingService;
+import com.robot.et.core.software.voice.TextToVoiceService;
+import com.robot.et.core.software.voice.TextUnderstanderService;
+import com.robot.et.core.software.voice.VoiceToTextService;
 
 /**
  * Created by houdeming on 2016/8/8.
+ * 对外提供调用语音
  */
 public class SpeechImpl implements Speech {
     private static SpeechImpl instance = null;
-    private static IflySpeakService speakService;
-    private static IflyVoiceToTextService voiceToTextService;
-    private static IflyTextUnderstanderService understanderService;
-    private static TuRingService tuRingService;
+    private static TextToVoiceService speakService;
+    private static VoiceToTextService voiceToTextService;
+    private static TextUnderstanderService understanderService;
 
     private SpeechImpl() {
     }
@@ -58,33 +57,21 @@ public class SpeechImpl implements Speech {
     }
 
     @Override
-    public void understanderTextByIfly(String content) {
+    public void understanderText(String content) {
         if (understanderService != null) {
-            understanderService.understanderTextByIfly(content);
+            understanderService.understanderText(content);
         }
     }
 
-    @Override
-    public void understanderTextByTuring(String content) {
-        if (tuRingService != null) {
-            tuRingService.understanderTextByTuring(content);
-        }
-    }
-
-    public static void setService(IflySpeakService service) {
+    public static void setService(TextToVoiceService service) {
         SpeechImpl.speakService = service;
     }
 
-    public static void setService(IflyVoiceToTextService service) {
+    public static void setService(VoiceToTextService service) {
         SpeechImpl.voiceToTextService = service;
     }
 
-    public static void setService(IflyTextUnderstanderService service) {
+    public static void setService(TextUnderstanderService service) {
         SpeechImpl.understanderService = service;
     }
-
-    public static void setService(TuRingService service) {
-        SpeechImpl.tuRingService = service;
-    }
-
 }

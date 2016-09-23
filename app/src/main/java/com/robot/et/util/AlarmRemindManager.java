@@ -153,7 +153,7 @@ public class AlarmRemindManager {
             RemindInfo info = new RemindInfo();
             info.setRobotNum(SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, ""));
             info.setDate(remindInfo.getDate());
-            info.setTime(remindInfo.getTime());
+            info.setTime(setAlarmTimeFormat(remindInfo.getTime()));
             info.setContent(remindInfo.getContent());
             info.setRemindInt(DataConfig.REMIND_NO_ID);
             info.setFrequency(1);
@@ -199,10 +199,12 @@ public class AlarmRemindManager {
         int size = datas.size();
         Log.i(TAG, "datas.size====" + size);
         if (datas != null && size > 0) {
-            content = "主人您好，您设置的" + datas.get(size - 1) + "提醒时间到了，不要忘记哦。";
+            content = "主人，要" + datas.get(size - 1) + "了";
             datas.remove(size - 1);
             setAlarmDatas(datas);
         }
+        // 设置单次闹铃
+        setSpeakRemindContent(content);
         return content;
     }
 
@@ -240,6 +242,8 @@ public class AlarmRemindManager {
     private static String remindMen;
     //原始的时间
     private static String originalAlarmTime;
+    // 提醒要反复说的话
+    private static String speakRemindContent;
 
     public static String getRequireAnswer() {
         return requireAnswer;
@@ -281,4 +285,11 @@ public class AlarmRemindManager {
         AlarmRemindManager.originalAlarmTime = originalAlarmTime;
     }
 
+    public static String getSpeakRemindContent() {
+        return speakRemindContent;
+    }
+
+    public static void setSpeakRemindContent(String speakRemindContent) {
+        AlarmRemindManager.speakRemindContent = speakRemindContent;
+    }
 }

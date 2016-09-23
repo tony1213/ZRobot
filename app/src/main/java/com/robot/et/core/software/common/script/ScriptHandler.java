@@ -301,7 +301,7 @@ public class ScriptHandler implements Script {
         } else {
             musicSrc = url;
         }
-        BroadcastEnclosure.startPlayMusic(context, musicSrc);
+        BroadcastEnclosure.startPlayMusic(context, musicSrc, DataConfig.PLAY_MUSIC);
     }
 
     //插入本地剧本

@@ -8,8 +8,8 @@ import turing.os.http.core.ErrorMessage;
  */
 public interface ITuring {
     // 图灵文本理解结果
-    void onResult(String result);
+    void onTuringResult(String result);
 
     // 图灵文本理解错误
-    void onError(ErrorMessage errorMessage);
+    void onTuringError(ErrorMessage errorMessage);
 }
