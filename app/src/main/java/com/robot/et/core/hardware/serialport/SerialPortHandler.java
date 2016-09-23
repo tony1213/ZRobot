@@ -145,7 +145,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
                         //向后退
                         int moveKey = ControlMoveEnum.BACKWARD.getMoveKey();
                         Log.i(TAG, "发送后退");
-                        BroadcastEnclosure.controlRobotMove(context, moveKey);
+                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, "0");
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
