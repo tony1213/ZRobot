@@ -35,8 +35,6 @@ public class BroadcastAction {
     public static String ACTION_FACE_DISTINGUISH = "action.face.distinguish";
     //打开脸部识别
     public static String ACTION_OPEN_FACE_DISTINGUISH = "action.open.face.distinguish";
-    //控制机器人移动(Netty指令)
-    public static String ACTION_CONTROL_ROBOT_MOVE_WITH_NETTY = "action.control.robot.move.with.netty";
     //控制机器人移动（语音控制）
     public static String ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE = "action.control.robot.move.with.voice";
     //打开netty的广播
@@ -53,10 +51,6 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_EARS_LED = "action.control.ears.led";
     //控制照明LED灯的广播
     public static String ACTION_CONTROL_LIGHT_LED = "action.control.light.led";
-    //跟随的广播
-    public static String ACTION_CONTROL_ROBOT_FOLLOW = "action.control.robot.follow";
-    //控制机器人转圈
-    public static String ACTION_CONTROL_ROBOT_TURN = "action.control.robot.turn";
     //控制小车不停车的广播
     public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
     //连接agora的广播

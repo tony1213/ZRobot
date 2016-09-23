@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.db.RobotDB;
@@ -76,7 +77,8 @@ public class ScriptHandler implements Script {
                     }
                     Log.i("netty", "doScriptAction() robotNum====" + robotNum);
                     Log.i("netty", "doScriptAction() toyCarNum====" + toyCarNum);
-                    BroadcastEnclosure.controlFollow(context, robotNum, toyCarNum);
+                    // 跟随
+                    BroadcastEnclosure.sendRos(context, RosConfig.FOLLOW, "");
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -85,7 +87,8 @@ public class ScriptHandler implements Script {
                     int direction = ScriptManager.getTurnDirection(content);
                     Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
-                    BroadcastEnclosure.controlTurnAround(context, direction, info.getSpareContent());
+                    // 转圈
+                    BroadcastEnclosure.sendRos(context, RosConfig.TURN, "");
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -132,7 +135,7 @@ public class ScriptHandler implements Script {
                             num = MatchStringUtil.getToyCarNum(spareContent);
                             BroadcastEnclosure.controlToyCarMove(context, moveDirection, num);
                         } else {
-                            BroadcastEnclosure.controlMoveByApp(context, moveDirection);
+                            BroadcastEnclosure.controlRobotMoveRos(context, moveDirection, "0");
                         }
                     }
 
@@ -142,7 +145,7 @@ public class ScriptHandler implements Script {
                 case ScriptConfig.SCRIPT_TURN://左转右转
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
-                    BroadcastEnclosure.controlMoveByApp(context, turnDirection);
+                    BroadcastEnclosure.controlRobotMoveRos(context, turnDirection, "0");
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;

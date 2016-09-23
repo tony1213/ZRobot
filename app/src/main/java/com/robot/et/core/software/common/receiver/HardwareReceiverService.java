@@ -167,10 +167,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
             } else {// 大于30度时身体转过去，手同时摆动
                 //硬件去转身
-                Intent turnIntent = new Intent();
-                turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                turnIntent.putExtra("degree", degree);
-                sendBroadcast(turnIntent);
+                BroadcastEnclosure.wakeUpTurnBody(HardwareReceiverService.this, degree);
                 // 耳朵的灯光在运动的时候进行闪烁
                 BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
                 // 摆手

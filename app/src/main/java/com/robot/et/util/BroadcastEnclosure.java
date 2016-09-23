@@ -11,7 +11,6 @@ import com.robot.et.common.ScriptConfig;
  * Created by houdeming on 2016/8/1.
  */
 public class BroadcastEnclosure {
-
     private static Intent intent;
 
     static {
@@ -21,13 +20,6 @@ public class BroadcastEnclosure {
     //连接netty
     public static void connectNetty(Context context) {
         intent.setAction(BroadcastAction.ACTION_OPEN_NETTY);
-        context.sendBroadcast(intent);
-    }
-
-    //通过App控制机器人走
-    public static void controlMoveByApp(Context context, int direction) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_NETTY);
-        intent.putExtra("direction", direction);
         context.sendBroadcast(intent);
     }
 
@@ -99,22 +91,6 @@ public class BroadcastEnclosure {
         }
     }
 
-    //跟随
-    public static void controlFollow(Context context, String robotNum, int toyCarNum) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_FOLLOW);
-        intent.putExtra("robotNum", robotNum);
-        intent.putExtra("toyCarNum", toyCarNum);
-        context.sendBroadcast(intent);
-    }
-
-    //控制小车转圈
-    public static void controlTurnAround(Context context, int turnDirection, String turnNum) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_TURN);
-        intent.putExtra("turnDirection", turnDirection);
-        intent.putExtra("turnNum", turnNum);
-        context.sendBroadcast(intent);
-    }
-
     //连接agora
     public static void connectAgora(Context context, int type) {
         intent.setAction(BroadcastAction.ACTION_CONNECT_AGORA);
@@ -131,14 +107,6 @@ public class BroadcastEnclosure {
     //发送雷达的广播
     public static void sendRadar(Context context) {
         intent.setAction(BroadcastAction.ACTION_ROBOT_RADAR);
-        context.sendBroadcast(intent);
-    }
-
-    //语音控制走小车的广播
-    public static void controlRobotMoveRos(Context context, int direction, String digit) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
-        intent.putExtra("direction", direction);
-        intent.putExtra("digit", digit);
         context.sendBroadcast(intent);
     }
 
@@ -168,6 +136,21 @@ public class BroadcastEnclosure {
     //人体感应的广播
     public static void bodyDetection(Context context) {
         intent.setAction(BroadcastAction.ACTION_BODY_DETECTION);
+        context.sendBroadcast(intent);
+    }
+
+    // 唤醒身体去转角度
+    public static void wakeUpTurnBody(Context context, int degree) {
+        intent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
+        intent.putExtra("degree", degree);
+        context.sendBroadcast(intent);
+    }
+
+    //语音控制机器人走的广播
+    public static void controlRobotMoveRos(Context context, int direction, String digit) {
+        intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
+        intent.putExtra("direction", direction);
+        intent.putExtra("digit", digit);
         context.sendBroadcast(intent);
     }
 

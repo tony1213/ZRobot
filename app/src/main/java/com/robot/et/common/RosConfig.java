@@ -5,7 +5,7 @@ package com.robot.et.common;
  */
 public class RosConfig {
     // 进入物体识别
-    public static final String START_DISTINGUISH = "Deep Learning";
+    public static final String START_DISTINGUISH = "Rai Learning";
     // 关闭视觉学习
     public static final String CLOSE_DISTINGUISH = "DeepLearnClose";
     // 退出
@@ -30,4 +30,6 @@ public class RosConfig {
     public static final String POSITION = "PositionName";
     // 导航
     public static final String NAVIGATION = "DestinationName";
+    // 转圈
+    public static final String TURN = "Turn";
 }

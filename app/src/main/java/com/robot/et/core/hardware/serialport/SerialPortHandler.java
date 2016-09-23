@@ -113,10 +113,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
 //                        //头部去转
 //                        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle));
                         //身体去转
-                        Intent turnIntent = new Intent();
-                        turnIntent.setAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-                        turnIntent.putExtra("degree", xFAngle);
-                        context.sendBroadcast(turnIntent);
+                        BroadcastEnclosure.wakeUpTurnBody(context, xFAngle);
                     }
                 }
 

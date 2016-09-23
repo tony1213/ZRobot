@@ -64,7 +64,7 @@ public class PushResultHandler implements NettyClientCallBack {
                         }
                         isControlHead = false;
                         Log.i(TAG, "控制脚走");
-                        BroadcastEnclosure.controlMoveByApp(context, moveKey);
+                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, "0");
                     } else {
                         //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
                         isControlHead = true;
