@@ -15,7 +15,32 @@ import org.ros.node.ConnectedNode;
 import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
+/**
+* @author wudong10012
+* @description 视觉学习
+* @date 2016-09-19
+*/
+
 public class VisualClient extends AbstractNodeMain {
+
+    /*
+    * List all requestID
+    * REC
+    */
+    private static final short VISUAL_REC_OPEN = 1; //打开视觉
+    private static final short VISUAL_REC_STUDY = 2;// 视觉学习
+    private static final short VISUAL_REC_RECOGNIZE = 3;//视觉识别
+    private static final short VISUAL_REC_CLOSE = 4;//关闭视觉
+    private static final short VISUAL_REC_CLEAR_DATA = 5;//删除所有的学习内容
+    /*
+    * List all requestID
+    * TRK
+    */
+    private static final short VISUAL_TRK_OPEN = 21;//打开人体跟踪
+    private static final short VISUAL_TRK_CLOSE = 22;//关闭人体跟踪
+    private static final short VISUAL_TRK_POSITION = 23;//人体位置返回
+
+
 
     private short flag;
     private String name;
@@ -47,14 +72,14 @@ public class VisualClient extends AbstractNodeMain {
             @Override
             public void onSuccess(VisualResponse response) {
                 Log.e("ROS_Client", "onSuccess:Result:" + response.getStatus() + ",Name:" + response.getOutputName());
-                if (flag == 1) {
+                if (flag == VISUAL_REC_OPEN) {
                     //打开视觉
                     if (response.getStatus() == 0) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉已启动");
                     } else {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉启动失败");
                     }
-                } else if (flag == 2) {
+                } else if (flag == VISUAL_REC_STUDY) {
                     //视觉学习
                     if (response.getStatus()== -1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
@@ -77,7 +102,7 @@ public class VisualClient extends AbstractNodeMain {
                     }else if (response.getStatus()==21){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
-                } else if (flag == 3) {
+                } else if (flag == VISUAL_REC_RECOGNIZE) {
                     //视觉识别
                     if (response.getStatus()== -1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
@@ -119,19 +144,38 @@ public class VisualClient extends AbstractNodeMain {
                     }else if (response.getStatus()==21){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
-                }else if (flag == 4){
-                    //视觉识别
+                }else if (flag == VISUAL_REC_CLOSE){
+                    //视觉关闭
                     if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模块");
                     }else {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模块失败");
                     }
-                }else if (flag == 5){
+                }else if (flag == VISUAL_REC_CLEAR_DATA){
                     //删除所有视觉学习内容
                     if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已删除所学内容");
                     }else {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "删除学习内容失败");
+                    }
+                }else if (flag == VISUAL_TRK_OPEN){
+                    //打开人体跟踪
+                    if (response.getStatus()==0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为人体检测模式");
+                    }else {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换人体检测模式失败");
+                    }
+                }else if (flag == VISUAL_TRK_POSITION){
+                    //获取人体的位置
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"获取到人体位置");
+
+
+                }else if (flag == VISUAL_TRK_CLOSE){
+                    //关闭人体跟踪
+                    if (response.getStatus()==0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"关闭人体检测模式");
+                    }else {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"关闭人体检测模式失败");
                     }
                 }
             }
@@ -139,6 +183,7 @@ public class VisualClient extends AbstractNodeMain {
             @Override
             public void onFailure(RemoteException e) {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
+                SpeechImpl.getInstance().startListen();
                 Log.e("ROS_Client", "onFailure");
 //                throw new RosRuntimeException(e);
             }

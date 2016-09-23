@@ -120,20 +120,19 @@ public class MainAppActivity extends RosActivity {
         initService();
         initBaiDuMap();
         IntentFilter filter = new IntentFilter();
-        filter.addAction("com.robot.et.rocon");
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         registerReceiver(receiver, filter);
         prepareAppManager();
-
     }
 
     @Override
     public void startMasterChooser() {
         Log.e(TAG, "开始执行MasterChooserService");
-        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来了");
+//        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来了");
+
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
         super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
@@ -159,9 +158,7 @@ public class MainAppActivity extends RosActivity {
         //对播放音乐频谱的初始设置
         setVolumeControlStream(AudioManager.STREAM_MUSIC);//设置音频流 - STREAM_MUSIC：音乐回放即媒体音量
         VisualizerView visualizerView = new VisualizerView(this);
-        visualizerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,//宽度
-                (int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)//高度
-        ));
+        visualizerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,(int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)));//宽度，高度
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
         OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
@@ -190,13 +187,12 @@ public class MainAppActivity extends RosActivity {
         });
     }
 
-    void init(Intent intent) {
+    private void init(Intent intent) {
         URI uri;
         try {
             roconDescription = (RoconDescription) intent.getSerializableExtra(RoconDescription.UNIQUE_KEY);
             validatedConcert = false;
             validateConcert(roconDescription.getMasterId());
-
             uri = new URI(roconDescription.getMasterId().getMasterUri());
             Log.i("Remocon", "init(Intent) - master uri is " + uri.toString());
         } catch (ClassCastException e) {
@@ -206,12 +202,6 @@ public class MainAppActivity extends RosActivity {
             throw new RosRuntimeException(e);
         }
         nodeMainExecutorService.setMasterUri(uri);
-        // Run init() in a new thread as a convenience since it often
-        // requires network access. This would be more robust if it
-        // had a failure handler for uncontactable errors (override
-        // onPostExecute) that occurred when calling init. In reality
-        // this shouldn't happen often - only when the connection
-        // is unavailable inbetween validating and init'ing.
         if (roconDescription.getCurrentRole() == null) {
             chooseRole();
         } else {
@@ -234,43 +224,6 @@ public class MainAppActivity extends RosActivity {
         }
     }
 
-    void init2(RoconDescription roconDescription) {
-        Log.e(TAG, "init2");
-        URI uri;
-        try {
-            validatedConcert = false;
-            validateConcert(roconDescription.getMasterId());
-            uri = new URI(roconDescription.getMasterId().getMasterUri());
-            Log.i(TAG, "init(Intent) - master uri is " + uri.toString());
-        } catch (ClassCastException e) {
-            Log.e(TAG, "Cannot get concert description from intent. " + e.getMessage());
-            throw new RosRuntimeException(e);
-        } catch (URISyntaxException e) {
-            throw new RosRuntimeException(e);
-        }
-        nodeMainExecutorService.setMasterUri(uri);
-        if (roconDescription.getCurrentRole() == null) {
-            chooseRole();
-        } else {
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    while (!validatedConcert) {
-                        // should use a sleep here to avoid burnout
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    Log.i(TAG, "init(Intent) passing control back to init(nodeMainExecutorService)");
-                    MainAppActivity.this.init(nodeMainExecutorService);
-                    return null;
-                }
-            }.execute();
-        }
-    }
-
     private void prepareAppManager() {
         // Prepare the app manager; we do here instead of on init to keep using the same instance when switching roles
         interactionsManager = new InteractionsManager(
@@ -283,10 +236,10 @@ public class MainAppActivity extends RosActivity {
         interactionsManager.setupGetInteractionsService(new ServiceResponseListener<GetInteractionsResponse>() {
             @Override
             public void onSuccess(GetInteractionsResponse response) {
+                Log.e(TAG,"GetInteractions Success");
                 List<Interaction> apps = response.getInteractions();
                 if (apps.size() > 0) {
                     availableAppsCache = (ArrayList<Interaction>) apps;
-
                     Log.e(TAG, "Interaction Publication: " + availableAppsCache.size() + " apps");
                     for (int i = 0; i < availableAppsCache.size(); i++) {
                         Log.e(TAG, "DisplayName:" + availableAppsCache.get(i).getDisplayName());
@@ -306,6 +259,7 @@ public class MainAppActivity extends RosActivity {
         interactionsManager.setupRequestService(new ServiceResponseListener<rocon_interaction_msgs.RequestInteractionResponse>() {
             @Override
             public void onSuccess(rocon_interaction_msgs.RequestInteractionResponse response) {
+                Log.e(TAG,"");
                 Preconditions.checkNotNull(selectedInteraction);
                 final boolean allowed = response.getResult();
                 final String reason = response.getMessage();
@@ -332,6 +286,7 @@ public class MainAppActivity extends RosActivity {
                                 //statusPublisher.update(true, selectedInteraction.getHash(), selectedInteraction.getName());
                                 // TODO try to no finish so statusPublisher remains while on app;  risky, but seems to work!    finish();
                             } else if (result == AppLauncher.Result.NOTHING) {
+                                Log.e(TAG,"Android app nothing");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());
                             } else if (result == AppLauncher.Result.NOT_INSTALLED) {
                                 // App not installed; ask for going to play store to download the missing app
@@ -339,11 +294,9 @@ public class MainAppActivity extends RosActivity {
                                 statusPublisher.update(false, 0, null);
                                 selectedInteraction = null;
                             } else {
-                                Log.e(TAG, "Cannot start app");
+                                Log.e(TAG, "Cannot start Android app");
                             }
                         }
-
-                        ;
                     });
                 } else {
                     Log.i(TAG, "User select cancel");
@@ -486,17 +439,13 @@ public class MainAppActivity extends RosActivity {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals("com.robot.et.rocon")) {
-                Log.e(TAG, "接收到数据");
-                roconDescription = (RoconDescription) intent.getSerializableExtra("RoconDescription");
-                init2(roconDescription);
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)) {
+             if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)) {
                 String flag = intent.getStringExtra("rosKey");
                 String name = intent.getStringExtra("name");
                 Log.e(TAG, "下发ROS服务：Key" + flag + ",name:" + name);
                 if (TextUtils.equals("Roaming", flag)) {
                     //随便走走(Rapp)
-                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "Roaming");
+                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Roaming");
                     SpeechImpl.getInstance().startListen();
                 } else if (TextUtils.equals("WORLDFOLLOWER", flag)) {
                     //跟随和不跟随(service)
@@ -508,32 +457,34 @@ public class MainAppActivity extends RosActivity {
                     }
                     nodeMainExecutorService.execute(followClient, nodeConfiguration.setNodeName("FollowClient"));
                 } else if (TextUtils.equals("Deep Learning", flag)) {
-//                    if (isWorldNavigationOpen){
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "未加载地图，请加载");
-//                    }
                     //视觉深度学习(Rapp)
                     Log.e("ROS_Client", "Start Deep Learning");
-                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "Deep Learning");
+                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Deep Learning");
                 } else if (TextUtils.equals("DeepLearnInit", flag)) {
+                    //视觉初始化(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                     visualClient = new VisualClient((short) 1, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
+                    //视觉学习(service)
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
                     visualClient = new VisualClient((short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
+                    //视觉识别(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
                     visualClient = new VisualClient((short) 3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
+                    //视觉关闭(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnClose");
                     visualClient = new VisualClient((short) 4, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("DeleteAllVisual", flag)) {
+                    //视觉删除学习内容(service)
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
                     visualClient = new VisualClient((short) 5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
@@ -545,7 +496,7 @@ public class MainAppActivity extends RosActivity {
                 } else if (TextUtils.equals("World Navigation", flag)) {
                     //地图导航(Rapp)
                     Log.e("ROS_Client", "Rapp:Start World Navigation");
-                    doRappControlerAction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
+                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "World Navigation");
                 } else if (TextUtils.equals("PositionName", flag)) {
                     //语音获取位置坐标(Service)
                     Log.e("ROS_Client", "Service:Start PositionName");
@@ -594,9 +545,7 @@ public class MainAppActivity extends RosActivity {
                     doStopAction();
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE)) {
-                Log.e("ROS_MOVE","=======>1");
 //                String direction=String.valueOf(intent.getIntExtra("direction",5));
-//
 //                Log.i("ROS_MOVE","语音控制时，得到的direction参数："+direction);
 //                if (null==direction|| TextUtils.equals("", direction)) {
 //                    return;
@@ -615,24 +564,21 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
 
                 String direction = String.valueOf(intent.getIntExtra("direction", 5));
-                Log.i("ROS_MOVE", "MainActivity语音控制时，得到的direction参数：" + direction);
-                if (null == direction || TextUtils.equals("", direction)) {
-                    return;
-                }
-                if (TextUtils.equals("1", direction) || TextUtils.equals("2", direction)) {
+                Log.i("ROS_MOVE", "ROS得到的direction参数：" + direction);
+                if (TextUtils.equals("1", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：前进");
                     doMoveAction(direction);
-//                    try {
-//                        Thread.sleep(1500);
-//
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    doMoveAction("5");
+                }else if (TextUtils.equals("2", direction)){
+                    Log.e("ROS_MOVE","开始执行运动，方向：后退");
+                    doMoveAction(direction);
                 } else if (TextUtils.equals("3", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：向左转");
                     doTrunAction(mover.getCurrentDegree(), 270);
                 } else if (TextUtils.equals("4", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：向右转");
                     doTrunAction(mover.getCurrentDegree(), 90);
                 } else if (TextUtils.equals("5", direction)) {
+                    Log.e("ROS_MOVE","开始执行运动，方向：停止");
                     doMoveAction(direction);
                 }
             }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)) {
@@ -644,8 +590,7 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 //方案二（直接控制Twist）
                 double d = (double) intent.getIntExtra("degree", 0);
-                Log.e("wakeup", "Twist：语音控制时，得到的唤醒角度" + d);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
+//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
                 doTrunAction(mover.getCurrentDegree(), d);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)) {
                 //方案一：（基于ROS地图服务）
@@ -703,7 +648,7 @@ public class MainAppActivity extends RosActivity {
         }
     }
 
-    protected void doRappControlerAction(final ArrayList<Interaction> apps, final String role, final String displayName) {
+    protected void startRosInteraction(final ArrayList<Interaction> apps, final String role, final String displayName) {
 //        doStopAction();
         selectedInteraction = null;
         for (int i = 0; i < apps.size(); i++) {
@@ -720,11 +665,6 @@ public class MainAppActivity extends RosActivity {
     protected void doStopAction() {
         pairSubscriber.setAppHash(0);
         statusPublisher.update(false, 0, null);
-        try {
-            Thread.sleep(15000);//用15秒时间关闭当前的一个Rapp
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -744,21 +684,23 @@ public class MainAppActivity extends RosActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        availableAppsCache.clear();
-        nodeMainExecutorService.shutdownNodeMain(statusPublisher);
-        nodeMainExecutorService.shutdownNodeMain(pairSubscriber);
-        interactionsManager.shutdown();
-        this.nodeMainExecutorService.forceShutdown();
+        shutdownRos();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        shutdownRos();
         destroyService();
         // 如果city为空，代表没有定位成功，要把定位关掉
         if (TextUtils.isEmpty(city)) {
             map.destroyMap();
         }
+    }
+
+
+    //关闭Ros
+    private void shutdownRos(){
         availableAppsCache.clear();
         nodeMainExecutorService.shutdownNodeMain(statusPublisher);
         nodeMainExecutorService.shutdownNodeMain(pairSubscriber);
