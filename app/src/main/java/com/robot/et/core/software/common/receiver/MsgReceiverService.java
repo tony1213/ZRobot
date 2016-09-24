@@ -422,7 +422,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         Log.i(TAG, "音乐开始播放");
         DataConfig.isPlayMusic = true;
         // 耳朵灯光闪烁
-        BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_BLINK);
+        BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_HORSE_RACE_LAMP);
         // 来自app推送来的音乐，判断是否有动作
         if (DataConfig.isJpushPlayMusic) {
             new ScriptHandler().scriptPlayMusic(MsgReceiverService.this, true);
