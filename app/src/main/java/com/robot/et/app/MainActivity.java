@@ -17,7 +17,7 @@ import com.baidu.location.BDLocation;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.hardware.move.ControlMoveService;
+import com.robot.et.core.software.common.receiver.ControlMoveService;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;

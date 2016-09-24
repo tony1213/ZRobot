@@ -93,7 +93,7 @@
         <service android:name=".core.software.voice.VoiceToTextService" />
         <service android:name=".core.software.common.receiver.MsgReceiverService" />
         <service android:name=".core.software.common.push.netty.NettyService" />
-        <service android:name=".core.hardware.move.ControlMoveService" />
+        <service android:name=".core.software.common.receiver.ControlMoveService" />
         <service android:name=".core.software.video.agora.AgoraService" />
         <service android:name=".core.software.common.receiver.HardwareReceiverService" />
 
