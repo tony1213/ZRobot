@@ -158,7 +158,7 @@ public class MainAppActivity extends RosActivity {
         //对播放音乐频谱的初始设置
         setVolumeControlStream(AudioManager.STREAM_MUSIC);//设置音频流 - STREAM_MUSIC：音乐回放即媒体音量
         VisualizerView visualizerView = new VisualizerView(this);
-        visualizerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,(int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)));//宽度，高度
+        visualizerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, (int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)));//宽度，高度
         showMusicView.addView(visualizerView);
         SpectrumManager.setView(showMusicView, visualizerView);
         OneImgManager.setView(showOneImg, imageView, imageBitmap, imagePhoto);
@@ -236,7 +236,7 @@ public class MainAppActivity extends RosActivity {
         interactionsManager.setupGetInteractionsService(new ServiceResponseListener<GetInteractionsResponse>() {
             @Override
             public void onSuccess(GetInteractionsResponse response) {
-                Log.e(TAG,"GetInteractions Success");
+                Log.e(TAG, "GetInteractions Success");
                 List<Interaction> apps = response.getInteractions();
                 if (apps.size() > 0) {
                     availableAppsCache = (ArrayList<Interaction>) apps;
@@ -259,7 +259,7 @@ public class MainAppActivity extends RosActivity {
         interactionsManager.setupRequestService(new ServiceResponseListener<rocon_interaction_msgs.RequestInteractionResponse>() {
             @Override
             public void onSuccess(rocon_interaction_msgs.RequestInteractionResponse response) {
-                Log.e(TAG,"");
+                Log.e(TAG, "");
                 Preconditions.checkNotNull(selectedInteraction);
                 final boolean allowed = response.getResult();
                 final String reason = response.getMessage();
@@ -286,7 +286,7 @@ public class MainAppActivity extends RosActivity {
                                 //statusPublisher.update(true, selectedInteraction.getHash(), selectedInteraction.getName());
                                 // TODO try to no finish so statusPublisher remains while on app;  risky, but seems to work!    finish();
                             } else if (result == AppLauncher.Result.NOTHING) {
-                                Log.e(TAG,"Android app nothing");
+                                Log.e(TAG, "Android app nothing");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());
                             } else if (result == AppLauncher.Result.NOT_INSTALLED) {
                                 // App not installed; ask for going to play store to download the missing app
@@ -439,7 +439,7 @@ public class MainAppActivity extends RosActivity {
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-             if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)) {
+            if (intent.getAction().equals(BroadcastAction.ACTION_ROS_SERVICE)) {
                 String flag = intent.getStringExtra("rosKey");
                 String name = intent.getStringExtra("name");
                 Log.e(TAG, "下发ROS服务：Key" + flag + ",name:" + name);
@@ -456,10 +456,10 @@ public class MainAppActivity extends RosActivity {
                         followClient = new FollowClient((byte) 1);
                     }
                     nodeMainExecutorService.execute(followClient, nodeConfiguration.setNodeName("FollowClient"));
-                } else if (TextUtils.equals("Deep Learning", flag)) {
+                } else if (TextUtils.equals("Rai Learning", flag)) {
                     //视觉深度学习(Rapp)
-                    Log.e("ROS_Client", "Start Deep Learning");
-                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Deep Learning");
+                    Log.e("ROS_Client", "Start Rai Learning");
+                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Rai Learning");
                 } else if (TextUtils.equals("DeepLearnInit", flag)) {
                     //视觉初始化(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
@@ -566,22 +566,22 @@ public class MainAppActivity extends RosActivity {
                 String direction = String.valueOf(intent.getIntExtra("direction", 5));
                 Log.i("ROS_MOVE", "ROS得到的direction参数：" + direction);
                 if (TextUtils.equals("1", direction)) {
-                    Log.e("ROS_MOVE","开始执行运动，方向：前进");
+                    Log.e("ROS_MOVE", "开始执行运动，方向：前进");
                     doMoveAction(direction);
-                }else if (TextUtils.equals("2", direction)){
-                    Log.e("ROS_MOVE","开始执行运动，方向：后退");
+                } else if (TextUtils.equals("2", direction)) {
+                    Log.e("ROS_MOVE", "开始执行运动，方向：后退");
                     doMoveAction(direction);
                 } else if (TextUtils.equals("3", direction)) {
-                    Log.e("ROS_MOVE","开始执行运动，方向：向左转");
+                    Log.e("ROS_MOVE", "开始执行运动，方向：向左转");
                     doTrunAction(mover.getCurrentDegree(), 270);
                 } else if (TextUtils.equals("4", direction)) {
-                    Log.e("ROS_MOVE","开始执行运动，方向：向右转");
+                    Log.e("ROS_MOVE", "开始执行运动，方向：向右转");
                     doTrunAction(mover.getCurrentDegree(), 90);
                 } else if (TextUtils.equals("5", direction)) {
-                    Log.e("ROS_MOVE","开始执行运动，方向：停止");
+                    Log.e("ROS_MOVE", "开始执行运动，方向：停止");
                     doMoveAction(direction);
                 }
-            }else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)) {
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE)) {
                 //方案一：（基于ROS地图服务）
 //                Log.e("ROS_Client", "Service：Get WakeUp Degree");
 //                float d = (float) intent.getIntExtra("degree", 0);
@@ -700,7 +700,7 @@ public class MainAppActivity extends RosActivity {
 
 
     //关闭Ros
-    private void shutdownRos(){
+    private void shutdownRos() {
         availableAppsCache.clear();
         nodeMainExecutorService.shutdownNodeMain(statusPublisher);
         nodeMainExecutorService.shutdownNodeMain(pairSubscriber);

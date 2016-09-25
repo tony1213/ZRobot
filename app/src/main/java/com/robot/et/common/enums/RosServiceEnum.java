@@ -49,7 +49,7 @@ public enum RosServiceEnum {
 	* @mark Learn is not here（CommandHandler Method：isRosService，line number：397）
 	* Created by Tony
 	*/
-	DEEPLEARN("Deep Learning","视觉学习服务"),//匹配Rapp中的Deep Learning
+	DEEPLEARN("Rai Learning","视觉学习服务"),//匹配Rapp中的Deep Learning
 
 	DEEPLEARNINIT("DeepLearnInit","启动视觉学习"),
 //	VISUALLEARNSERVICE("VisualLearn","视觉学习"),
