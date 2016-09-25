@@ -28,7 +28,6 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
-import com.robot.et.core.software.common.receiver.ControlMoveService;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -392,8 +391,6 @@ public class MainAppActivity extends RosActivity {
         startService(new Intent(this, MsgReceiverService.class));
         //语音合成
         startService(new Intent(this, TextToVoiceService.class));
-        //控制动
-        startService(new Intent(this, ControlMoveService.class));
         //agora
         startService(new Intent(this, AgoraService.class));
         //接受与硬件相关消息
@@ -715,7 +712,6 @@ public class MainAppActivity extends RosActivity {
         stopService(new Intent(this, TextUnderstanderService.class));
         stopService(new Intent(this, MsgReceiverService.class));
 //        stopService(new Intent(this, NettyService.class));
-        stopService(new Intent(this, ControlMoveService.class));
         stopService(new Intent(this, AgoraService.class));
         stopService(new Intent(this, HardwareReceiverService.class));
         stopService(new Intent(this, MasterChooserService.class));

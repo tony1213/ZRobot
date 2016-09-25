@@ -64,31 +64,32 @@ public class CommandHandler {
 
     //是否控制运动
     public boolean isControlMove(String result) {
-        Log.e("ControlMove", "执行语音运动控制");
+        Log.i("ifly", "执行语音运动控制");
         if (!TextUtils.isEmpty(result)) {
             int moveKey = EnumManager.getMoveKey(result);
             Log.i("ifly", "moveKey===" + moveKey);
             if (moveKey != 0) {
-                if (DataConfig.isControlToyCar) {//控制小车
-                    DataConfig.controlNum = 0;
-                    BroadcastEnclosure.controlToyCarMove(context, moveKey, DataConfig.toyCarNum);
-                    SpeechImpl.getInstance().startListen();
-                } else {//控制机器人
-                    Log.e("ControlMove", "执行语音控制机器人");
-                    DataConfig.isControlRobotMove = true;
-                    String content = "";
-                    if (result.contains("过来")) {
-                        content = "好的，主人，我来啦";
-                    } else {
-                        content = getRandomAnswer();
-                    }
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
-
-                    int digit = getIntNum(result);
-                    Log.i("ControlMove", "result===" + result);
-                    Log.i("ControlMove", "digit===" + digit);
-                    BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
+//                if (DataConfig.isControlToyCar) {//控制小车
+//                    DataConfig.controlNum = 0;
+//                    BroadcastEnclosure.controlToyCarMove(context, moveKey, DataConfig.toyCarNum);
+//                    SpeechImpl.getInstance().startListen();
+//                } else {//控制机器人
+//                }
+                //控制机器人
+                Log.i("ifly", "执行语音控制机器人");
+                DataConfig.isControlRobotMove = true;
+                String content = "";
+                if (result.contains("过来")) {
+                    content = "好的，主人，我来啦";
+                } else {
+                    content = getRandomAnswer();
                 }
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+
+                int digit = getIntNum(result);
+                Log.i("ifly", "result===" + result);
+                Log.i("ifly", "digit===" + digit);
+                BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
                 return true;
             }
         }

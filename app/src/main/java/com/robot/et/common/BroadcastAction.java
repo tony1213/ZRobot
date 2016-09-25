@@ -51,8 +51,6 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_EARS_LED = "action.control.ears.led";
     //控制照明LED灯的广播
     public static String ACTION_CONTROL_LIGHT_LED = "action.control.light.led";
-    //控制小车不停车的广播
-    public static String ACTION_CONTROL_TOYCAR_AWAYS = "action.control.toycar.aways";
     //连接agora的广播
     public static String ACTION_CONNECT_AGORA = "action.connect.agora";
     //进入agora的广播

@@ -123,17 +123,17 @@ public class MatchSceneHandler {
 
                 break;
             case DO_ACTION_SCENE:// 智能学习做动作
-                flag = false;
 
                 break;
             case CONTROL_TOYCAR_SCENE:// 控制玩具车
-                flag = true;
-                DataConfig.isControlToyCar = true;
-                // 获取小车编号
-                int toyCarNum = MatchStringUtil.getToyCarNum(result);
-                Log.i("ifly", "toyCarNum=====" + toyCarNum);
-                DataConfig.toyCarNum = toyCarNum;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                // 控制小车的不处理
+//                flag = true;
+//                DataConfig.isControlToyCar = true;
+//                // 获取小车编号
+//                int toyCarNum = MatchStringUtil.getToyCarNum(result);
+//                Log.i("ifly", "toyCarNum=====" + toyCarNum);
+//                DataConfig.toyCarNum = toyCarNum;
+//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
 
                 break;
             case RAISE_HAND_SCENE:// 抬手

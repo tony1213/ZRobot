@@ -11,6 +11,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
@@ -20,6 +21,7 @@ import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.hardware.light.EarsLightHandler;
+import com.robot.et.core.hardware.serialport.SerialPortHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
 import com.robot.et.core.software.common.network.HttpManager;
@@ -31,6 +33,7 @@ import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.voice.util.PhoneManager;
 import com.robot.et.entity.RobotInfo;
+import com.robot.et.entity.SerialPortSendInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;
 import com.robot.et.util.DeviceUuidFactory;
@@ -53,7 +56,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private final int CALL_PHONE = 1;
     private final int UPDATE_VIEW = 2;
     private EarsLightHandler earsLightHandler;
-
+    private SerialPortHandler serialPortHandler;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,6 +72,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_ROBOT_SLEEP);
         filter.addAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
+        filter.addAction(BroadcastAction.ACTION_CONTROL_WAVING);
+        filter.addAction(BroadcastAction.ACTION_CONTROL_MOUTH_LED);
+        filter.addAction(BroadcastAction.ACTION_ROBOT_TURN_HEAD);
         registerReceiver(receiver, filter);
     }
 
@@ -86,6 +92,32 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                     earsLightHandler = new EarsLightHandler();
                 }
                 earsLightHandler.setLight(LEDState);
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_WAVING)) {//举手摆手
+                Log.i(TAG, "举手摆手");
+                String handDirection = intent.getStringExtra("handDirection");// 代表手向上向下还是摆手
+                String handCategory = intent.getStringExtra("handCategory");// 代表左手、右手还是双手
+                String num = intent.getStringExtra("num");// 代表执行的次数
+                Log.i(TAG, "handCategory===" + handCategory);
+                if (!TextUtils.isEmpty(handDirection) && !TextUtils.isEmpty(handCategory)) {
+                    handAction(handDirection, handCategory);
+                }
+
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//嘴的LED灯
+                Log.i(TAG, "嘴的LED灯");
+                String LEDState = intent.getStringExtra("LEDState");// 代表灯的状态，（开、关、闪烁）
+                if (!TextUtils.isEmpty(LEDState)) {
+                    controlMouthLED(LEDState);
+                }
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_TURN_HEAD)) {//控制头转
+                Log.i(TAG, "控制头转");
+                int directionValue = intent.getIntExtra("direction", DataConfig.TURN_HEAD_ABOUT);// 代表是点头，抬头还是转头等
+                String angleValue = intent.getStringExtra("angle");// 代表头转动的度数
+                Log.i(TAG, "控制头转angleValue==" + angleValue);//-30
+                if (!TextUtils.isEmpty(angleValue)) {
+                    if (angleValue.contains("-") || TextUtils.isDigitsOnly(angleValue)) {
+                        controlHeadTurn(directionValue, Integer.parseInt(angleValue));
+                    }
+                }
             }
         }
     };
@@ -120,7 +152,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isScriptQA = false;
         DataConfig.isAppPushRemind = false;
         DataConfig.isStartTime = false;
-        DataConfig.isControlToyCar = false;
+//        DataConfig.isControlToyCar = false;
         DataConfig.isLookPhoto = false;
         DataConfig.isShowLoadPicQRCode = false;
         DataConfig.isShowChatQRCode = false;
@@ -344,6 +376,86 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 }
             }
         });
+    }
+
+    //控制摆臂
+    private void handAction(String handDirection, String handCategory) {
+        // 转换为硬件所需要的json格式字符串
+        SerialPortSendInfo info = new SerialPortSendInfo();
+        info.setcG("Hand");
+        if (TextUtils.equals(handDirection, ScriptConfig.HAND_UP)) {
+            info.setaT("up");
+        } else if (TextUtils.equals(handDirection, ScriptConfig.HAND_DOWN)) {
+            info.setaT("down");
+        } else if (TextUtils.equals(handDirection, ScriptConfig.HAND_WAVING)) {
+            info.setaT("waving");
+        } else if (TextUtils.equals(handDirection, ScriptConfig.HAND_STOP)) {
+            info.setaT("stop");
+        }
+
+        if (TextUtils.equals(handCategory, ScriptConfig.HAND_LEFT)) {
+            info.setSide("L");
+        } else if (TextUtils.equals(handCategory, ScriptConfig.HAND_RIGHT)) {
+            info.setSide("R");
+        } else if (TextUtils.equals(handCategory, ScriptConfig.HAND_TWO)) {
+            info.setSide("LR");
+        }
+        String json = JSON.toJSONString(info);
+        sendMoveAction(json);
+    }
+
+    //控制嘴的LED
+    private void controlMouthLED(String LEDState) {
+        // 转换为硬件所需要的json格式字符串
+        SerialPortSendInfo info = new SerialPortSendInfo();
+        info.setcG("DP");
+        if (TextUtils.equals(LEDState, ScriptConfig.LED_ON)) {
+            info.setaT("ON");
+        } else if (TextUtils.equals(LEDState, ScriptConfig.LED_OFF)) {
+            info.setaT("OFF");
+        } else if (TextUtils.equals(LEDState, ScriptConfig.LED_BLINK)) {
+            info.setaT("blink");
+        }
+        String json = JSON.toJSONString(info);
+        sendMoveAction(json);
+    }
+
+    //控制头转向
+    private void controlHeadTurn(int directionValue, int angleValue) {
+        // 转换为硬件所需要的json格式字符串
+        SerialPortSendInfo info = new SerialPortSendInfo();
+        info.setcG("DIS");
+        if (directionValue == DataConfig.TURN_HEAD_ABOUT) {
+            info.setaT("HZ");
+        } else if (directionValue == DataConfig.TURN_HEAD_AROUND) {
+            info.setaT("VT");
+        }
+        info.setaG(angleValue);
+        String json = JSON.toJSONString(info);
+        sendMoveAction(json);
+    }
+
+    // 发送与运动相关的json消息
+    private void sendMoveAction(String result) {
+        Log.i(TAG, "json===" + result);
+        if (!TextUtils.isEmpty(result)) {
+            byte[] content = result.getBytes();
+            byte[] end = new byte[]{0x0a};//结束符
+            byte[] realContent = byteMerger(content, end);
+            if (serialPortHandler == null) {
+                // 初始化串口
+                serialPortHandler = new SerialPortHandler(this);
+            }
+            serialPortHandler.sendData(realContent);
+        }
+    }
+
+    // 通过arraycopy获取byte数组
+    private byte[] byteMerger(byte[] first, byte[] second) {
+        byte[] content = new byte[first.length + second.length];
+        System.arraycopy(first, 0, content, 0, first.length);
+        System.arraycopy(second, 0, content, first.length, second.length);
+        return content;
     }
 
     @Override
