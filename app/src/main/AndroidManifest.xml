@@ -59,7 +59,7 @@
         android:largeHeap="true"
         tools:replace="icon, label">
         <activity
-            android:name=".app.MainAppActivity"
+            android:name=".business.MainAppActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
