@@ -7,7 +7,7 @@ import org.ros.internal.message.Message;
  */
 
 public interface VisualResponse extends Message {
-    String _TYPE = "com.robot.et.core.software.ros.visual/VisualResponse";
+    String _TYPE = "com.robot.et.core.software.ros.client.visual/VisualResponse";
     String _DEFINITION = "int16 status\nint16 confidence\nstring output_name\nint16 pos_x\nint16 pos_y\nint16 pos_z\n";
 
     short getStatus();
