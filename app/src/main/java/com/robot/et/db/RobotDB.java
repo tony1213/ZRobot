@@ -10,7 +10,7 @@ import com.robot.et.entity.RemindInfo;
 import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.entity.ScriptInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
-import com.robot.et.main.CustomApplication;
+import com.robot.et.app.CustomApplication;
 
 import java.util.ArrayList;
 import java.util.List;

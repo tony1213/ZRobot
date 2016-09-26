@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.robot.et.core.software.common.receiver.AlarmRemindReceiver;
-import com.robot.et.main.CustomApplication;
+import com.robot.et.app.CustomApplication;
 
 import java.util.Calendar;
 
