@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.text.TextUtils;
 
 import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.ScriptConfig;
 
 /**
  * Created by houdeming on 2016/8/1.
@@ -52,18 +51,6 @@ public class BroadcastEnclosure {
             intent.putExtra("emotion", emotionKey);
             context.sendBroadcast(intent);
         }
-    }
-
-    //摆手
-    public static void controlWaving(Context context, String handDirection, String handCategory, String num) {
-        intent.setAction(BroadcastAction.ACTION_CONTROL_WAVING);
-        intent.putExtra("handDirection", handDirection);
-        if (TextUtils.isEmpty(handCategory)) {
-            handCategory = ScriptConfig.HAND_TWO;
-        }
-        intent.putExtra("handCategory", handCategory);
-        intent.putExtra("num", num);
-        context.sendBroadcast(intent);
     }
 
     //嘴巴的LED灯
@@ -115,10 +102,20 @@ public class BroadcastEnclosure {
     }
 
     //控制头的广播
-    public static void controlHead(Context context, int direction, String angle) {
+    public static void controlHead(Context context, int direction, String angle, int moveTime) {
         intent.putExtra("direction", direction);
         intent.putExtra("angle", angle);
+        intent.putExtra("moveTime", moveTime);
         intent.setAction(BroadcastAction.ACTION_ROBOT_TURN_HEAD);
+        context.sendBroadcast(intent);
+    }
+
+    //控制手臂的广播
+    public static void controlArm(Context context, String handCategory, String angle, int moveTime) {
+        intent.putExtra("handCategory", handCategory);
+        intent.putExtra("angle", angle);
+        intent.putExtra("moveTime", moveTime);
+        intent.setAction(BroadcastAction.ACTION_CONTROL_WAVING);
         context.sendBroadcast(intent);
     }
 
@@ -127,13 +124,6 @@ public class BroadcastEnclosure {
         intent.putExtra("playType", playType);
         intent.putExtra("soundId", soundId);
         intent.setAction(BroadcastAction.ACTION_PLAY_SOUND_TIPS);
-        context.sendBroadcast(intent);
-    }
-
-    //触摸的广播
-    public static void touchRobot(Context context, int touchId) {
-        intent.putExtra("touchId", touchId);
-        intent.setAction(BroadcastAction.ACTION_HARDWARE_TOUCH);
         context.sendBroadcast(intent);
     }
 
@@ -155,6 +145,16 @@ public class BroadcastEnclosure {
         intent.setAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         intent.putExtra("direction", direction);
         intent.putExtra("digit", digit);
+        context.sendBroadcast(intent);
+    }
+
+    // 通过串口控制运动
+    public static void controlMoveBySerialPort(Context context, int direction, int distance, int moveTime, int moveRadius) {
+        intent.setAction(BroadcastAction.ACTION_CONTROL_MOVE_BY_SERIALPORT);
+        intent.putExtra("direction", direction);
+        intent.putExtra("distance", distance);
+        intent.putExtra("moveTime", moveTime);
+        intent.putExtra("moveRadius", moveRadius);
         context.sendBroadcast(intent);
     }
 

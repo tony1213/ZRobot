@@ -138,12 +138,12 @@ public class MatchSceneHandler {
                 break;
             case RAISE_HAND_SCENE:// 抬手
                 flag = true;
-                hand(1, ScriptConfig.HAND_RIGHT);
+                hand(ScriptConfig.HAND_LEFT, "60", 1000);
 
                 break;
             case WAVING_SCENE:// 摆手
                 flag = true;
-                hand(1, ScriptConfig.HAND_TWO);
+                hand(ScriptConfig.HAND_TWO, "-60", 1000);
 
                 break;
             case OPEN_HOUSEHOLD_SCENE:// 打开家电
@@ -210,7 +210,7 @@ public class MatchSceneHandler {
             case PHOTOGRAPH_SCENE:// 拍照
                 flag = true;
                 // 拍照时手抬起来
-                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, ScriptConfig.HAND_TWO, "0");
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_RIGHT, "25", 1500);
                 // 说提示音
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_NO_SOUND_TIPS, "好的，三，二，一，茄子");
                 // 开始自动拍照
@@ -286,17 +286,17 @@ public class MatchSceneHandler {
 
             case OPEN_VISUAL_BODY_TRK://开启人体侦测
                 flag = true;
-                BroadcastEnclosure.sendRos(context,RosConfig.OPEN_VISUAL_BODY_TRK, "");
+                BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
 
                 break;
             case VISUAL_BODY_TRK://人体侦测
                 flag = true;
-                BroadcastEnclosure.sendRos(context,RosConfig.VISUAL_BODY_TRK, "");
+                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
 
                 break;
             case CLOSE_VISUAL_BODY_TRK://关闭人体侦测
                 flag = true;
-                BroadcastEnclosure.sendRos(context,RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
 
                 break;
 
@@ -318,12 +318,12 @@ public class MatchSceneHandler {
     }
 
     //手臂
-    private void hand(int num, final String handCategory) {
-        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+    private void hand(final String handCategory, final String angle, final int moveTime) {
+        BroadcastEnclosure.controlArm(context, handCategory, angle, moveTime);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+                BroadcastEnclosure.controlArm(context, handCategory, "0", moveTime);
             }
         }, 1500);
         SpeechImpl.getInstance().startListen();

@@ -30,7 +30,7 @@ public class ScriptHandler implements Script {
     //表演剧本
     public static void playScript(Context context, String content) {
         if (!TextUtils.isEmpty(content)) {
-            BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+            BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1000);
             // 根据剧本名字获取具体的剧本信息
             List<ScriptActionInfo> infos = getScriptActions(content);
             Log.i("netty", "playScript() infos.size()====" + infos.size());
@@ -88,7 +88,7 @@ public class ScriptHandler implements Script {
                     Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
                     // 转圈
-                    BroadcastEnclosure.sendRos(context, RosConfig.TURN, "");
+                    BroadcastEnclosure.controlMoveBySerialPort(context, direction, 1 * 1000, 1000, 1000);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -120,7 +120,7 @@ public class ScriptHandler implements Script {
                     String handDirection = ScriptManager.getHandDirection(info.getSpareContent());
                     String handCategory = ScriptManager.getHandCategory(content);
                     Log.i("netty", "doScriptAction() handDirection===" + handDirection);
-                    BroadcastEnclosure.controlWaving(context, handDirection, handCategory, "1");
+                    BroadcastEnclosure.controlArm(context, handCategory, "25", 1500);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -135,7 +135,7 @@ public class ScriptHandler implements Script {
                             num = MatchStringUtil.getToyCarNum(spareContent);
                             BroadcastEnclosure.controlToyCarMove(context, moveDirection, num);
                         } else {
-                            BroadcastEnclosure.controlRobotMoveRos(context, moveDirection, "0");
+                            BroadcastEnclosure.controlMoveBySerialPort(context, moveDirection, 1 * 1000, 1000, 0);
                         }
                     }
 
@@ -145,13 +145,13 @@ public class ScriptHandler implements Script {
                 case ScriptConfig.SCRIPT_TURN://左转右转
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
-                    BroadcastEnclosure.controlRobotMoveRos(context, turnDirection, "0");
+                    BroadcastEnclosure.controlMoveBySerialPort(context, turnDirection, 1 * 1000, 1000, 0);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
                 case ScriptConfig.SCRIPT_STOP://停止
                     Log.i("netty", "doScriptAction() 停止");
-                    BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+                    BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
                     handleNewScriptInfos(context, infos, true, getDealyTime(2000));
 
                     break;
@@ -206,12 +206,12 @@ public class ScriptHandler implements Script {
             isSingle = true;
         }
         Log.i("netty", "doScriptAction() 头turnAngle====" + turnAngle);
-        BroadcastEnclosure.controlHead(context, headDirection, turnAngle);
+        BroadcastEnclosure.controlHead(context, headDirection, turnAngle, 1000);
         if (!isSingle) {//点头
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, "5");
+                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, "5", 1000);
                 }
             }, 1000);
         }
@@ -279,7 +279,7 @@ public class ScriptHandler implements Script {
         Log.i("netty", "playScriptEnd()");
         DataConfig.isPlayScript = false;
         if (!DataConfig.isPlayMusic) {
-            BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+            BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
         }
         //重连netty
         BroadcastEnclosure.connectNetty(context);

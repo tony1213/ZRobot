@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
@@ -89,7 +90,18 @@ public class CommandHandler {
                 int digit = getIntNum(result);
                 Log.i("ifly", "result===" + result);
                 Log.i("ifly", "digit===" + digit);
-                BroadcastEnclosure.controlRobotMoveRos(context, moveKey, String.valueOf(digit));
+                if (moveKey == ControlMoveEnum.LEFT.getMoveKey() || moveKey == ControlMoveEnum.RIGHT.getMoveKey()) {
+                    // 左转右转
+                    if (digit == 0) {
+                        digit = 90;// 默认90度
+                    }
+                } else {
+                    if (digit == 0) {
+                        digit = 1 * 1000;// 默认1米
+                    }
+                }
+                // 距离：毫米  时间：毫秒
+                BroadcastEnclosure.controlMoveBySerialPort(context, moveKey, digit, 1000, 0);
                 return true;
             }
         }

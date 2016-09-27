@@ -114,12 +114,12 @@ public class TouchHandler {
 
     // 摆手
     private static void waving(final Context context, final String handCategory) {
-        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_UP, handCategory, "0");
+        BroadcastEnclosure.controlArm(context, handCategory, "25", 1500);
         // 1.5秒后把手放下来
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, handCategory, "0");
+                BroadcastEnclosure.controlArm(context, handCategory, "0", 1500);
             }
         }, 1500);
         SpeechImpl.getInstance().startListen();
@@ -127,12 +127,12 @@ public class TouchHandler {
 
     // 转头   头向左转, 向左10度即+10,头向右转, 向右10度即-10
     private static void headTurn(final Context context, final int headDirection, final String digit) {
-        BroadcastEnclosure.controlHead(context, headDirection, digit);
+        BroadcastEnclosure.controlHead(context, headDirection, digit, 1000);
         // 1.5s 头归位
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                BroadcastEnclosure.controlHead(context, headDirection, "0");
+                BroadcastEnclosure.controlHead(context, headDirection, "0", 1000);
             }
         }, 1500);
     }

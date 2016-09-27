@@ -25,8 +25,6 @@ public class BroadcastAction {
     public static String ACTION_ROBOT_SLEEP = "action.robot.sleep";
     //人体监测的广播
     public static String ACTION_BODY_DETECTION = "action.body.detection";
-    //硬件触摸的广播
-    public static String ACTION_HARDWARE_TOUCH = "action.hardware.touch";
     //开始播放音乐
     public static String ACTION_PLAY_MUSIC_START = "action.play.music.start";
     //停止音乐播放
@@ -69,5 +67,7 @@ public class BroadcastAction {
     public static String ACTION_PLAY_SOUND_TIPS = "com.robot.et.play.sound.tips";
     //关闭人脸检测的广播
     public static String ACTION_CLOSE_FACE_DISTINGUISH = "com.robot.et.close.face.distinguish";
+    //通过串口控制运动的广播
+    public static String ACTION_CONTROL_MOVE_BY_SERIALPORT = "com.robot.et.control.move.by.serialport";
 
 }

@@ -215,7 +215,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED)) {//自动拍照完成
                 Log.i(TAG, "MsgReceiverService  自动拍照完成");
                 // 拍完照手放下来
-                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_DOWN, ScriptConfig.HAND_TWO, "0");
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "0", 1500);
                 // 获取拍照后传来的图片数据
                 byte[] photoData = intent.getByteArrayExtra("photoData");
                 if (photoData != null && photoData.length > 0) {
@@ -261,20 +261,20 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     TimerManager.cancelTimer(timer);
                     timer = null;
                 } else {
-                    //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+                    //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即+10，向左10度即-10
                     int angleValue = getAngle();
                     angle = String.valueOf(angleValue);
                     Log.i(TAG, "app控制头  angleValue==" + angleValue + ",angle====" + angle);
                     // 发送控制头部的广播
-                    BroadcastEnclosure.controlHead(MsgReceiverService.this, directionTurn, angle);
+                    BroadcastEnclosure.controlHead(MsgReceiverService.this, directionTurn, angle, 1000);
 
                     // 当头移动的方向满足一定的值后停止
-                    if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 +60 --- -60
+                    if (directionTurn == DataConfig.TURN_HEAD_ABOUT) {//左右 -90 --- +90
                         DataConfig.LAST_HEAD_ANGLE_ABOUT = angleValue;
-                        if (angleValue <= -60 || angleValue >= 60) {
+                        if (angleValue <= -90 || angleValue >= 90) {
                             DataConfig.isHeadStop = true;
                         }
-                    } else if (directionTurn == DataConfig.TURN_HEAD_AROUND) {//前后 -18 ----- +18
+                    } else if (directionTurn == DataConfig.TURN_HEAD_AROUND) {//前后 -20 ----- +20
                         DataConfig.LAST_HEAD_ANGLE_AROUND = angleValue;
                         if (angleValue <= -20 || angleValue >= 20) {
                             DataConfig.isHeadStop = true;
@@ -285,7 +285,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         }
     };
 
-    //左右 +60 ---- -60    前后 -18 ----- +18   获取一直发的角度
+    //左右 -90 ---- -90    前后 +20 ----- +20   获取一直发的角度
     private int getAngle() {
         int data = 0;
         if (!TextUtils.isEmpty(angle)) {
@@ -306,14 +306,14 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     }
                 } else {//左右
                     if (DataConfig.isHeadLeft) {//左
-                        angleValue += incrementValue;
-                        if (angleValue >= 60) {
-                            angleValue = 60;
+                        angleValue -= incrementValue;
+                        if (angleValue <= -90) {
+                            angleValue = -90;
                         }
                     } else {//右
-                        angleValue -= incrementValue;
-                        if (angleValue <= -60) {
-                            angleValue = -60;
+                        angleValue += incrementValue;
+                        if (angleValue >= 90) {
+                            angleValue = 90;
                         }
                     }
                 }

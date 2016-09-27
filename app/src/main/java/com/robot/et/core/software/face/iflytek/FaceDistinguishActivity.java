@@ -110,7 +110,7 @@ public class FaceDistinguishActivity extends Activity {
         // 获取已注册人脸的数据
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
         // 开始人脸识别的时候头稍微向后转
-        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "15");
+        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(15), 1000);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CLOSE_FACE_DISTINGUISH);
@@ -357,7 +357,7 @@ public class FaceDistinguishActivity extends Activity {
                                 Log.i("face", "directionValue===" + directionValue);
 
                                 // 发送控制头部运动的广播
-                                BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_ABOUT, directionValue);
+                                BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_ABOUT, directionValue, 1000);
                             }
                             // 处理识别到的人脸
                             handleFace(mImageData, faceInfos);
@@ -379,10 +379,10 @@ public class FaceDistinguishActivity extends Activity {
         String sign = "";
         if (pointY < screenCenterY) {//向左转
             Log.i("face", "向左转");
+            sign = "-";
             tempValue = screenCenterY - pointY;
         } else {//向右转
             Log.i("face", "向右转");
-            sign = "-";
             tempValue = pointY - screenCenterY;
         }
         if (tempValue <= 20) {
@@ -406,7 +406,7 @@ public class FaceDistinguishActivity extends Activity {
         // 提示灯关闭
         BroadcastEnclosure.controlEarsLED(this, EarsLightConfig.EARS_CLOSE);
         // 通知头部复位
-//        BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "0");
+//        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(0), 1000);
     }
 
     @Override

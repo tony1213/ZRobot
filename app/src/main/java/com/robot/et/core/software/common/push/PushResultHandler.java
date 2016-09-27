@@ -64,7 +64,7 @@ public class PushResultHandler implements NettyClientCallBack {
                         }
                         isControlHead = false;
                         Log.i(TAG, "控制脚走");
-                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, "0");
+                        BroadcastEnclosure.controlMoveBySerialPort(context, moveKey, 1 * 1000, 1000, 0);
                     } else {
                         //上下以垂直方向为0度，向前10度即-10，向后10度即+10  左右横向运动以正中为0度，向右10度即-10，向左10度即+10
                         isControlHead = true;
@@ -348,7 +348,7 @@ public class PushResultHandler implements NettyClientCallBack {
         beginHandler();
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_BLINK);
         // 手上下摆动
-        BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_WAVING, ScriptConfig.HAND_TWO, "0");
+        BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "25", 1500);
         // 说话
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, userName + "回来了，我们去门口迎接他吧");
         // 走到门口
@@ -358,7 +358,7 @@ public class PushResultHandler implements NettyClientCallBack {
             @Override
             public void run() {
                 BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
-                BroadcastEnclosure.controlWaving(context, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
             }
         }, 2000);
     }

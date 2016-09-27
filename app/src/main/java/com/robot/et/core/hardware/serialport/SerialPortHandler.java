@@ -1,17 +1,11 @@
 package com.robot.et.core.hardware.serialport;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.robot.et.common.BroadcastAction;
-import com.robot.et.common.DataConfig;
-import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
 import com.robot.et.entity.SerialPortReceiverInfo;
-import com.robot.et.util.BroadcastEnclosure;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,66 +87,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
         if (!TextUtils.isEmpty(result)) {
             SerialPortReceiverInfo info = getBluthReceiverInfo(result);
             if (info != null) {
-                // 获取语音唤醒的值，当为1时代表有人唤醒
-                int xFState = info.getxF();
-                if (xFState == 1) {//有唤醒
-                    // 获取唤醒的角度
-                    int xFAngle = info.getxAg();
-                    Log.i("wakeup", "xFAngle===" + xFAngle);
-                    //当在人脸检测的时候不发送广播
-                    if (!DataConfig.isFaceRecogniseIng) {
-                        //软件做业务
-                        Intent interruptIntent = new Intent();
-                        interruptIntent.setAction(BroadcastAction.ACTION_WAKE_UP_OR_INTERRUPT);
-                        context.sendBroadcast(interruptIntent);
-
-//                        handleAngle(xFAngle);
-//
-//                        Log.i("wakeup", "headAngle===" + headAngle);
-//                        Log.i("wakeup", "bodyAngle===" + bodyAngle);
-//                        //头部去转
-//                        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle));
-                        //身体去转
-                        BroadcastEnclosure.wakeUpTurnBody(context, xFAngle);
-                    }
-                }
-
-                // 获取红外检测的值，当为1时代表检测到人
-                int hW = info.getHw();
-                if (hW == 1) {//有人影进入范围
-                    Log.i("wakeup", "检测到人影");
-                    // 发送检测到人影的广播
-                    BroadcastEnclosure.bodyDetection(context);
-                }
-
-                // 获取雷达数据
-                int leftValue = info.getRdL();// 左边的距离数据
-                int middleValue = info.getRdM();// 中间的距离数据
-                int rightValue = info.getRdR();// 右边的距离数据
-                Log.i(TAG, "leftValue==" + leftValue + "---middleValue===" + middleValue + "---rightValue===" + rightValue);
-                // 只有在语音控制走的时候，才会发送雷达停止的广播
-                if (DataConfig.isControlRobotMove) {
-                    int stopValue = 50;// 距离多少时发送雷达停止的广播
-                    if (leftValue < stopValue || middleValue < stopValue || rightValue < stopValue) {
-                        DataConfig.isControlRobotMove = false;
-                        Log.i(TAG, "雷达发送停止1");
-                        // 发送雷达停止的广播
-                        BroadcastEnclosure.sendRadar(context);
-
-                        //向后退
-                        int moveKey = ControlMoveEnum.BACKWARD.getMoveKey();
-                        Log.i(TAG, "发送后退");
-                        BroadcastEnclosure.controlRobotMoveRos(context, moveKey, "0");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.i(TAG, "雷达发送停止2");
-                                BroadcastEnclosure.sendRadar(context);
-                            }
-                        }, 1000);
-                    }
-                }
-
+               
             }
         }
     }

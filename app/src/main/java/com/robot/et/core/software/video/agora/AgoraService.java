@@ -115,7 +115,7 @@ public class AgoraService extends Service {
         SpeechImpl.getInstance().cancelSpeak();
         SpeechImpl.getInstance().cancelListen();
         BroadcastEnclosure.stopMusic(this);
-        BroadcastEnclosure.controlWaving(this, ScriptConfig.HAND_STOP, ScriptConfig.HAND_TWO, "0");
+        BroadcastEnclosure.controlArm(this, ScriptConfig.HAND_TWO, "0", 1500);
 
         SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
         share.putString(SharedPreferencesKeys.AGORA_ROOM_NUM, roomNum);
