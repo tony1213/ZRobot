@@ -26,6 +26,7 @@ import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.RosConfig;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
@@ -54,6 +55,7 @@ import com.robot.et.core.software.voice.VoiceToTextService;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
 
 import org.ros.android.RosActivity;
@@ -286,6 +288,10 @@ public class MainAppActivity extends RosActivity {
                                 // TODO try to no finish so statusPublisher remains while on app;  risky, but seems to work!    finish();
                             } else if (result == AppLauncher.Result.NOTHING) {
                                 Log.e(TAG, "Android app nothing");
+                                if (TextUtils.equals(selectedInteraction.getDisplayName(),"Rai Learning")){
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"视觉已开启");
+                                }
+                                Log.e(TAG, "Android app nothing2");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());
                             } else if (result == AppLauncher.Result.NOT_INSTALLED) {
                                 // App not installed; ask for going to play store to download the missing app
@@ -485,6 +491,34 @@ public class MainAppActivity extends RosActivity {
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
                     visualClient = new VisualClient((short) 5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                } else if (TextUtils.equals("OpenBodyTRK",flag)){
+                    //视觉人体检测开启
+                    Log.e("ROS_Client","Service: Start OpenBodyTRK");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 21,"");
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                } else if (TextUtils.equals("BodyTRK",flag)){
+                    //视觉人体跟踪
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            while (true){
+                                Log.e("ROS_Client","Service: Start BodyTRK");
+                                visualClient = new VisualClient(MainAppActivity.this,(short) 23,"");
+                                nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                                // 每20ms读一次
+                                try {
+                                    Thread.sleep(20);
+                                } catch (InterruptedException e) {
+                                    Log.i("body", "bodyTRK InterruptedException=" + e.getMessage());
+                                }
+                            }
+                        }
+                    }).start();
+                } else if (TextUtils.equals("CloseBodyTRK",flag)){
+                    //视觉人体检测关闭
+                    Log.e("ROS_Client","Service: Start CloseBodyTRK");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 22,"");
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("SaveAMap", flag)) {
                     //保存地图(Service)
                     Log.e("ROS_Client", "Service:Start SaveAMap");
@@ -587,7 +621,7 @@ public class MainAppActivity extends RosActivity {
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 //方案二（直接控制Twist）
                 double d = (double) intent.getIntExtra("degree", 0);
-//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "获取的唤醒角度是：" + d);
                 doTrunAction(mover.getCurrentDegree(), d);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_RADAR)) {
                 //方案一：（基于ROS地图服务）

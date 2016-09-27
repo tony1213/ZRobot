@@ -1,11 +1,14 @@
 package com.robot.et.core.software.ros.client;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.ros.client.visual.VisualRequest;
 import com.robot.et.core.software.ros.client.visual.VisualResponse;
+import com.robot.et.util.BroadcastEnclosure;
 
 import org.ros.exception.RemoteException;
 import org.ros.exception.ServiceNotFoundException;
@@ -42,10 +45,16 @@ public class VisualClient extends AbstractNodeMain {
 
 
 
+    private Context context;
     private short flag;
     private String name;
 
     public VisualClient(short flag, String name) {
+        this.flag = flag;
+        this.name = name;
+    }
+    public VisualClient(Context context,short flag, String name) {
+        this.context =context;
         this.flag = flag;
         this.name = name;
     }
@@ -160,6 +169,7 @@ public class VisualClient extends AbstractNodeMain {
                     }
                 }else if (flag == VISUAL_TRK_OPEN){
                     //打开人体跟踪
+                    Log.e("body","Open Body TRK");
                     if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为人体检测模式");
                     }else {
@@ -167,11 +177,18 @@ public class VisualClient extends AbstractNodeMain {
                     }
                 }else if (flag == VISUAL_TRK_POSITION){
                     //获取人体的位置
+                    Log.e("body","Body TRK");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"获取到人体位置");
-
-
+                    Log.e("body","response.getPosX():"+response.getPosX());
+                    Log.e("body","response.getPosY():"+response.getPosY());
+                    Log.e("body","response.getPosZ():"+response.getPosZ());
+                    if (response.getPosZ()<80){
+                        Log.e("body","response.getPosZ()<80,触发停止");
+                        BroadcastEnclosure.controlRobotMoveRos(context,5,"0");
+                    }
                 }else if (flag == VISUAL_TRK_CLOSE){
                     //关闭人体跟踪
+                    Log.e("body","Close Body TRK");
                     if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"关闭人体检测模式");
                     }else {
