@@ -233,10 +233,10 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
 
             if (DataConfig.isLookPhoto) {// 查看图片
                 if (MatchStringUtil.matchString(result, MatchStringUtil.lastPhotoRegex)) {// 上一张照片
-                    Gallery.showLastOnePic();
+                    Gallery.showLastOnePic(VoiceToTextService.this);
                     return;
                 } else if (MatchStringUtil.matchString(result, MatchStringUtil.nextPhotoRegex)) {// 下一张照片
-                    Gallery.showNextPic();
+                    Gallery.showNextPic(VoiceToTextService.this);
                     return;
                 } else {
                     DataConfig.isLookPhoto = false;

@@ -1,7 +1,10 @@
 package com.robot.et.core.software.common.view;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -48,7 +51,7 @@ public class OneImgManager {
     }
 
     //显示拍的照片
-    public static void showPhoto(Bitmap bitmap) {
+    public static void showPhoto(Context context, int animId, Bitmap bitmap) {
         if (imagePhoto != null) {
             showImgLinearLayout(true);
             if (imageBitmap != null) {
@@ -56,8 +59,34 @@ public class OneImgManager {
                 imageView.setVisibility(View.GONE);
             }
             imagePhoto.setVisibility(View.VISIBLE);
-            imagePhoto.setImageBitmap(bitmap);
+            if (animId == 0) {
+                imagePhoto.setImageBitmap(bitmap);
+            } else {
+                playAnim(context, animId, bitmap);
+            }
         }
+    }
+
+    // 播放图片切换动画
+    private static void playAnim(Context context, int animId, final Bitmap bitmap) {
+        Animation animation = AnimationUtils.loadAnimation(context, animId);
+        imagePhoto.startAnimation(animation);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                imagePhoto.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     //显示表情父布局

@@ -224,7 +224,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     Bitmap bitmap = BitmapUtil.byte2Bitmap(photoData);
                     // 显示拍照后的图片
                     ViewCommon.initView();
-                    OneImgManager.showPhoto(bitmap);
+                    OneImgManager.showPhoto(MsgReceiverService.this, 0, bitmap);
                     // 1s之后显示二维码
                     SystemClock.sleep(1000);
                     // 上传图片到服务器

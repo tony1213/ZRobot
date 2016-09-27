@@ -194,7 +194,7 @@ public class MatchSceneHandler {
             case LOOK_PHOTO_SCENE:// 看看照片的标志
                 flag = true;
                 DataConfig.isLookPhoto = true;
-                Gallery.getShowPic();
+                Gallery.getShowPic(context);
 
                 break;
             case OPEN_SECURITY_SCENE:// 进入安保场景

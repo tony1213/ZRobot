@@ -1,5 +1,6 @@
 package com.robot.et.core.software.common.speech;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -7,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.UrlConfig;
 import com.robot.et.core.software.common.network.HttpManager;
@@ -38,9 +40,12 @@ public class Gallery {
     private static int CURRENT_INDEX = 0;
     // 图片创建时间（用于获取上下张图片）
     private static String createTime;
+    private static Context context;
+    private static int animId;// 播放动画的id
 
     // 获取所有图片 第一次去请求图片时，可以不带参数
-    public static void getShowPic() {
+    public static void getShowPic(Context context) {
+        Gallery.context = context;
         // 设置参数 第一次只传机器编号
         HttpEngine.Param[] params = new HttpEngine.Param[]{
                 new HttpEngine.Param("robotNumber", SharedPreferencesUtils.getInstance().getString(SharedPreferencesKeys.ROBOT_NUM, "")),
@@ -58,6 +63,7 @@ public class Gallery {
                     mInfos.addAll(infos);
                     // 初始脚标为0
                     CURRENT_INDEX = 0;
+                    animId = 0;
                     showPic(mInfos.get(CURRENT_INDEX));
                 } else {
                     noPic();
@@ -67,7 +73,8 @@ public class Gallery {
     }
 
     // 获取上一张图片
-    public static void showLastOnePic() {
+    public static void showLastOnePic(Context context) {
+        Gallery.context = context;
         if (mInfos != null && mInfos.size() > 0) {
             // 如果当前是第一张的话，就不再去查了
             if (CURRENT_INDEX <= 0) {
@@ -77,6 +84,7 @@ public class Gallery {
             CURRENT_INDEX--;
 
             if (CURRENT_INDEX < mInfos.size() && CURRENT_INDEX >= 0) {
+                animId = R.anim.anim_pic_last;
                 showPic(mInfos.get(CURRENT_INDEX));
                 return;
             }
@@ -88,10 +96,12 @@ public class Gallery {
     }
 
     // 获取下一张图片
-    public static void showNextPic() {
+    public static void showNextPic(Context context) {
+        Gallery.context = context;
         if (mInfos != null && mInfos.size() > 0) {
             CURRENT_INDEX++;
             if (CURRENT_INDEX < mInfos.size() && CURRENT_INDEX >= 0) {
+                animId = R.anim.anim_pic_next;
                 showPic(mInfos.get(CURRENT_INDEX));
             } else {// 如果当前是最后一张的话，去查新的
                 // 设置参数
@@ -106,6 +116,7 @@ public class Gallery {
                         if (infos != null && infos.size() > 0) {
                             mInfos.addAll(infos);
                             if (CURRENT_INDEX < mInfos.size()) {
+                                animId = R.anim.anim_pic_next;
                                 showPic(mInfos.get(CURRENT_INDEX));
                             }
                         } else {
@@ -147,7 +158,7 @@ public class Gallery {
             Bitmap bitmap = (Bitmap) msg.obj;
             if (bitmap != null) {
                 ViewCommon.initView();
-                OneImgManager.showPhoto(bitmap);
+                OneImgManager.showPhoto(context, animId, bitmap);
             }
         }
     };
