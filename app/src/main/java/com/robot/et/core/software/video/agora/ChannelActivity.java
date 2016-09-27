@@ -162,7 +162,8 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_CLOSE_AGORA)) {//关闭agora
                 Log.i("agoravideo", "ChannelActivity   关闭agora");
-                closeChannel();
+                boolean isNeedVoiceType = intent.getBooleanExtra("isNeedVoiceType", false);
+                closeChannel(isNeedVoiceType);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED)) {//检测网络变化
                 boolean isNetBad = intent.getBooleanExtra("NetWorkSpeed", false);
                 Log.i("agoravideo", "ChannelActivity   检测网络变化isNetBad===" + isNetBad);
@@ -186,23 +187,27 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     };
 
     //退出当前通话
-    private void closeChannel() {
+    private void closeChannel(boolean isNeedVoiceType) {
         setRemoteUserViewVisibility(false);
         leaveChannel();
         isUserJoined = true;
         finish();
-        Log.i("agoravideo", "islook222===" + isLook);
-        if (isLook || isNetWorkNotGood) { // 查看
-            Log.i("agoravideo", "查看");
-            if (isLook) {
-                speakContent(DataConfig.SPEAK_TYPE_PHONE_NO_TIPS, "");
+        if (isNeedVoiceType) {
+            Log.i("agoravideo", "islook222===" + isLook);
+            if (isLook || isNetWorkNotGood) { // 查看
+                Log.i("agoravideo", "查看");
+                if (isLook) {
+                    speakContent(DataConfig.SPEAK_TYPE_PHONE_NO_TIPS, "");
+                } else {
+                    isNetWorkNotGood = false;
+                    speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，网络不给力，已断开");
+                }
             } else {
-                isNetWorkNotGood = false;
-                speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，网络不给力，已断开");
+                Log.i("agoravideo", "不是查看");
+                speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，对方已挂断");
             }
         } else {
-            Log.i("agoravideo", "不是查看");
-            speakContent(RequestConfig.JPUSH_CALL_CLOSE, "抱歉，对方已挂断");
+            speakContent(DataConfig.SPEAK_TYPE_PHONE_NO_TIPS, "");
         }
 
         isLook = false;

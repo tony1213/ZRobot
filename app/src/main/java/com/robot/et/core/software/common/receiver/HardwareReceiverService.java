@@ -20,7 +20,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.UrlConfig;
-import com.robot.et.core.hardware.light.EarsLightHandler;
+import com.robot.et.core.hardware.light.LightHandler;
 import com.robot.et.core.hardware.serialport.SerialPortHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
@@ -55,8 +55,12 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private WakeUpHandler wakeUpHandler;
     private final int CALL_PHONE = 1;
     private final int UPDATE_VIEW = 2;
-    private EarsLightHandler earsLightHandler;
+    private final int SHORT_PRESS = 3;
+    private final int TOUCH = 4;
+    private LightHandler lightHandler;
     private SerialPortHandler serialPortHandler;
+    private boolean isFirstPress;// 短按
+    private static int mTouchId;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -68,6 +72,8 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         super.onCreate();
         // 初始化唤醒
         wakeUpHandler = new WakeUpHandler(this);
+        // 初始化灯
+        lightHandler = new LightHandler();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_ROBOT_SLEEP);
@@ -84,14 +90,11 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_SLEEP)) {// 机器人沉睡
                 Log.i(TAG, "HardwareReceiverService 机器人沉睡");
-                wakeUpHandler.faceWakeUp();
+                wakeUpHandler.sleepAwaken();
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_EARS_LED)) {// 耳朵灯
                 int LEDState = intent.getIntExtra("LEDState", 0);
                 Log.i(TAG, "HardwareReceiverService 耳朵灯LEDState==" + LEDState);
-                if (earsLightHandler == null) {
-                    earsLightHandler = new EarsLightHandler();
-                }
-                earsLightHandler.setLight(LEDState);
+                lightHandler.setEarsLight(LEDState);
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_WAVING)) {//举手摆手
                 Log.i(TAG, "举手摆手");
                 String handDirection = intent.getStringExtra("handDirection");// 代表手向上向下还是摆手
@@ -140,7 +143,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     }
 
     // 接受到唤醒后的处理
-    private void responseAwaken() {
+    private void responseAwaken(boolean isSpeak) {
         //停止说
         SpeechImpl.getInstance().cancelSpeak();
         //停止听
@@ -157,7 +160,11 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isShowLoadPicQRCode = false;
         DataConfig.isShowChatQRCode = false;
 
-        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
+        if (isSpeak) {
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
+        } else {
+            SpeechImpl.getInstance().startListen();
+        }
     }
 
     //获取唤醒时要说的内容
@@ -184,7 +191,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         //当在人脸检测的时候不发送广播
         if (!DataConfig.isFaceRecogniseIng) {
             // 相应唤醒后要做的事
-            responseAwaken();
+            responseAwaken(true);
             awaken();
             // 小于30度只头转
             if (degree >= 330 && degree <= 360) {
@@ -234,7 +241,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         } else {
             if (DataConfig.isSecuritySign) {// 安保模式
                 // 自身照明灯亮起
-                BroadcastEnclosure.controlLightLED(HardwareReceiverService.this, "");
+                controlLightLED(LIGHT_ON);
                 // 耳朵灯旋转
                 BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_CLOCKWISE_TURN);
                 // 防止在拨打电话前检测到多次，每次计时之前，先停止掉前面的计时器，保证最新的计时时间
@@ -268,8 +275,19 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 return;
             }
             awaken();
-            // 响应触摸
-            touch(touchId);
+            mTouchId = touchId;
+            handler.sendEmptyMessage(TOUCH);
+
+        }
+    }
+
+    @Override
+    public void shortPress() {
+        Log.i(TAG, "HardwareReceiverService 短按");
+        // 当一直按的时候会一直触发，防止一直按着不放
+        if (!isFirstPress) {
+            isFirstPress = true;
+            handler.sendEmptyMessage(SHORT_PRESS);
         }
     }
 
@@ -288,7 +306,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                         @Override
                         public void run() {
                             // 照明灯灭
-                            BroadcastEnclosure.controlLightLED(HardwareReceiverService.this, "");
+                            controlLightLED(LIGHT_OFF);
                         }
                     }, 30 * 1000);
                 } else {// 不是安保模式
@@ -319,43 +337,73 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == CALL_PHONE) {
-                // 拨打用户手机视频
-                if (DataConfig.isSecuritySign) {// 安保模式
-                    TimerManager.cancelTimer(timer);
-                    timer = null;
-                    // 获取管理员手机号
-                    final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
-                    String adminPhone = share.getString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, "");
-                    if (TextUtils.isEmpty(adminPhone)) {
-                        HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, new DeviceUuidFactory(HardwareReceiverService.this).getDeviceUuid(), new RobotInfoCallBack() {
-                            @Override
-                            public void onSuccess(RobotInfo info) {
-                                if (info != null) {
-                                    String phone = info.getAdminPhone();
-                                    if (!TextUtils.isEmpty(phone)) {
-                                        share.putString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, phone);
-                                        share.commitValue();
-                                        callPhone(phone);
+            switch (msg.what) {
+                case CALL_PHONE:// 呼叫电话
+                    // 拨打用户手机视频
+                    if (DataConfig.isSecuritySign) {// 安保模式
+                        TimerManager.cancelTimer(timer);
+                        timer = null;
+                        // 获取管理员手机号
+                        final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+                        String adminPhone = share.getString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, "");
+                        if (TextUtils.isEmpty(adminPhone)) {
+                            HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, new DeviceUuidFactory(HardwareReceiverService.this).getDeviceUuid(), new RobotInfoCallBack() {
+                                @Override
+                                public void onSuccess(RobotInfo info) {
+                                    if (info != null) {
+                                        String phone = info.getAdminPhone();
+                                        if (!TextUtils.isEmpty(phone)) {
+                                            share.putString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, phone);
+                                            share.commitValue();
+                                            callPhone(phone);
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onFail(String errorMsg) {
+                                @Override
+                                public void onFail(String errorMsg) {
 
-                            }
-                        });
+                                }
+                            });
 
-                    } else {
-                        callPhone(adminPhone);
+                        } else {
+                            callPhone(adminPhone);
+                        }
                     }
-                }
 
-            } else {
-                // 显示正常表情
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                    break;
+                case UPDATE_VIEW:// 更新view
+                    // 显示正常表情
+                    ViewCommon.initView();
+                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
+                    break;
+                case SHORT_PRESS:// 短按
+                    // 如果正在音视频的话关掉
+                    if (DataConfig.isVideoOrVoice) {
+                        BroadcastEnclosure.closeAgora(HardwareReceiverService.this, false);
+                        isFirstPress = false;
+                        return;
+                    }
+                    // 如果正在人脸识别的话关掉
+                    if (DataConfig.isFaceRecogniseIng) {
+                        BroadcastEnclosure.closeFaceDistinguish(HardwareReceiverService.this);
+                        isFirstPress = false;
+                        awaken();
+                        SpeechImpl.getInstance().startListen();
+                        return;
+                    }
+
+                    responseAwaken(false);
+                    awaken();
+                    isFirstPress = false;
+
+                    break;
+                case TOUCH:// 触摸
+                    touch(mTouchId);
+                    break;
+                default:
+                    break;
             }
         }
     };
@@ -376,6 +424,15 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 }
             }
         });
+    }
+
+    // 照明灯 1：开  0：关
+    private final int LIGHT_ON = 1;
+    private final int LIGHT_OFF = 0;
+
+    // 控制照明灯
+    private void controlLightLED(int lightState) {
+        lightHandler.setFloodLight(lightState);
     }
 
     //控制摆臂

@@ -12,4 +12,7 @@ public interface IWakeUp {
 
     // 触摸
     void bodyTouch(int touchId);
+
+    // 短按
+    void shortPress();
 }

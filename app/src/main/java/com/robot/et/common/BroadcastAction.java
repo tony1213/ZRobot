@@ -49,8 +49,6 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_MOUTH_LED = "action.control.mouth.led";
     //控制机器人耳朵LED灯的广播
     public static String ACTION_CONTROL_EARS_LED = "action.control.ears.led";
-    //控制照明LED灯的广播
-    public static String ACTION_CONTROL_LIGHT_LED = "action.control.light.led";
     //连接agora的广播
     public static String ACTION_CONNECT_AGORA = "action.connect.agora";
     //进入agora的广播
@@ -69,5 +67,7 @@ public class BroadcastAction {
     public static String ACTION_CONTROL_HEAD_BY_APP = "com.robot.et.control.head.by.app";
     //播放声音提示（说话结束、拍照、打电话等）
     public static String ACTION_PLAY_SOUND_TIPS = "com.robot.et.play.sound.tips";
+    //关闭人脸检测的广播
+    public static String ACTION_CLOSE_FACE_DISTINGUISH = "com.robot.et.close.face.distinguish";
 
 }

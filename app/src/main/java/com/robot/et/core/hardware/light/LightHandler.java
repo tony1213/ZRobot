@@ -13,18 +13,22 @@ import java.util.TimerTask;
 /**
  * Created by houdeming on 2016/9/18.
  */
-public class EarsLightHandler {
+public class LightHandler {
     private static final String TAG = "light";
     private Timer timer;
     private int lightState;
 
-    static {
-        int lightFd = EarsLight.initEarsLight();
-        Log.i(TAG, "lightFd==" + lightFd);
+    public LightHandler() {
+        // 初始化耳朵灯
+        int earsLightFd = EarsLight.initEarsLight();
+        Log.i(TAG, "earsLightFd==" + earsLightFd);
+        // 初始化照明灯
+        int floodLightFd = FloodLight.initFloodLight();
+        Log.i(TAG, "floodLightFd==" + floodLightFd);
     }
 
     // 设置耳朵灯的状态
-    public void setLight(int lightState) {
+    public void setEarsLight(int lightState) {
         Log.i(TAG, "lightState==" + lightState);
         this.lightState = lightState;
         switch (lightState) {
@@ -51,6 +55,11 @@ public class EarsLightHandler {
             default:
                 break;
         }
+    }
+
+    // 设置照明灯的状态
+    public void setFloodLight(int lightState) {
+        FloodLight.setLightStatus(lightState);
     }
 
     private void startTimer() {

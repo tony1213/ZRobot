@@ -2,8 +2,10 @@ package com.robot.et.core.software.face.iflytek;
 
 import android.Manifest.permission;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.ImageFormat;
@@ -110,7 +112,19 @@ public class FaceDistinguishActivity extends Activity {
         // 开始人脸识别的时候头稍微向后转
         BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_AROUND, "15");
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastAction.ACTION_CLOSE_FACE_DISTINGUISH);
+        registerReceiver(receiver, filter);
     }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(BroadcastAction.ACTION_CLOSE_FACE_DISTINGUISH)) {// 关闭人脸检测
+                finish();
+            }
+        }
+    };
 
     //获取屏幕中心点坐标
     private void getScreenCenterPoint() {
@@ -402,6 +416,7 @@ public class FaceDistinguishActivity extends Activity {
         mFaceDetector.destroy();
         DataConfig.isFaceRecogniseIng = false;
         DataConfig.isVoiceFaceRecognise = false;
+        unregisterReceiver(receiver);
     }
 
     // 脸部识别后的处理 对传来的注册数据一个一个遍历验证人脸，验证不通过便注册人脸

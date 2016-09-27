@@ -82,19 +82,23 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
-    //照明灯
-    public static void controlLightLED(Context context, String LEDState) {
-        if (!TextUtils.isEmpty(LEDState)) {
-            intent.setAction(BroadcastAction.ACTION_CONTROL_LIGHT_LED);
-            intent.putExtra("LEDState", LEDState);
-            context.sendBroadcast(intent);
-        }
-    }
-
     //连接agora
     public static void connectAgora(Context context, int type) {
         intent.setAction(BroadcastAction.ACTION_CONNECT_AGORA);
         intent.putExtra("type", type);
+        context.sendBroadcast(intent);
+    }
+
+    //关闭agora
+    public static void closeAgora(Context context, boolean isNeedVoiceType) {
+        intent.setAction(BroadcastAction.ACTION_CLOSE_AGORA);
+        intent.putExtra("isNeedVoiceType", isNeedVoiceType);
+        context.sendBroadcast(intent);
+    }
+
+    //关闭人脸检测
+    public static void closeFaceDistinguish(Context context) {
+        intent.setAction(BroadcastAction.ACTION_CLOSE_FACE_DISTINGUISH);
         context.sendBroadcast(intent);
     }
 

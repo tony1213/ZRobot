@@ -9,44 +9,60 @@ import com.robot.et.common.DataConfig;
  * 与唤醒相关的处理
  */
 public class WakeUpHandler {
+    private final String TAG = "wakeup";
+    private final int AWAKEN_VOICE = 1;// 语音唤醒
+    private final int AWAKEN_PRESS = 2;// 短按唤醒
+    private final int AWAKEN_TOUCH = 3;// 触摸唤醒
+    private int sleepAwakenFd;
+    private int allAwakeFd;
     private IWakeUp iWakeUp;
-    private int voiceFd;
-    private int faceFd;
 
     public WakeUpHandler(IWakeUp iWakeUp) {
         this.iWakeUp = iWakeUp;
-        // 获取人体检测的串口id
-        faceFd = WakeUp.faceWakeUpInit();
-        Log.i("wakeup", "face faceFd==" + faceFd);
-        // 获取语音唤醒的串口id
-        voiceFd = WakeUp.wakeUpInit();
-        Log.i("wakeup", "voice voiceFd==" + voiceFd);
-        // 去检测是否有语音唤醒
-        voiceWakeUp();
+        // 初始化什么情况下都唤醒
+        allAwakeFd = AllAwake.initAllAwake();
+        Log.i(TAG, "allAwakeFd==" + allAwakeFd);
+        // 初始化只有沉睡的时候再唤醒
+        sleepAwakenFd = SleepAwake.initSleepAwake();
+        Log.i(TAG, "sleepAwakenFd==" + sleepAwakenFd);
+
+        allAwaken();
     }
 
-    //语言唤醒
-    private void voiceWakeUp() {
+    // 一直唤醒
+    private void allAwaken() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                    if (voiceFd > 0) {
-                        // 获取语音唤醒的状态值，当为1的时候代表唤醒，0的时候没有人唤醒
-                        int wakeUpState = WakeUp.getWakeUpState();
-                        if (wakeUpState == 1) {
-                            // 获取唤醒的角度
-                            int degree = WakeUp.getWakeUpDegree();
-                            Log.i("wakeup", "degree==" + degree);
-                            WakeUp.setGainDirection(0);// 设置麦克0为主麦
-                            iWakeUp.getVoiceWakeUpDegree(degree);
+                    int allValue = AllAwake.getAllAwakeValue();
+                    if (allValue != 65535) {
+                        int intSource = allValue & 0xFFFF;
+                        Log.i(TAG, "intSource==" + intSource);
+                        switch (intSource) {
+                            case AWAKEN_VOICE:// 语音唤醒
+                                int degree = ((allValue & 0xFFFF0000) >> 16);
+                                Log.i(TAG, "degree==" + degree);
+                                iWakeUp.getVoiceWakeUpDegree(degree);
+
+                                break;
+                            case AWAKEN_PRESS:// 短按唤醒
+                                iWakeUp.shortPress();
+
+                                break;
+                            case AWAKEN_TOUCH:// 触摸唤醒
+                                int touchId = ((allValue & 0xFFFF0000) >> 16);
+                                Log.i(TAG, "touchId==" + touchId);
+                                iWakeUp.bodyTouch(touchId);
+
+                                break;
+
                         }
-                        // 每20ms读一次
-                        try {
-                            Thread.sleep(20);
-                        } catch (InterruptedException e) {
-                            Log.i("wakeup", "voiceWakeUp InterruptedException=" + e.getMessage());
-                        }
+                    }
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        Log.i(TAG, "allAwaken InterruptedException");
                     }
                 }
             }
@@ -54,18 +70,19 @@ public class WakeUpHandler {
     }
 
     //人脸唤醒
-    public void faceWakeUp() {
+    public void sleepAwaken() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 // 只有沉睡的时候再去检测人体
                 while (DataConfig.isSleep) {
-                    if (faceFd > 0) {
+                    if (sleepAwakenFd > 0) {
                         // 获取人体检测的状态值，1代表检测到人体，0代表没有检测到人体
-                        int faceWakeUpState = WakeUp.getFaceWakeUpState();
-                        if (faceWakeUpState == 1) {
+                        int sleepValue = SleepAwake.getSleepAwakeValue();
+                        Log.i(TAG, "sleepValue==" + sleepValue);
+                        if (sleepValue != 65535) {
                             //有人影进入范围
-                            Log.i("wakeup", "检测到人影");
+                            Log.i(TAG, "检测到人影");
                             // 发送人体感应
                             iWakeUp.bodyDetection();
                         }
@@ -74,7 +91,7 @@ public class WakeUpHandler {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                        Log.i("wakeup", "faceWakeUp InterruptedException=" + e.getMessage());
+                        Log.i(TAG, "sleepAwaken InterruptedException=" + e.getMessage());
                     }
                 }
             }
