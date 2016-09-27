@@ -16,6 +16,12 @@ public class RosConfig {
     public static final String LEARN_OBJECT_WHAT = "DeepLearnRec";
     // 学习物体（这是手机）
     public static final String LEARN_OBJECT_KNOWN = "DeepLearn";
+    //开启人体检测
+    public static final String OPEN_VISUAL_BODY_TRK = "OpenBodyTRK";
+    //识别视觉人体位置
+    public static final String VISUAL_BODY_TRK = "BodyTRK";
+    //关闭人体检测
+    public static final String CLOSE_VISUAL_BODY_TRK = "CloseBodyTRK";
     // 创建地图
     public static final String CREATE_MAP = "MakeAMap";
     // 保存地图

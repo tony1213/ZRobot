@@ -268,7 +268,7 @@ public class MatchSceneHandler {
                 flag = true;
                 DataConfig.isStartDistinguish = false;
                 // 关闭视觉
-                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE, "");
+                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
 
                 break;
             case INIT_VISION_SCENE:// 初始化视觉
@@ -283,6 +283,23 @@ public class MatchSceneHandler {
                 BroadcastEnclosure.sendRos(context, RosConfig.FORGET_LEARN_CONTENT, "");
 
                 break;
+
+            case OPEN_VISUAL_BODY_TRK://开启人体侦测
+                flag = true;
+                BroadcastEnclosure.sendRos(context,RosConfig.OPEN_VISUAL_BODY_TRK, "");
+
+                break;
+            case VISUAL_BODY_TRK://人体侦测
+                flag = true;
+                BroadcastEnclosure.sendRos(context,RosConfig.VISUAL_BODY_TRK, "");
+
+                break;
+            case CLOSE_VISUAL_BODY_TRK://关闭人体侦测
+                flag = true;
+                BroadcastEnclosure.sendRos(context,RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+
+                break;
+
             case NAVIGATION_SCENE:// 导航到
                 String area = MatchStringUtil.getNavigationArea(result);
                 if (!TextUtils.isEmpty(area)) {
