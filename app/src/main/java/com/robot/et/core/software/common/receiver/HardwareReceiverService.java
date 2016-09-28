@@ -117,8 +117,8 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                     }
                 }
 
-            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//嘴的LED灯
-                Log.i(TAG, "嘴的LED灯");
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_MOUTH_LED)) {//胸口的LED灯
+                Log.i(TAG, "胸口的LED灯");
                 String LEDState = intent.getStringExtra("LEDState");// 代表灯的状态，（开、关、闪烁）
                 if (!TextUtils.isEmpty(LEDState)) {
                     String json = MoveFormat.controlMouthLED(LEDState);
@@ -141,13 +141,15 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 int distance = intent.getIntExtra("distance", 0);
                 int moveTime = intent.getIntExtra("moveTime", 0);
                 int moveRadius = intent.getIntExtra("moveRadius", 0);
-
+                Log.i(TAG, "distance==" + distance);
                 int speed;
                 if (direction == ControlMoveEnum.LEFT.getMoveKey() || direction == ControlMoveEnum.RIGHT.getMoveKey()) {
                     // 左转右转是度数
                     speed = distance;
+                    moveTime = distance * 1000 / 90;// 默认速度90度/s
                 } else {// 前进后退是距离
-                    speed = distance / (moveTime / 1000);
+                    speed = 300;// 默认速度300mm/s
+                    moveTime = (distance * 10) / 3;
                 }
                 String json = MoveFormat.controlMove(direction, speed, moveTime, moveRadius);
                 sendMoveAction(json);
@@ -231,7 +233,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     // 被唤醒
     private void awaken() {
         // 胸口灯常亮
-        BroadcastEnclosure.controlMouthLED(this, ScriptConfig.LED_ON);
+        BroadcastEnclosure.controlChestLED(this, ScriptConfig.LED_ON);
     }
 
     @Override
@@ -242,24 +244,59 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             // 相应唤醒后要做的事
             responseAwaken(true);
             awaken();
-            // 小于30度只头转
-            if (degree >= 330 && degree <= 360) {
-                // 330-360  头向左转, 向左10度即-10
-                int digit = degree - 360;// 要转的角度
-                BroadcastEnclosure.controlHead(HardwareReceiverService.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(digit), 1000);
-
-            } else if (degree >= 0 && degree <= 30) {
-                // 0-30  头向右转, 向右10度即+10，
-                BroadcastEnclosure.controlHead(HardwareReceiverService.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(degree), 1000);
-
-            } else {// 大于30度时身体转过去，手同时摆动
-                //硬件去转身
-                BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.LEFT.getMoveKey(), degree, 1000, 0);
+            Log.i(TAG, "degree==" + degree);
+            handleAngle(degree);
+            Log.i(TAG, "headAngle==" + headAngle);
+            // 头转
+            BroadcastEnclosure.controlHead(HardwareReceiverService.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle), 1000);
+            Log.i(TAG, "bodyAngle==" + bodyAngle);
+            if (bodyAngle > 0) {// 身体向右转
+                BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.RIGHT.getMoveKey(), bodyAngle, 1000, 0);
+            } else {// 身体向左转
+                BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.LEFT.getMoveKey(), Math.abs(bodyAngle), 1000, 0);
+            }
+            // 只有身体转的时候处理
+            if (degree > 30 && degree < 330) {
                 // 耳朵的灯光在运动的时候进行闪烁
                 BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
                 // 摆手
                 BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "30", 1500);
             }
+        }
+    }
+
+    private int headAngle;//头部角度
+    private int bodyAngle;//身体角度
+    private static int lastAngle = 0;// 最后一次的角度，跟转身相关
+
+    // 处理头与身体转的问题
+    //0-30  头向右转  ： 330-360  头向左转
+    //左右横向运动以正中为0度，向左10度即-10，向右10度即+10
+    private void handleAngle(int angle) {
+        if (angle < 0 || angle > 360) {
+            return;
+        }
+        if (angle > 180 && angle <= 360) {
+            angle = angle - 360;//-180-0
+        }
+        lastAngle += angle;
+        if (lastAngle > 30) {
+            bodyAngle = lastAngle;
+            headAngle = 0;
+            lastAngle = headAngle;
+        } else if (lastAngle < -30) {
+            bodyAngle = lastAngle;
+            headAngle = 0;
+            lastAngle = headAngle;
+        } else {// 只需转头，不需要转身体
+            headAngle = lastAngle;
+            bodyAngle = 0;
+        }
+        // < 0 向左   > 0 向右
+        if (bodyAngle > 180) {
+            bodyAngle = bodyAngle - 360;
+        } else if (bodyAngle < -180) {
+            bodyAngle = 360 + bodyAngle;
         }
     }
 

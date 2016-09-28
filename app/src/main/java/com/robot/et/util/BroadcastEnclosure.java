@@ -53,8 +53,8 @@ public class BroadcastEnclosure {
         }
     }
 
-    //嘴巴的LED灯
-    public static void controlMouthLED(Context context, String LEDState) {
+    //胸口的LED灯
+    public static void controlChestLED(Context context, String LEDState) {
         if (!TextUtils.isEmpty(LEDState)) {
             intent.setAction(BroadcastAction.ACTION_CONTROL_MOUTH_LED);
             intent.putExtra("LEDState", LEDState);

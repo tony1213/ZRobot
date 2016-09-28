@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSON;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.entity.SerialPortFormatInfo;
-import com.robot.et.entity.SerialPortSendInfo;
 
 /**
  * Created by houdeming on 2016/9/27.
@@ -16,14 +15,14 @@ public class MoveFormat {
     //控制嘴的LED
     public static String controlMouthLED(String LEDState) {
         // 转换为硬件所需要的json格式字符串
-        SerialPortSendInfo info = new SerialPortSendInfo();
-        info.setcG("DP");
+        SerialPortFormatInfo info = new SerialPortFormatInfo();
+        info.setAct("led");
         if (TextUtils.equals(LEDState, ScriptConfig.LED_ON)) {
-            info.setaT("ON");
+            info.setCmd("on");
         } else if (TextUtils.equals(LEDState, ScriptConfig.LED_OFF)) {
-            info.setaT("OFF");
+            info.setCmd("off");
         } else if (TextUtils.equals(LEDState, ScriptConfig.LED_BLINK)) {
-            info.setaT("blink");
+            info.setCmd("blink");
         }
         String json = JSON.toJSONString(info);
         return json;

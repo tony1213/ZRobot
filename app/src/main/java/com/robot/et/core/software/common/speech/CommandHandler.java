@@ -21,6 +21,7 @@ import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.util.AlarmRemindManager;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
+import com.robot.et.util.Utilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +88,7 @@ public class CommandHandler {
                 }
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
 
-                int digit = getIntNum(result);
+                int digit = Utilities.chineseNumber2Int(result);
                 Log.i("ifly", "result===" + result);
                 Log.i("ifly", "digit===" + digit);
                 if (moveKey == ControlMoveEnum.LEFT.getMoveKey() || moveKey == ControlMoveEnum.RIGHT.getMoveKey()) {
@@ -98,6 +99,8 @@ public class CommandHandler {
                 } else {
                     if (digit == 0) {
                         digit = 1 * 1000;// 默认1米
+                    } else {
+                        digit *= 1000;// 单位是mm
                     }
                 }
                 // 距离：毫米  时间：毫秒
@@ -106,39 +109,6 @@ public class CommandHandler {
             }
         }
         return false;
-    }
-
-    //获取要走的距离
-    private int getIntNum(String result) {
-        int data = 0;
-        if (!TextUtils.isEmpty(result)) {
-            char[] datas = new char[]{'一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '两'};
-            int resultLength = result.length();
-            StringBuffer buffer = new StringBuffer();
-            for (int i = 0; i < resultLength; i++) {
-                char temp = result.charAt(i);
-                if (Character.isDigit(temp)) {
-                    buffer.append(temp);
-                } else {
-                    int datasLength = datas.length;
-                    for (int j = 0; j < datasLength; j++) {
-                        if (temp == datas[j]) {
-                            data = j + 1;
-                            if (j == datas.length - 1) {
-                                data = 2;
-                            }
-                        }
-                    }
-                }
-            }
-            String tempDistance = buffer.toString();
-            if (!TextUtils.isEmpty(tempDistance)) {
-                if (TextUtils.isDigitsOnly(tempDistance)) {
-                    data = Integer.parseInt(tempDistance);
-                }
-            }
-        }
-        return data;
     }
 
     //是否是自定义问答

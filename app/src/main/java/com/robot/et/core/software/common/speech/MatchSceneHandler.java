@@ -339,7 +339,7 @@ public class MatchSceneHandler {
         // 耳朵灯灭
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
-        BroadcastEnclosure.controlMouthLED(context, ScriptConfig.LED_BLINK);
+        BroadcastEnclosure.controlChestLED(context, ScriptConfig.LED_BLINK);
         // 显示睡觉表情
         ViewCommon.initView();
         EmotionManager.showEmotionAnim(R.drawable.emotion_rest);

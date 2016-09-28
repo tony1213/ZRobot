@@ -1,4 +1,4 @@
-package com.robot.et.core.hardware.wakeup;
+package com.robot.et.core.hardware.sleepawake;
 
 // 只有沉睡的时候才会唤醒
 public class SleepAwake {

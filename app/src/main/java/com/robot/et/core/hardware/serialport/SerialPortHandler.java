@@ -86,9 +86,6 @@ public class SerialPortHandler implements OnDataReceiveListener {
     private void handleJsonResult(String result) {
         if (!TextUtils.isEmpty(result)) {
             SerialPortReceiverInfo info = getBluthReceiverInfo(result);
-            if (info != null) {
-               
-            }
         }
     }
 
@@ -99,25 +96,36 @@ public class SerialPortHandler implements OnDataReceiveListener {
     private static int lastAngle = 0;// 最后一次的角度，跟转身相关
 
     //对角度处理
-    //0-60  头向右转  ： 300-360  头向左转
-    //左右横向运动以正中为0度，向右10度即-10，向左10度即+10
+    //0-30  头向右转  ： 330-360  头向左转
+    //左右横向运动以正中为0度，向左10度即-10，向右10度即+10
     private void handleAngle(int angle) {
-        lastAngle = (lastAngle + angle) % 360;
 
-        if (lastAngle >= 300 && lastAngle <= 360) {
-            headAngle = 360 - lastAngle;
-            bodyAngle = 0;
-
-        } else if (lastAngle >= 0 && lastAngle <= 60) {
-            headAngle = lastAngle - 60;
-            bodyAngle = 0;
-
-        } else {
-            headAngle = 0;
-            bodyAngle = lastAngle;
-            lastAngle = 0;
-
+        if (angle > 180 && angle <= 360) {
+            angle = angle - 360;//-180-0
         }
+
+        lastAngle += angle;
+
+        if (lastAngle > 30) {
+            bodyAngle = lastAngle;
+            headAngle = 0;
+            lastAngle = headAngle;
+        } else if (lastAngle < -30) {
+            bodyAngle = lastAngle;
+            headAngle = 0;
+            lastAngle = headAngle;
+        } else {// 只需转头，不需要转身体
+            headAngle = lastAngle;
+            bodyAngle = 0;
+        }
+
+        // < 0 向左   > 0 向右
+        if (bodyAngle > 180) {
+            bodyAngle = bodyAngle - 360;
+        } else if (bodyAngle < -180) {
+            bodyAngle = 360 + bodyAngle;
+        }
+
     }
 
     //{"rdl":0,"rdm":0,"rdr":0,"xf":1,"xag":20,"hw":1}

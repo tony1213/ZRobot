@@ -3,6 +3,7 @@ package com.robot.et.core.hardware.wakeup;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.hardware.sleepawake.SleepAwake;
 
 /**
  * Created by houdeming on 2016/9/16.
@@ -43,6 +44,8 @@ public class WakeUpHandler {
                             case AWAKEN_VOICE:// 语音唤醒
                                 int degree = ((allValue & 0xFFFF0000) >> 16);
                                 Log.i(TAG, "degree==" + degree);
+                                // 语音板置0
+                                AllAwake.setAllAwakePara(AWAKEN_VOICE, 0);
                                 iWakeUp.getVoiceWakeUpDegree(degree);
 
                                 break;
@@ -76,11 +79,11 @@ public class WakeUpHandler {
             public void run() {
                 // 只有沉睡的时候再去检测人体
                 while (DataConfig.isSleep) {
-                    if (sleepAwakenFd > 0) {
+                    if (sleepAwakenFd >= 0) {
                         // 获取人体检测的状态值，1代表检测到人体，0代表没有检测到人体
                         int sleepValue = SleepAwake.getSleepAwakeValue();
                         Log.i(TAG, "sleepValue==" + sleepValue);
-                        if (sleepValue != 65535) {
+                        if (sleepValue == 1) {
                             //有人影进入范围
                             Log.i(TAG, "检测到人影");
                             // 发送人体感应
