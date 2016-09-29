@@ -1,7 +1,6 @@
 package com.robot.et.app;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import com.alibaba.sdk.android.push.CloudPushService;
@@ -11,7 +10,6 @@ import com.baidu.mapapi.SDKInitializer;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
-import com.robot.et.core.software.common.push.ali.ALiPush;
 import com.squareup.leakcanary.LeakCanary;
 
 public class CustomApplication extends Application {
@@ -31,7 +29,7 @@ public class CustomApplication extends Application {
         // 初始化科大讯飞
         initVoice();
         // 初始化云推送
-        initCloudChannel(this);
+        initCloudChannel();
         // 初始化百度地图
         initBaiDuMap();
     }
@@ -55,22 +53,19 @@ public class CustomApplication extends Application {
     /**
      * 初始化阿里云推送通道
      * 一定要放在这里初始化云推送，不然清掉apk再打开，接受不到推送的消息
-     *
-     * @param applicationContext
      */
-    private void initCloudChannel(final Context applicationContext) {
-        PushServiceFactory.init(applicationContext);
+    private void initCloudChannel() {
+        PushServiceFactory.init(this);
         CloudPushService pushService = PushServiceFactory.getCloudPushService();
-        pushService.register(applicationContext, new CommonCallback() {
+        pushService.register(this, new CommonCallback() {
             @Override
             public void onSuccess(String response) {
                 Log.i("alipush", "init cloudchannel success");
-                new ALiPush(applicationContext);
             }
 
             @Override
             public void onFailed(String errorCode, String errorMessage) {
-                Log.e("alipush", "init cloudchannel failed -- errorcode:" + errorCode + " -- errorMessage:" + errorMessage);
+                Log.i("alipush", "init cloudchannel failed -- errorcode:" + errorCode + " -- errorMessage:" + errorMessage);
             }
         });
     }

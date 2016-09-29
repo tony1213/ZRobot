@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,9 +27,10 @@ import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.RosConfig;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
+import com.robot.et.core.software.common.network.NetWorkConnect;
+import com.robot.et.core.software.common.push.ali.ALiPush;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
 import com.robot.et.core.software.common.receiver.MsgReceiverService;
 import com.robot.et.core.software.common.speech.SpeechImpl;
@@ -45,18 +47,18 @@ import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.connect.first.MasterChooserService;
-import com.robot.et.core.software.ros.connect.second.MasterFactory;
 import com.robot.et.core.software.ros.move.MoveControler;
 import com.robot.et.core.software.ros.position.PositionControler;
 import com.robot.et.core.software.video.agora.AgoraService;
 import com.robot.et.core.software.voice.TextToVoiceService;
 import com.robot.et.core.software.voice.TextUnderstanderService;
 import com.robot.et.core.software.voice.VoiceToTextService;
+import com.robot.et.core.software.zxing.ScanCodeActivity;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
+import com.robot.et.util.Utilities;
 
 import org.ros.android.RosActivity;
 import org.ros.exception.RemoteException;
@@ -94,6 +96,10 @@ public class MainAppActivity extends RosActivity {
     private boolean validatedConcert;
     private Map map;
     private String city;
+    private NetWorkConnect netWorkConnect;
+    private WifiManager mWiFiManager;
+    private boolean isConnectNet;// 是否连接网络
+    private boolean isConnectIng;// 是否正在连接网络
 
     private VisualClient visualClient;//ROS 视觉识别的Client（Service：learn_to_recognize_ros_server）
     private RmapClient rmapClient;   //ROS 地图保存的Client（Service：/turtlebot/save_only_map）
@@ -117,16 +123,37 @@ public class MainAppActivity extends RosActivity {
         setContentView(R.layout.activity_main);
         // 保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // 初始化WiFi
+        mWiFiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        netWorkConnect = new NetWorkConnect(mWiFiManager);
+        // 初始化UI
         initView();
-        initService();
-        initBaiDuMap();
+        // 注册广播
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
         filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
+        filter.addAction(BroadcastAction.ACTION_SCAN_QR_CODE);
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
         prepareAppManager();
+        // 连接网络，有时候开机重启系统没有检测到网络断开
+        connectNet();
+    }
+
+    // 连接网络
+    private void connectNet() {
+        boolean isNetConnected = Utilities.isNetworkConnected(this);
+        if (!isNetConnected) {
+            Log.i("network", "网络没连接");
+            isConnectIng = true;
+            // 有时候第一次不能检测到网络没连接，防止误打开扫码
+            if (ScanCodeActivity.instance == null) {
+                Intent mIntent = new Intent(this, ScanCodeActivity.class);
+                startActivity(mIntent);
+            }
+        }
     }
 
     @Override
@@ -136,7 +163,7 @@ public class MainAppActivity extends RosActivity {
 
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
-        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
+//        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
     }
 
     // 初始化UI
@@ -288,8 +315,8 @@ public class MainAppActivity extends RosActivity {
                                 // TODO try to no finish so statusPublisher remains while on app;  risky, but seems to work!    finish();
                             } else if (result == AppLauncher.Result.NOTHING) {
                                 Log.e(TAG, "Android app nothing");
-                                if (TextUtils.equals(selectedInteraction.getDisplayName(),"Rai Learning")){
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"视觉已开启");
+                                if (TextUtils.equals(selectedInteraction.getDisplayName(), "Rai Learning")) {
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉已开启");
                                 }
                                 Log.e(TAG, "Android app nothing2");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());
@@ -387,8 +414,6 @@ public class MainAppActivity extends RosActivity {
     }
 
     private void initService() {
-        //netty
-//        startService(new Intent(this, NettyService.class));
         //语音听写
         startService(new Intent(this, VoiceToTextService.class));
         //文本理解
@@ -491,19 +516,19 @@ public class MainAppActivity extends RosActivity {
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
                     visualClient = new VisualClient((short) 5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
-                } else if (TextUtils.equals("OpenBodyTRK",flag)){
+                } else if (TextUtils.equals("OpenBodyTRK", flag)) {
                     //视觉人体检测开启
-                    Log.e("ROS_Client","Service: Start OpenBodyTRK");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 21,"");
+                    Log.e("ROS_Client", "Service: Start OpenBodyTRK");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 21, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
-                } else if (TextUtils.equals("BodyTRK",flag)){
+                } else if (TextUtils.equals("BodyTRK", flag)) {
                     //视觉人体跟踪
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            while (true){
-                                Log.e("ROS_Client","Service: Start BodyTRK");
-                                visualClient = new VisualClient(MainAppActivity.this,(short) 23,"");
+                            while (true) {
+                                Log.e("ROS_Client", "Service: Start BodyTRK");
+                                visualClient = new VisualClient(MainAppActivity.this, (short) 23, "");
                                 nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                                 // 每20ms读一次
                                 try {
@@ -514,10 +539,10 @@ public class MainAppActivity extends RosActivity {
                             }
                         }
                     }).start();
-                } else if (TextUtils.equals("CloseBodyTRK",flag)){
+                } else if (TextUtils.equals("CloseBodyTRK", flag)) {
                     //视觉人体检测关闭
-                    Log.e("ROS_Client","Service: Start CloseBodyTRK");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 22,"");
+                    Log.e("ROS_Client", "Service: Start CloseBodyTRK");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 22, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
                 } else if (TextUtils.equals("SaveAMap", flag)) {
                     //保存地图(Service)
@@ -630,6 +655,46 @@ public class MainAppActivity extends RosActivity {
                 //方案二：（直接控制Twist）
                 Log.e("radar", "触发雷达安全距离，执行刹车指令");
                 doMoveAction("5");
+            } else if (intent.getAction().equals(BroadcastAction.ACTION_SCAN_QR_CODE)) {// 扫码结果
+                String mCodeNo = intent.getStringExtra("result");
+                Log.i("network", "扫码结果mCodeNo==" + mCodeNo);
+                if (!TextUtils.isEmpty(mCodeNo)) {
+                    if (mCodeNo.contains("MUZI")) {
+                        //result的结果为：company:MUZHI;S:xiaohuangren;P:test1230;
+                        String[] arrar = mCodeNo.split(";");
+                        String netWorkName = arrar[1].split(":")[1];
+                        Log.i("network", "网络名称：" + netWorkName);
+                        String password = arrar[2].split(":")[1];
+                        Log.i("network", "密码：" + password);
+                        netWorkConnect.Connect(netWorkName, password, NetWorkConnect.WifiCipherType.WIFICIPHER_WPA);
+                    }
+                }
+            } else if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {// 检测网络
+                Log.i("network", "检测网络");
+                boolean isNetConnected = Utilities.isNetworkConnected(MainAppActivity.this);
+                if (isNetConnected) {
+                    Log.i("network", "网络已连接");
+                    isConnectNet = true;
+                    isConnectIng = false;
+                    // 防止连上网后还在扫码
+                    if (ScanCodeActivity.instance != null) {
+                        ScanCodeActivity.instance.finish();
+                        ScanCodeActivity.instance = null;
+                    }
+                    initService();
+                    // 初始化百度地图
+                    initBaiDuMap();
+                    // 初始化阿里推送
+                    new ALiPush(MainAppActivity.this);
+                } else {
+                    Log.i("network", "网络断开");
+                    if (isConnectNet) {// 只有连接过网络的时候再关闭开启过的service
+                        destroyService();
+                    }
+                    if (!isConnectIng) {
+                        connectNet();
+                    }
+                }
             }
         }
     };
@@ -745,7 +810,6 @@ public class MainAppActivity extends RosActivity {
         stopService(new Intent(this, TextToVoiceService.class));
         stopService(new Intent(this, TextUnderstanderService.class));
         stopService(new Intent(this, MsgReceiverService.class));
-//        stopService(new Intent(this, NettyService.class));
         stopService(new Intent(this, AgoraService.class));
         stopService(new Intent(this, HardwareReceiverService.class));
         stopService(new Intent(this, MasterChooserService.class));

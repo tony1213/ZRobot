@@ -69,5 +69,7 @@ public class BroadcastAction {
     public static String ACTION_CLOSE_FACE_DISTINGUISH = "com.robot.et.close.face.distinguish";
     //通过串口控制运动的广播
     public static String ACTION_CONTROL_MOVE_BY_SERIALPORT = "com.robot.et.control.move.by.serialport";
+    //自动扫码后结果的广播
+    public static String ACTION_SCAN_QR_CODE = "com.robot.et.scan.qr.code";
 
 }
