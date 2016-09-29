@@ -41,6 +41,7 @@ import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.SpectrumManager;
 import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.VisualizerView;
+import com.robot.et.core.software.ros.BodyPositionSubscriber;
 import com.robot.et.core.software.ros.PairSubscriber;
 import com.robot.et.core.software.ros.StatusPublisher;
 import com.robot.et.core.software.ros.client.FollowClient;
@@ -48,6 +49,7 @@ import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.connect.first.MasterChooserService;
+import com.robot.et.core.software.ros.connect.second.MasterFactory;
 import com.robot.et.core.software.ros.move.MoveControler;
 import com.robot.et.core.software.ros.position.PositionControler;
 import com.robot.et.core.software.video.agora.AgoraService;
@@ -58,6 +60,7 @@ import com.robot.et.core.software.zxing.ScanCodeActivity;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
 import com.robot.et.util.Utilities;
 
@@ -108,6 +111,7 @@ public class MainAppActivity extends RosActivity {
     private MoveClient moveClient;   //ROS 运动控制（Topic:/set_goal）
     private PositionControler positionControler; //ROS 获取当前位置的坐标（Topic:/amcl_pose）
     private FollowClient followClient; //ROS跟随服务Client：（Service：/turtlebot_follower/change_state）
+    private BodyPositionSubscriber bodyPositionSubscriber;//ROS 获取视觉人体位置的坐标
 
     private MoveControler mover; //ROS 操作Twist控制Robot（Topic:/cmd_vel_mux/input/teleop && /odom）
 
@@ -165,7 +169,7 @@ public class MainAppActivity extends RosActivity {
 
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
-//        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
+        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
     }
 
     // 初始化UI
@@ -275,6 +279,8 @@ public class MainAppActivity extends RosActivity {
                         Log.e(TAG, "DisplayName:" + availableAppsCache.get(i).getDisplayName());
                     }
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "小黄人我来啦");
+                    //开启视觉模块 
+                    startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Rai Learning");
                 } else {
                     // TODO: maybe I should notify the user... he will think something is wrong!
                     Log.e(TAG, "No interactions available for the '" + roconDescription.getCurrentRole() + "' role.");
@@ -435,7 +441,7 @@ public class MainAppActivity extends RosActivity {
         Log.e(TAG, "init(NodeMainExecutor nodeMainExecutor)");
         mover = new MoveControler();
         mover.isPublishVelocity(false);
-
+        bodyPositionSubscriber = new BodyPositionSubscriber();//获取视觉的人体坐标
         positionControler = new PositionControler();//获取当前的位置坐标
         try {
             java.net.Socket socket = new java.net.Socket(getMasterUri().getHost(), getMasterUri().getPort());
@@ -460,6 +466,7 @@ public class MainAppActivity extends RosActivity {
             nodeMainExecutorService.execute(mover, nodeConfiguration.setNodeName("mover"));
 
             nodeMainExecutorService.execute(positionControler, nodeConfiguration.setNodeName("positionControler"));
+            nodeMainExecutorService.execute(bodyPositionSubscriber, nodeConfiguration.setNodeName("bodyPositionSubscriber"));
 //            nodeMainExecutor.execute(positionControler, nodeConfiguration);
         } catch (IOException e) {
             // Socket problem
@@ -495,57 +502,49 @@ public class MainAppActivity extends RosActivity {
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
                     visualClient = new VisualClient((short) 1, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     //视觉学习(service)
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
                     visualClient = new VisualClient((short) 2, name);
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     //视觉识别(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
                     visualClient = new VisualClient((short) 3, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
                     //视觉关闭(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnClose");
                     visualClient = new VisualClient((short) 4, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeleteAllVisual", flag)) {
                     //视觉删除学习内容(service)
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
                     visualClient = new VisualClient((short) 5, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("OpenBodyTRK", flag)) {
                     //视觉人体检测开启
                     Log.e("ROS_Client", "Service: Start OpenBodyTRK");
                     visualClient = new VisualClient(MainAppActivity.this, (short) 21, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("BodyTRK", flag)) {
-                    //视觉人体跟踪
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            while (true) {
-                                Log.e("ROS_Client", "Service: Start BodyTRK");
-                                visualClient = new VisualClient(MainAppActivity.this, (short) 23, "");
-                                nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
-                                // 每20ms读一次
-                                try {
-                                    Thread.sleep(20);
-                                } catch (InterruptedException e) {
-                                    Log.i("body", "bodyTRK InterruptedException=" + e.getMessage());
-                                }
-                            }
-                        }
-                    }).start();
+                    //视觉人体跟踪(获取人体xyz数值),更换为ROS Topic模式
+                    double x=bodyPositionSubscriber.getX();
+                    double y=bodyPositionSubscriber.getY();
+                    double z=bodyPositionSubscriber.getZ();
+                    Log.e("BodyPosition","获取到人体中心点的位置：X＝"+x+",Y="+y+",Z="+z);
+                    if (z<80){
+                        Log.e("body","response.getPosZ()<80,触发停止");
+                        BroadcastEnclosure.controlRobotMoveRos(context,5,"0");
+                    }
                 } else if (TextUtils.equals("CloseBodyTRK", flag)) {
                     //视觉人体检测关闭
                     Log.e("ROS_Client", "Service: Start CloseBodyTRK");
                     visualClient = new VisualClient(MainAppActivity.this, (short) 22, "");
-                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("deepLearnClient"));
+                    nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("SaveAMap", flag)) {
                     //保存地图(Service)
                     Log.e("ROS_Client", "Service:Start SaveAMap");
@@ -702,11 +701,13 @@ public class MainAppActivity extends RosActivity {
                     initBaiDuMap();
                     // 初始化阿里推送
                     new ALiPush(MainAppActivity.this);
+//                    startMasterChooser();
                 } else {
                     Log.i("network", "网络断开");
                     isConnectSuccess = false;
                     if (isConnectNet) {// 只有连接过网络的时候再关闭开启过的service
                         destroyService();
+                        shutdownRos();
                     }
                     if (!isConnectIng) {
                         connectNet();

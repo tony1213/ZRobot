@@ -176,16 +176,9 @@ public class VisualClient extends AbstractNodeMain {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换人体检测模式失败");
                     }
                 }else if (flag == VISUAL_TRK_POSITION){
-                    //获取人体的位置
+                    //获取人体的位置更改为Topic模式
                     Log.e("body","Body TRK");
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"获取到人体位置");
-                    Log.e("body","response.getPosX():"+response.getPosX());
-                    Log.e("body","response.getPosY():"+response.getPosY());
-                    Log.e("body","response.getPosZ():"+response.getPosZ());
-                    if (response.getPosZ()<80){
-                        Log.e("body","response.getPosZ()<80,触发停止");
-                        BroadcastEnclosure.controlRobotMoveRos(context,5,"0");
-                    }
+
                 }else if (flag == VISUAL_TRK_CLOSE){
                     //关闭人体跟踪
                     Log.e("body","Close Body TRK");
