@@ -241,13 +241,21 @@ public class MatchSceneHandler {
                 if (DataConfig.isStartDistinguish) {
                     flag = true;
                     String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
-                    if (TextUtils.isEmpty(visionContent)) {// 这是什么？
-                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
-                    } else {// 这是手机
-                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
+                    //该步骤需要进行视觉初始化，所以该地方需要视觉初始化
+                    try {
+                        BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");//视觉初始化成功，需要时间大概是1～2秒
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化失败，错误码5");
+                        break;
+                    } finally {
+                        if (TextUtils.isEmpty(visionContent)) {// 这是什么？
+                            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
+                        } else {// 这是手机
+                            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
+                        }
                     }
                 }
-
                 break;
             case GO_WHERE_SCENE:// 去哪里的指令
 //                String whereContent = MatchStringUtil.getGoWhereAnswer(result);
