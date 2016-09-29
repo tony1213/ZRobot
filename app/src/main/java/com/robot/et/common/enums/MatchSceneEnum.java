@@ -77,10 +77,34 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.controlToyCarRegex);
         }
     },
+    RAISE_LEFT_HAND_SCENE {// 抬左手
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.raiseLeftHandRegex);
+        }
+    },
+    RAISE_RIGHT_HAND_SCENE {// 抬右手
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.raiseRightHandRegex);
+        }
+    },
     RAISE_HAND_SCENE {// 抬手
 
         public boolean isScene(String str) {
             return MatchStringUtil.matchString(str, MatchStringUtil.raiseHandRegex);
+        }
+    },
+    HEAD_UP_SCENE {// 抬头
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.raiseHeadUpRegex);
+        }
+    },
+    HEAD_DOWN_SCENE {// 低头
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.raiseHeadDownRegex);
         }
     },
     WAVING_SCENE {// 摆手
@@ -190,18 +214,6 @@ public enum MatchSceneEnum {
 
         public boolean isScene(String str) {
             return MatchStringUtil.matchString(str, MatchStringUtil.closeSecuritySignRegex);
-        }
-    },
-    OPEN_HOUSEHOLD_SCENE {// 打开家电
-
-        public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.openHouseholdRegex);
-        }
-    },
-    CLOSE_HOUSEHOLD_SCENE {// 关闭家电
-
-        public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.closeHouseholdRegex);
         }
     };
 

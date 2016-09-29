@@ -144,8 +144,7 @@ public class MainAppActivity extends RosActivity {
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(receiver, filter);
         prepareAppManager();
-        // 连接网络，有时候开机重启系统没有检测到网络断开
-        connectNet();
+
     }
 
     // 连接网络
@@ -160,6 +159,14 @@ public class MainAppActivity extends RosActivity {
                 startActivity(mIntent);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("network", "onResume()");
+        // 连接网络，有时候开机重启系统没有检测到网络断开, 有时候联网后检测慢，误打开扫码联网，所以放在这里判断
+        connectNet();
     }
 
     @Override
@@ -669,7 +676,7 @@ public class MainAppActivity extends RosActivity {
                         Log.i("network", "密码：" + password);
                         // 联网返回值不对，有没有联网成功都会返回true
                         boolean isConnected = netWorkConnect.Connect(netWorkName, password, NetWorkConnect.WifiCipherType.WIFICIPHER_WPA);
-                        // 3s之后如果还没连上网就再次打开扫码联网
+                        // 10s之后如果还没连上网就再次打开扫码联网,联网速度有点慢，防止扫码界面再出现
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -678,7 +685,7 @@ public class MainAppActivity extends RosActivity {
                                     connectNet();
                                 }
                             }
-                        }, 3 * 1000);
+                        }, 10 * 1000);
                     } else {// 防止别人随意用一张二维码来连接网络
                         connectNet();
                     }

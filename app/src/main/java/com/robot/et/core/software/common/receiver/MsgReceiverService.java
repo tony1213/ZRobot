@@ -27,7 +27,6 @@ import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
-import com.robot.et.core.software.common.ximalaya.IPlayer;
 import com.robot.et.core.software.common.ximalaya.IXiMaLaYa;
 import com.robot.et.core.software.common.ximalaya.XiMaLaYa;
 import com.robot.et.core.software.face.iflytek.FaceDistinguishActivity;
@@ -111,46 +110,52 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 String musicName = intent.getStringExtra("musicUrl");
                 Log.i(TAG, "MsgReceiverService  musicUrl==" + musicName);
                 if (!TextUtils.isEmpty(musicName)) {
-                    // 播放音乐
-                    if (DataConfig.isJpushPlayMusic) {// app推送
-                        boolean isSuccess = music.play(musicName);
-                        // 播放音乐失败
-                        if (!isSuccess) {
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
-                        }
-                    } else {// 第三方
-                        // 播放类型
-                        int playType = intent.getIntExtra("playType", 0);
-                        Log.i(TAG, "MsgReceiverService  playType==" + playType);
-
-                        if (playType == DataConfig.PLAY_MUSIC) {// 播放音乐
-                            xiMaLaYa.playMusic(musicName, new IPlayer() {
-                                @Override
-                                public void playSuccess() {
-                                    Log.i(TAG, "MsgReceiverService  播放成功");
-                                }
-
-                                @Override
-                                public void playFail() {
-                                    Log.i(TAG, "MsgReceiverService  播放失败");
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
-                                }
-                            });
-                        } else {// 播放电台
-                            xiMaLaYa.playRadio(musicName, new IPlayer() {
-                                @Override
-                                public void playSuccess() {
-                                    Log.i(TAG, "MsgReceiverService  播放成功");
-                                }
-
-                                @Override
-                                public void playFail() {
-                                    Log.i(TAG, "MsgReceiverService  播放失败");
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
-                                }
-                            });
-                        }
+                    boolean isSuccess = music.play(musicName);
+                    // 播放音乐失败
+                    if (!isSuccess) {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
                     }
+
+                    // 播放音乐
+//                    if (DataConfig.isJpushPlayMusic) {// app推送
+//                        boolean isSuccess = music.play(musicName);
+//                        // 播放音乐失败
+//                        if (!isSuccess) {
+//                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, DataConfig.MUSIC_NOT_EXIT);
+//                        }
+//                    } else {// 第三方
+//                        // 播放类型
+//                        int playType = intent.getIntExtra("playType", 0);
+//                        Log.i(TAG, "MsgReceiverService  playType==" + playType);
+//
+//                        if (playType == DataConfig.PLAY_MUSIC) {// 播放音乐
+//                            xiMaLaYa.playMusic(musicName, new IPlayer() {
+//                                @Override
+//                                public void playSuccess() {
+//                                    Log.i(TAG, "MsgReceiverService  播放成功");
+//                                }
+//
+//                                @Override
+//                                public void playFail() {
+//                                    Log.i(TAG, "MsgReceiverService  播放失败");
+//                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+//                                }
+//                            });
+//                        } else {// 播放电台
+//                            xiMaLaYa.playRadio(musicName, new IPlayer() {
+//                                @Override
+//                                public void playSuccess() {
+//                                    Log.i(TAG, "MsgReceiverService  播放成功");
+//                                }
+//
+//                                @Override
+//                                public void playFail() {
+//                                    Log.i(TAG, "MsgReceiverService  播放失败");
+//                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，播放资源不存在");
+//                                }
+//                            });
+//                        }
+//                    }
                     return;
                 }
 
@@ -159,13 +164,13 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_STOP_MUSIC)) {//停止音乐播放
                 Log.i(TAG, "MsgReceiverService  停止音乐播放");
                 // 停止播放音乐
-                if (DataConfig.isJpushPlayMusic) {// app推送
-                    music.stopPlay();
-                } else {// 第三方
-                    if (xiMaLaYa != null) {
-                        xiMaLaYa.stopPlay();
-                    }
-                }
+                music.stopPlay();
+//                if (DataConfig.isJpushPlayMusic) {// app推送
+//                } else {// 第三方
+//                    if (xiMaLaYa != null) {
+//                        xiMaLaYa.stopPlay();
+//                    }
+//                }
                 // 耳朵灯光灭
                 BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
 
@@ -215,7 +220,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
             } else if (intent.getAction().equals(BroadcastAction.ACTION_TAKE_PHOTO_COMPLECTED)) {//自动拍照完成
                 Log.i(TAG, "MsgReceiverService  自动拍照完成");
                 // 拍完照手放下来
-                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "0", 1500);
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "0", 1000);
                 // 获取拍照后传来的图片数据
                 byte[] photoData = intent.getByteArrayExtra("photoData");
                 if (photoData != null && photoData.length > 0) {

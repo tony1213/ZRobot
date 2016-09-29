@@ -348,7 +348,7 @@ public class PushResultHandler implements NettyClientCallBack {
         beginHandler();
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_BLINK);
         // 手上下摆动
-        BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "25", 1500);
+        BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "60", 1000);
         // 说话
         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, userName + "回来了，我们去门口迎接他吧");
         // 走到门口
@@ -358,7 +358,6 @@ public class PushResultHandler implements NettyClientCallBack {
             @Override
             public void run() {
                 BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
-                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
             }
         }, 2000);
     }
