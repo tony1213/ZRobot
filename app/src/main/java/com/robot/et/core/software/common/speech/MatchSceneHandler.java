@@ -10,13 +10,11 @@ import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
-import com.robot.et.common.RequestConfig;
 import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -136,26 +134,35 @@ public class MatchSceneHandler {
 //                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
 
                 break;
-            case RAISE_HAND_SCENE:// 抬手
+            case RAISE_LEFT_HAND_SCENE:// 抬左手
                 flag = true;
                 hand(ScriptConfig.HAND_LEFT, "60", 1000);
 
                 break;
+            case RAISE_RIGHT_HAND_SCENE:// 抬右手
+                flag = true;
+                hand(ScriptConfig.HAND_RIGHT, "60", 1000);
+
+                break;
+            case RAISE_HAND_SCENE:// 抬手
+                flag = true;
+                hand(ScriptConfig.HAND_LEFT, "60", 1000);
+                hand(ScriptConfig.HAND_RIGHT, "60", 1000);
+
+                break;
             case WAVING_SCENE:// 摆手
                 flag = true;
-                hand(ScriptConfig.HAND_TWO, "-60", 1000);
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "60", 1000);
 
                 break;
-            case OPEN_HOUSEHOLD_SCENE:// 打开家电
+            case HEAD_UP_SCENE:// 抬头
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("开", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new PushResultHandler(context));
+                head(DataConfig.TURN_HEAD_AROUND, "15", 1000);
 
                 break;
-            case CLOSE_HOUSEHOLD_SCENE:// 关闭家电
+            case HEAD_DOWN_SCENE:// 低头
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                HttpManager.pushMsgToApp("关", RequestConfig.TO_APP_BLUETOOTH_CONTROLLER, new PushResultHandler(context));
+                head(DataConfig.TURN_HEAD_AROUND, "-10", 1000);
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称
@@ -210,7 +217,7 @@ public class MatchSceneHandler {
             case PHOTOGRAPH_SCENE:// 拍照
                 flag = true;
                 // 拍照时手抬起来
-                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_RIGHT, "25", 1500);
+                BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "100", 1000);
                 // 说提示音
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_NO_SOUND_TIPS, "好的，三，二，一，茄子");
                 // 开始自动拍照
@@ -326,6 +333,18 @@ public class MatchSceneHandler {
                 BroadcastEnclosure.controlArm(context, handCategory, "0", moveTime);
             }
         }, 1500);
+        SpeechImpl.getInstance().startListen();
+    }
+
+    // 头部
+    private void head(final int direction, final String angle, final int moveTime) {
+        BroadcastEnclosure.controlHead(context, direction, angle, moveTime);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                BroadcastEnclosure.controlHead(context, direction, "0", moveTime);
+//            }
+//        }, 1500);
         SpeechImpl.getInstance().startListen();
     }
 

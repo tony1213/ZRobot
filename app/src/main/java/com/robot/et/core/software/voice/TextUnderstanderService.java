@@ -225,14 +225,16 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
                                     break;
                                 case RADIO://电台
                                     answer = ResultParse.getRadioName(jObject);
-                                    if (!TextUtils.isEmpty(answer)) {
-                                        DataConfig.isJpushPlayMusic = false;
-                                        MusicManager.setMusicType(DataConfig.PLAY_RADIO);
-                                        MusicManager.setMusicName(answer);
-                                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");
-                                    } else {
-                                        speakContent(question, answer);
-                                    }
+//                                    if (!TextUtils.isEmpty(answer)) {
+//                                        DataConfig.isJpushPlayMusic = false;
+//                                        MusicManager.setMusicType(DataConfig.PLAY_RADIO);
+//                                        MusicManager.setMusicName(answer);
+//                                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");
+//                                    } else {
+//                                        speakContent(question, answer);
+//                                    }
+
+                                    speakContent(question, answer);
 
                                     break;
 

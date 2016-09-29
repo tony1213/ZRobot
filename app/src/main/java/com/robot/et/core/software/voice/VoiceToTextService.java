@@ -35,6 +35,8 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
     private CommandHandler commandHandler;
     private VoiceDictate voiceDictate;
     private MatchSceneHandler matchSceneHandler;
+    private final int UPDATE_VIEW = 1;
+    private final int TIME_CONTROL = 2;
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -83,9 +85,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         }
 
         if (!DataConfig.isLookPhoto) {// 不是查看图片
-            // 显示正常表情
-            ViewCommon.initView();
-            EmotionManager.showEmotion(R.mipmap.emotion_normal);
+            handler.sendEmptyMessage(UPDATE_VIEW);
         }
 
         // 调用听方法
@@ -106,7 +106,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(0);
+                handler.sendEmptyMessage(TIME_CONTROL);
             }
         }, 2 * 60 * 1000);//设置多少分钟沉睡（单位毫秒）
     }
@@ -116,11 +116,24 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            TimerManager.cancelTimer(timer);
-            timer = null;
-            voiceDictate.stopListen();
-            // 沉睡
-            MatchSceneHandler.sleep(VoiceToTextService.this);
+            switch (msg.what) {
+                case UPDATE_VIEW:
+                    // 显示正常表情
+                    ViewCommon.initView();
+                    EmotionManager.showEmotion(R.mipmap.emotion_normal);
+
+                    break;
+                case TIME_CONTROL:
+                    TimerManager.cancelTimer(timer);
+                    timer = null;
+                    voiceDictate.stopListen();
+                    // 沉睡
+                    MatchSceneHandler.sleep(VoiceToTextService.this);
+
+                    break;
+                default:
+                    break;
+            }
         }
     };
 

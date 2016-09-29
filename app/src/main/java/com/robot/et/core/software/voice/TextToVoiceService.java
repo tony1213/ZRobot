@@ -145,11 +145,14 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
                 break;
             case DataConfig.SPEAK_TYPE_MUSIC_START://音乐开始播放前的提示
                 showNormalEmotion(true);
-                if (DataConfig.isJpushPlayMusic) {// app推送
-                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc(), MusicManager.getMusicType());
-                } else {// 第三方
-                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicName(), MusicManager.getMusicType());
-                }
+
+                BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc(), MusicManager.getMusicType());
+
+//                if (DataConfig.isJpushPlayMusic) {// app推送
+//                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicSrc(), MusicManager.getMusicType());
+//                } else {// 第三方
+//                    BroadcastEnclosure.startPlayMusic(this, MusicManager.getMusicName(), MusicManager.getMusicType());
+//                }
                 break;
             case DataConfig.SPEAK_TYPE_DO_NOTHINF://什么都不处理
                 showNormalEmotion(true);

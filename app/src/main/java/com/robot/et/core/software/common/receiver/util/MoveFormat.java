@@ -78,6 +78,9 @@ public class MoveFormat {
             case 5:// 停止
                 info.setCmd("stop");
                 break;
+            case 6:// 后转
+                info.setCmd("tleft");
+                break;
             default:
                 break;
         }

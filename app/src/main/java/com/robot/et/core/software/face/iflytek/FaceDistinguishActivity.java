@@ -337,28 +337,27 @@ public class FaceDistinguishActivity extends Activity {
 
                             mImageData = BitmapUtil.bitmap2Byte(BitmapUtil.decodeToBitMap(tmp, PREVIEW_WIDTH, PREVIEW_HEIGHT, 80));
                             noFaceCount = 0;
-                            //转身  多次检测的时候只转一次头
-                            if (!isSendAngle) {
-                                isSendAngle = true;
-                                FaceRect face = faces[0];
-                                //X中心点
-                                float pointX = FaceUtil.getRectCenterX(face);
-                                Log.i("face", "pointX===" + pointX);
-                                //Y中心点
-                                float pointY = FaceUtil.getRectCenterY(face);
-                                Log.i("face", "pointY===" + pointY);
-                                /* 横向转头：0-180  正中间 90，  向左转90-0   向右 90-180
-                                   越靠近90度的，距离正中间的位置越近
-                                   上下抬头：0-60
-                                   上下以垂直方向为0度，向前10度即-10，向后10度即+10。
-                                   左右横向运动以正中为0度，向右10度即-10，向左10度即+10。
-                                 */
-                                String directionValue = getTurnDigit(pointY);
-                                Log.i("face", "directionValue===" + directionValue);
-
-                                // 发送控制头部运动的广播
-                                BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_ABOUT, directionValue, 1000);
-                            }
+                            // 转身  多次检测的时候只转一次头(控制头转)
+//                            if (!isSendAngle) {
+//                                isSendAngle = true;
+//                                FaceRect face = faces[0];
+//                                //X中心点
+//                                float pointX = FaceUtil.getRectCenterX(face);
+//                                Log.i("face", "pointX===" + pointX);
+//                                //Y中心点
+//                                float pointY = FaceUtil.getRectCenterY(face);
+//                                Log.i("face", "pointY===" + pointY);
+//                                /* 横向转头：0-180  正中间 90，  向左转90-0   向右 90-180
+//                                   越靠近90度的，距离正中间的位置越近
+//                                   上下抬头：0-60
+//                                   上下以垂直方向为0度，向前10度即-10，向后10度即+10。
+//                                   左右横向运动以正中为0度，向右10度即-10，向左10度即+10。
+//                                 */
+//                                String directionValue = getTurnDigit(pointY);
+//                                Log.i("face", "directionValue===" + directionValue);
+//                                // 发送控制头部运动的广播
+//                                BroadcastEnclosure.controlHead(FaceDistinguishActivity.this, DataConfig.TURN_HEAD_ABOUT, directionValue, 1000);
+//                            }
                             // 处理识别到的人脸
                             handleFace(mImageData, faceInfos);
                         }

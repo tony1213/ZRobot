@@ -96,6 +96,8 @@ public class CommandHandler {
                     if (digit == 0) {
                         digit = 90;// 默认90度
                     }
+                } else if (moveKey == ControlMoveEnum.TURN_AFTER.getMoveKey()) {// 向后转
+                    digit = 180;
                 } else {
                     if (digit == 0) {
                         digit = 1 * 1000;// 默认1米

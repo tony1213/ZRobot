@@ -31,14 +31,18 @@ public class MatchStringUtil {
     public static String doActionRegex = "^" + baseRegex + "*我+" + baseRegex + "*((问)|(说))+" + baseRegex + "*你+" + baseRegex + "+(萌|(卖个萌))+" + baseRegex + "*$";
     //控制机器人周围的玩具车走
     public static String controlToyCarRegex = "^" + baseRegex + "+号+" + baseRegex + "*(车|(小车)|(玩具车)|(汽车))+" + baseRegex + "*$";
+    // 抬左手
+    public static String raiseLeftHandRegex = "^" + baseRegex + "*(抬|举)+" + baseRegex + "*(左手)+" + baseRegex + "*$";
+    // 抬右手
+    public static String raiseRightHandRegex = "^" + baseRegex + "*(抬|举)+" + baseRegex + "*(右手)+" + baseRegex + "*$";
     // 抬手举手
     public static String raiseHandRegex = "^" + baseRegex + "*(抬|举)+" + baseRegex + "*手+" + baseRegex + "*$";
+    // 抬头
+    public static String raiseHeadUpRegex = "^" + baseRegex + "*(抬|举|仰)+" + baseRegex + "*头+" + baseRegex + "*$";
+    // 低头
+    public static String raiseHeadDownRegex = "^" + baseRegex + "*(低|底)+" + baseRegex + "*头+" + baseRegex + "*$";
     // 摆手
     public static String wavingRegex = "^" + baseRegex + "*摆+" + baseRegex + "*手+" + baseRegex + "*$";
-    // 打开家电
-    public static String openHouseholdRegex = "^" + baseRegex + "*开+" + baseRegex + "*(灯|(插座))+" + baseRegex + "*$";
-    // 关闭家电
-    public static String closeHouseholdRegex = "^" + baseRegex + "*关+" + baseRegex + "*(灯|(插座))+" + baseRegex + "*$";
     // 脸检测
     public static String faceTestRegex = "^" + baseRegex + "*((我是谁)|(认识我))+" + baseRegex + "*$";
     // 识别问名字

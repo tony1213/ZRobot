@@ -57,6 +57,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private final int UPDATE_VIEW = 2;
     private final int SHORT_PRESS = 3;
     private final int TOUCH = 4;
+    private final int LISTENER = 5;
     private LightHandler lightHandler;
     private SerialPortHandler serialPortHandler;
     private boolean isFirstPress;// 短按
@@ -103,6 +104,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 int moveTime = intent.getIntExtra("moveTime", 0);
                 Log.i(TAG, "handCategory===" + handCategory);
                 if (TextUtils.equals(handCategory, ScriptConfig.HAND_TWO)) {
+                    // 当角度为0代表停止摆动，否则就是摆手
                     if (TextUtils.equals(angleValue, "0")) {// 停止摆动
                         // 停止左手
                         setHand(ScriptConfig.HAND_LEFT, 0, 1000);
@@ -143,8 +145,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 int moveRadius = intent.getIntExtra("moveRadius", 0);
                 Log.i(TAG, "distance==" + distance);
                 int speed;
-                if (direction == ControlMoveEnum.LEFT.getMoveKey() || direction == ControlMoveEnum.RIGHT.getMoveKey()) {
-                    // 左转右转是度数
+                if (direction == ControlMoveEnum.LEFT.getMoveKey() || direction == ControlMoveEnum.RIGHT.getMoveKey()
+                        || direction == ControlMoveEnum.TURN_AFTER.getMoveKey()) {
+                    // 左转右转后转是度数
                     speed = distance;
                     moveTime = distance * 1000 / 90;// 默认速度90度/s
                 } else {// 前进后退是距离
@@ -159,13 +162,13 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
     // 摆手
     private void handWaving() {
-        setHand(ScriptConfig.HAND_LEFT, 30, 1000);
-        setHand(ScriptConfig.HAND_RIGHT, -30, 1000);
+        setHand(ScriptConfig.HAND_LEFT, 60, 1000);
+        setHand(ScriptConfig.HAND_RIGHT, -60, 1000);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                setHand(ScriptConfig.HAND_LEFT, -30, 1500);
-                setHand(ScriptConfig.HAND_RIGHT, 30, 1500);
+                setHand(ScriptConfig.HAND_LEFT, 0, 1000);
+                setHand(ScriptConfig.HAND_RIGHT, 0, 1000);
             }
         }, 1500);
     }
@@ -211,10 +214,13 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isShowLoadPicQRCode = false;
         DataConfig.isShowChatQRCode = false;
 
+        // 停止运动
+        BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
+
         if (isSpeak) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, getAwakenContent());
-        } else {
-            SpeechImpl.getInstance().startListen();
+        } else {// 短按说你好
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "你好");
         }
     }
 
@@ -239,29 +245,36 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     @Override
     public void getVoiceWakeUpDegree(int degree) {
         Log.i(TAG, "HardwareReceiverService 接受到唤醒中断的广播");
-        //当在人脸检测的时候不发送广播
-        if (!DataConfig.isFaceRecogniseIng) {
-            // 相应唤醒后要做的事
-            responseAwaken(true);
-            awaken();
-            Log.i(TAG, "degree==" + degree);
-            handleAngle(degree);
-            Log.i(TAG, "headAngle==" + headAngle);
-            // 头转
-            BroadcastEnclosure.controlHead(HardwareReceiverService.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle), 1000);
-            Log.i(TAG, "bodyAngle==" + bodyAngle);
-            if (bodyAngle > 0) {// 身体向右转
-                BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.RIGHT.getMoveKey(), bodyAngle, 1000, 0);
-            } else {// 身体向左转
-                BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.LEFT.getMoveKey(), Math.abs(bodyAngle), 1000, 0);
-            }
-            // 只有身体转的时候处理
-            if (degree > 30 && degree < 330) {
-                // 耳朵的灯光在运动的时候进行闪烁
-                BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
-                // 摆手
-                BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "30", 1500);
-            }
+        // 如果正在音视频的话关掉
+        if (DataConfig.isVideoOrVoice) {
+            return;
+        }
+        // 如果正在人脸识别的话关掉
+        if (DataConfig.isFaceRecogniseIng) {
+            BroadcastEnclosure.closeFaceDistinguish(HardwareReceiverService.this);
+            handler.sendEmptyMessage(LISTENER);
+            return;
+        }
+        // 相应唤醒后要做的事
+        responseAwaken(true);
+        awaken();
+        Log.i(TAG, "degree==" + degree);
+        handleAngle(degree);
+        Log.i(TAG, "headAngle==" + headAngle);
+        // 头转
+        BroadcastEnclosure.controlHead(HardwareReceiverService.this, DataConfig.TURN_HEAD_ABOUT, String.valueOf(headAngle), 1000);
+        Log.i(TAG, "bodyAngle==" + bodyAngle);
+        if (bodyAngle > 0) {// 身体向右转
+            BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.RIGHT.getMoveKey(), bodyAngle, 1000, 0);
+        } else {// 身体向左转
+            BroadcastEnclosure.controlMoveBySerialPort(HardwareReceiverService.this, ControlMoveEnum.LEFT.getMoveKey(), Math.abs(bodyAngle), 1000, 0);
+        }
+        // 只有身体转的时候处理
+        if (degree > 30 && degree < 330) {
+            // 耳朵的灯光在运动的时候进行闪烁
+            BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
+            // 摆手
+            BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "30", 1000);
         }
     }
 
@@ -486,6 +499,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                     break;
                 case TOUCH:// 触摸
                     touch(mTouchId);
+                    break;
+                case LISTENER:// 听，防止线程操作view
+                    SpeechImpl.getInstance().startListen();
                     break;
                 default:
                     break;
