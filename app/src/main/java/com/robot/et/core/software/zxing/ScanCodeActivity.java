@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.Window;
+import android.view.WindowManager;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -50,6 +51,8 @@ public class ScanCodeActivity extends Activity implements Callback {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_zxing_scan);
+        // 保持屏幕常亮
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         CameraManager.init(getApplication());
         mContext = ScanCodeActivity.this;
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);

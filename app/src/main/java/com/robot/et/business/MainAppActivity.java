@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -100,6 +101,7 @@ public class MainAppActivity extends RosActivity {
     private WifiManager mWiFiManager;
     private boolean isConnectNet;// 是否连接网络
     private boolean isConnectIng;// 是否正在连接网络
+    private boolean isConnectSuccess;// 是否连接成功
 
     private VisualClient visualClient;//ROS 视觉识别的Client（Service：learn_to_recognize_ros_server）
     private RmapClient rmapClient;   //ROS 地图保存的Client（Service：/turtlebot/save_only_map）
@@ -666,7 +668,20 @@ public class MainAppActivity extends RosActivity {
                         Log.i("network", "网络名称：" + netWorkName);
                         String password = arrar[2].split(":")[1];
                         Log.i("network", "密码：" + password);
-                        netWorkConnect.Connect(netWorkName, password, NetWorkConnect.WifiCipherType.WIFICIPHER_WPA);
+                        // 联网返回值不对，有没有联网成功都会返回true
+                        boolean isConnected = netWorkConnect.Connect(netWorkName, password, NetWorkConnect.WifiCipherType.WIFICIPHER_WPA);
+                        // 3s之后如果还没连上网就再次打开扫码联网
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 没有联网成功再次联网
+                                if (!isConnectSuccess) {
+                                    connectNet();
+                                }
+                            }
+                        }, 3 * 1000);
+                    } else {// 防止别人随意用一张二维码来连接网络
+                        connectNet();
                     }
                 }
             } else if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {// 检测网络
@@ -675,6 +690,7 @@ public class MainAppActivity extends RosActivity {
                 if (isNetConnected) {
                     Log.i("network", "网络已连接");
                     isConnectNet = true;
+                    isConnectSuccess = true;
                     isConnectIng = false;
                     // 防止连上网后还在扫码
                     if (ScanCodeActivity.instance != null) {
@@ -688,6 +704,7 @@ public class MainAppActivity extends RosActivity {
                     new ALiPush(MainAppActivity.this);
                 } else {
                     Log.i("network", "网络断开");
+                    isConnectSuccess = false;
                     if (isConnectNet) {// 只有连接过网络的时候再关闭开启过的service
                         destroyService();
                     }
