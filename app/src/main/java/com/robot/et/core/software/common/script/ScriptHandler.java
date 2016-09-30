@@ -9,6 +9,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
+import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.ScriptActionInfo;
@@ -44,8 +45,8 @@ public class ScriptHandler implements Script {
 
     //执行剧本剧本动作
     public static void doScriptAction(Context context, List<ScriptActionInfo> infos) {
-        Log.i("netty", "doScriptAction()   infos.size()====" + infos.size());
         if (infos != null && infos.size() > 0) {
+            Log.i("netty", "doScriptAction()   infos.size()====" + infos.size());
             ScriptActionInfo info = infos.get(0);
             String content = info.getContent();
             Log.i("netty", "doScriptAction() info.getContent()====" + content);
@@ -55,7 +56,7 @@ public class ScriptHandler implements Script {
                     int emotionKey = EnumManager.getEmotionKey(content);
                     Log.i("netty", "doScriptAction() emotionKey====" + emotionKey);
                     BroadcastEnclosure.controlRobotEmotion(context, emotionKey);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1500));
 
                     break;
                 case ScriptConfig.SCRIPT_MUSIC://音乐
@@ -79,17 +80,18 @@ public class ScriptHandler implements Script {
                     Log.i("netty", "doScriptAction() toyCarNum====" + toyCarNum);
                     // 跟随
                     BroadcastEnclosure.sendRos(context, RosConfig.FOLLOW, "");
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1500));
 
                     break;
                 case ScriptConfig.SCRIPT_TURN_AROUND://转圈
                     Log.i("netty", "doScriptAction() 转圈");
                     int direction = ScriptManager.getTurnDirection(content);
+                    int spareType = info.getSpareType();
                     Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
                     // 转圈
-                    BroadcastEnclosure.controlMoveBySerialPort(context, direction, 1 * 1000, 1000, 1000);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    BroadcastEnclosure.controlMoveBySerialPort(context, direction, 500, 1000, spareType);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1000));
 
                     break;
                 case ScriptConfig.SCRIPT_QUESTION_ANSWER://问答
@@ -117,17 +119,26 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_HAND://手
                     Log.i("netty", "doScriptAction() 手");
+                    // 举手摆手
                     String handDirection = ScriptManager.getHandDirection(info.getSpareContent());
+                    // 左手右手
                     String handCategory = ScriptManager.getHandCategory(content);
                     Log.i("netty", "doScriptAction() handDirection===" + handDirection);
-                    BroadcastEnclosure.controlArm(context, handCategory, "25", 1500);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    BroadcastEnclosure.controlArm(context, handCategory, handDirection, 1000);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1000));
 
                     break;
                 case ScriptConfig.SCRIPT_MOVE://走
                     Log.i("netty", "doScriptAction() 走");
                     int moveDirection = EnumManager.getMoveKey(content);
                     String spareContent = info.getSpareContent();
+                    String distance = info.getSpareContent2();
+                    int distanceInt = 500;
+                    if (!TextUtils.isEmpty(distance)) {
+                        if (TextUtils.isDigitsOnly(distance)) {
+                            distanceInt = Integer.parseInt(distance);
+                        }
+                    }
                     Log.i("netty", "spareContent==" + spareContent);
                     int num = 0;
                     if (!TextUtils.isEmpty(spareContent)) {
@@ -135,33 +146,45 @@ public class ScriptHandler implements Script {
                             num = MatchStringUtil.getToyCarNum(spareContent);
                             BroadcastEnclosure.controlToyCarMove(context, moveDirection, num);
                         } else {
-                            BroadcastEnclosure.controlMoveBySerialPort(context, moveDirection, 1 * 1000, 1000, 0);
+                            BroadcastEnclosure.controlMoveBySerialPort(context, moveDirection, distanceInt, 1000, 0);
                         }
                     }
 
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    handleNewScriptInfos(context, infos, true, getDealyTime(500));
 
                     break;
                 case ScriptConfig.SCRIPT_TURN://左转右转
                     Log.i("netty", "doScriptAction() 左转右转");
                     int turnDirection = EnumManager.getMoveKey(content);
-                    BroadcastEnclosure.controlMoveBySerialPort(context, turnDirection, 1 * 1000, 1000, 0);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    String spareContent2 = info.getSpareContent2();
+                    int moveRadius = info.getSpareType();
+                    int turnInt = 60;
+                    if (!TextUtils.isEmpty(spareContent2)) {
+                        if (TextUtils.isDigitsOnly(spareContent2)) {
+                            turnInt = Integer.parseInt(spareContent2);
+                        }
+                    }
+                    BroadcastEnclosure.controlMoveBySerialPort(context, turnDirection, turnInt, 1000, moveRadius);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(500));
 
                     break;
                 case ScriptConfig.SCRIPT_STOP://停止
                     Log.i("netty", "doScriptAction() 停止");
-                    BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(2000));
+                    // 停止摆手
+                    BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1000);
+                    // 停止走
+                    BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(500));
 
                     break;
                 case ScriptConfig.SCRIPT_HEAD://头
                     Log.i("netty", "doScriptAction() 头");
                     String angle = info.getSpareContent();
+                    // 如果是点头的话，时间3s，否则2s
                     boolean flag = turnHead(context, content, angle);
-                    long time = 2000;
+                    long time = 1000;
                     if (flag) {
-                        time = 3000;
+                        time = 1500;
                     }
                     handleNewScriptInfos(context, infos, true, getDealyTime(time));
 
@@ -186,12 +209,12 @@ public class ScriptHandler implements Script {
         if (TextUtils.equals(content, "抬头")) {
             Log.i("netty", "doScriptAction() 抬头");
             headDirection = DataConfig.TURN_HEAD_AROUND;
-            turnAngle = "5";
+            turnAngle = "15";
             isSingle = true;
         } else if (TextUtils.equals(content, "点头")) {
             Log.i("netty", "doScriptAction() 点头");
             headDirection = DataConfig.TURN_HEAD_AROUND;
-            turnAngle = "-5";
+            turnAngle = "-10";
             isSingle = false;
             isHeadUp = true;
         } else if (TextUtils.equals(content, "左转")) {
@@ -211,7 +234,7 @@ public class ScriptHandler implements Script {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, "5", 1000);
+                    BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, "0", 1000);
                 }
             }, 1000);
         }
@@ -229,16 +252,16 @@ public class ScriptHandler implements Script {
             }
         } else {
             if (isLeft) {
-                angle = "30";
-            } else {
                 angle = "-30";
+            } else {
+                angle = "30";
             }
         }
         return angle;
     }
 
     //更新剧本的内容
-    public static void handleNewScriptInfos(final Context context, final List<ScriptActionInfo> infos, boolean isResume, long delayTime) {
+    public static void handleNewScriptInfos(final Context context, final List<ScriptActionInfo> infos, boolean isResume, final long delayTime) {
         if (DataConfig.isAppPushRemind) {
             DataConfig.isAppPushRemind = false;
             return;
@@ -250,12 +273,14 @@ public class ScriptHandler implements Script {
 
             if (isResume) {
                 if (DataConfig.isPlayScript) {
+                    Log.i("netty", "delayTime111==" + delayTime);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             doScriptAction(context, infos);
                         }
                     }, delayTime);
+
                 } else {
                     Log.i("netty", "DataConfig.isPlayScript===false 剧本执行完毕");
                     playScriptEnd(context);
@@ -275,11 +300,11 @@ public class ScriptHandler implements Script {
     }
 
     //剧本执行完毕
-    private static void playScriptEnd(Context context) {
+    public static void playScriptEnd(Context context) {
         Log.i("netty", "playScriptEnd()");
         DataConfig.isPlayScript = false;
         if (!DataConfig.isPlayMusic) {
-            BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1500);
+            BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_TWO, "0", 1000);
         }
         //重连netty
         BroadcastEnclosure.connectNetty(context);
@@ -287,13 +312,7 @@ public class ScriptHandler implements Script {
     }
 
     private static long getDealyTime(long custormTime) {
-        long time = 0;
-        if (DataConfig.isPlayMusic) {
-            time = 4000;
-        } else {
-            time = custormTime;
-        }
-        return time;
+        return custormTime;
     }
 
     //播放剧本音乐
@@ -310,6 +329,7 @@ public class ScriptHandler implements Script {
     //插入本地剧本
     public static void addLocalScript(Context context, String scriptName) {
         String content = FileUtils.readFile(context, scriptName, "utf-8");
+        Log.i("netty", "addScript  content==" + content);
         ScriptParse.parseScript(content, new ScriptInfoCallBack() {
             @Override
             public void getScribt(ScriptInfo info, List<ScriptActionInfo> infos) {

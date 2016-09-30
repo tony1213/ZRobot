@@ -15,6 +15,7 @@ import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -163,6 +164,19 @@ public class MatchSceneHandler {
             case HEAD_DOWN_SCENE:// 低头
                 flag = true;
                 head(DataConfig.TURN_HEAD_AROUND, "-10", 1000);
+
+                break;
+            case PLAY_SCRIPT_SCENE:// 表演节目
+                flag = true;
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                if (isPlayCo) {
+                    isPlayCo = false;
+                    ScriptHandler.playScript(context, "合唱共舞");
+                } else {
+                    isPlayCo = true;
+                    ScriptHandler.playScript(context, "大家一起喜羊羊");
+                }
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称
@@ -324,6 +338,8 @@ public class MatchSceneHandler {
         return flag;
     }
 
+    private boolean isPlayCo;
+
     //手臂
     private void hand(final String handCategory, final String angle, final int moveTime) {
         BroadcastEnclosure.controlArm(context, handCategory, angle, moveTime);
@@ -349,12 +365,8 @@ public class MatchSceneHandler {
     }
 
     //让机器人睡觉
-    public static void sleep(Context context) {
+    public static void sleep(final Context context) {
         DataConfig.isSleep = true;
-        // 告诉机器人沉睡了
-        Intent intent = new Intent();
-        intent.setAction(BroadcastAction.ACTION_ROBOT_SLEEP);
-        context.sendBroadcast(intent);
         // 耳朵灯灭
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
@@ -362,5 +374,17 @@ public class MatchSceneHandler {
         // 显示睡觉表情
         ViewCommon.initView();
         EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
+        // 防止人体检测立即开启，5s之后再开启人体检测
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 告诉机器人沉睡了
+                if (DataConfig.isSleep) {
+                    Intent intent = new Intent();
+                    intent.setAction(BroadcastAction.ACTION_ROBOT_SLEEP);
+                    context.sendBroadcast(intent);
+                }
+            }
+        }, 5 * 1000);
     }
 }

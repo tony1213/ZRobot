@@ -1,0 +1,306 @@
+{
+  "scriptContent" : "合唱共舞",
+  "script" : [
+    {
+      "content" : "白龙马",
+      "actionType" : "90002",
+      "spareContent" : "",
+      "spareContent2" : "",
+      "spareType" : " "
+    },
+     {
+         "content" : "向前",
+         "actionType" : "90008",
+         "spareContent" : "80000069",
+         "spareContent2" : "500",
+         "spareType" : " "
+      },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    },
+    {
+      "content" : "向左",
+      "actionType" : "90009",
+      "spareContent" : "80000069",
+      "spareContent2" : "45",
+      "spareType" : " "
+    }
+  ]
+}

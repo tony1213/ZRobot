@@ -113,6 +113,12 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.wavingRegex);
         }
     },
+    PLAY_SCRIPT_SCENE {// 表演节目
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.playScriptRegex);
+        }
+    },
     FACE_TEST_SCENE {// 脸部检测
 
         public boolean isScene(String str) {

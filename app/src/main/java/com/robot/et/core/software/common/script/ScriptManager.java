@@ -50,14 +50,17 @@ public class ScriptManager {
 
     //获取手的方向
     public static String getHandDirection(String handDirection) {
-        String direction = "";
+        String direction = "0";
         if (!TextUtils.isEmpty(handDirection)) {
             if (TextUtils.equals(handDirection, "举手")) {
-                direction = ScriptConfig.HAND_UP;
+//                direction = ScriptConfig.HAND_UP;
+                direction = "80";
             } else if (TextUtils.equals(handDirection, "放手")) {
-                direction = ScriptConfig.HAND_DOWN;
+//                direction = ScriptConfig.HAND_DOWN;
+                direction = "0";
             } else if (TextUtils.equals(handDirection, "摆手")) {
-                direction = ScriptConfig.HAND_WAVING;
+//                direction = ScriptConfig.HAND_WAVING;
+                direction = "80";
             }
         }
         return direction;

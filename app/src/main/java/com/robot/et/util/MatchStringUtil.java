@@ -43,6 +43,8 @@ public class MatchStringUtil {
     public static String raiseHeadDownRegex = "^" + baseRegex + "*(低|底)+" + baseRegex + "*头+" + baseRegex + "*$";
     // 摆手
     public static String wavingRegex = "^" + baseRegex + "*摆+" + baseRegex + "*手+" + baseRegex + "*$";
+    // 表演节目
+    public static String playScriptRegex = "^" + baseRegex + "*(表演)+" + baseRegex + "*(节目|(剧本))+" + baseRegex + "*$";
     // 脸检测
     public static String faceTestRegex = "^" + baseRegex + "*((我是谁)|(认识我))+" + baseRegex + "*$";
     // 识别问名字

@@ -28,6 +28,7 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
 import com.robot.et.core.software.common.receiver.util.MoveFormat;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -149,7 +150,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                         || direction == ControlMoveEnum.TURN_AFTER.getMoveKey()) {
                     // 左转右转后转是度数
                     speed = distance;
-                    moveTime = distance * 1000 / 90;// 默认速度90度/s
+                    moveTime = distance * 1000 / 30;// 默认速度30度/s
                 } else {// 前进后退是距离
                     speed = 300;// 默认速度300mm/s
                     moveTime = (distance * 10) / 3;
@@ -214,6 +215,10 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isShowLoadPicQRCode = false;
         DataConfig.isShowChatQRCode = false;
 
+        // 正在表演剧本
+        if (DataConfig.isPlayScript) {
+            ScriptHandler.playScriptEnd(this);
+        }
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
 

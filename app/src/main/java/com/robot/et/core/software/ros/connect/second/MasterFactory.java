@@ -27,7 +27,7 @@ public class MasterFactory extends Activity {
     private List<MasterItem> masterItems;
     private Yaml yaml = new Yaml();
 
-    private static final String masterUri = "http://192.168.2.158:11311/";
+    private static final String masterUri = "http://192.168.2.168:11311/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
