@@ -107,7 +107,7 @@ public class ScriptParse {
                 if (object.has("spareType")) {
                     String spareType = object.getString("spareType");
                     if (!TextUtils.isEmpty(spareType)) {
-                        if (TextUtils.isDigitsOnly(spareType)) {
+                        if (TextUtils.isDigitsOnly(spareType) || spareType.contains("-")) {
                             info.setSpareType(Integer.parseInt(spareType));
                         }
                     }
