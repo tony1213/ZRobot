@@ -87,6 +87,11 @@ public class MatchStringUtil {
     // 解除安保场景的标志
     public static String closeSecuritySignRegex = "^" + baseRegex + "*((解除)|(退出)|(关闭))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
 
+    // 漫游的标志
+    public static String roamSignRegex = "^" + baseRegex + "*(((漫游)+)|(随+" + baseRegex + "*走+))" + baseRegex + "*$";
+    // 跟着我的标志
+    public static String followSignRegex = "^" + baseRegex + "*跟+" + baseRegex + "*我+" + baseRegex + "*$";
+
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {
         return str.matches(strRegex);

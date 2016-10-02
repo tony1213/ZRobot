@@ -8,6 +8,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * Created by houdeming on 2016/7/25.
@@ -76,12 +77,42 @@ public class MusicManager {
         return fileSrc;
     }
 
+    //获取任意一首歌名
+    public static String getRandomMusicName() {
+        String fileSrc = getMusicFile(RequestConfig.JPUSH_MUSIC);
+        Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
+        File file = new File(fileSrc);
+        String[] names = file.list();
+        int length = names.length;
+        if (names != null && length > 0) {
+            Random random = new Random();
+            int randomInt = random.nextInt(length);
+            String name = names[randomInt];
+            StringBuffer buffer = new StringBuffer(1024);
+            String musicSrc = buffer.append(fileSrc).append(File.separator).append(name).toString();
+            setMusicSrc(musicSrc);
+            return getMusicNameOnly(name);
+        }
+        return "";
+    }
+
     //获取音乐的名字不带.mp3
     public static String getMusicNameNoMp3(String content) {
         if (!TextUtils.isEmpty(content)) {
             int start = content.lastIndexOf("/");
             int end = content.indexOf(".mp3");
             return content.substring(start + 1, end);
+        }
+        return "";
+    }
+
+    //获取音乐的名字
+    public static String getMusicNameOnly(String content) {
+        if (!TextUtils.isEmpty(content)) {
+            if (content.contains(".mp3")) {
+                int end = content.indexOf(".mp3");
+                return content.substring(0, end);
+            }
         }
         return "";
     }

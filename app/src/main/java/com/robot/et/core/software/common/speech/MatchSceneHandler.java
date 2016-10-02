@@ -14,6 +14,7 @@ import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
+import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -303,8 +304,8 @@ public class MatchSceneHandler {
             case INIT_VISION_SCENE:// 初始化视觉
                 flag = true;
                 // 初始化视觉
-                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
 
+                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
                 break;
             case FORGET_LEARN_SCENE:// 忘记学习内容
                 flag = true;
@@ -319,13 +320,33 @@ public class MatchSceneHandler {
 
                 break;
             case VISUAL_BODY_TRK://人体侦测
-                flag = true;
-                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+//                flag = true;
+//                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
 
                 break;
             case CLOSE_VISUAL_BODY_TRK://关闭人体侦测
                 flag = true;
                 BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+
+                break;
+            case ROAM_SCENE:// 漫游
+                flag = true;
+                // 显示正常表情
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                DataConfig.isRoam = true;
+                // 漫游
+                RoamMove.roam(context);
+
+                break;
+            case FOLLOW_SCENE:// 跟着我
+                flag = true;
+                DataConfig.isFollow = true;
+                // 显示正常表情
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                // 跟随
+                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
 
                 break;
 

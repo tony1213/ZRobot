@@ -186,4 +186,8 @@ public class DataConfig {
     public static final int PLAY_MUSIC = 0;
     public static final int PLAY_RADIO = 1;
 
+    // 是否是跟随
+    public static boolean isFollow;
+    // 是否是漫游
+    public static boolean isRoam;
 }

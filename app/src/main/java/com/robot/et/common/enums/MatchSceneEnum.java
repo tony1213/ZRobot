@@ -204,6 +204,18 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.navigationRegex);
         }
     },
+    ROAM_SCENE {// 漫游
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.roamSignRegex);
+        }
+    },
+    FOLLOW_SCENE {// 跟着我
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.followSignRegex);
+        }
+    },
     LOOK_PHOTO_SCENE {// 看看照片的标志
 
         public boolean isScene(String str) {

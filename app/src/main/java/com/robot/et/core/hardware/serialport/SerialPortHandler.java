@@ -53,9 +53,23 @@ public class SerialPortHandler implements OnDataReceiveListener {
             Log.i(TAG, "result===" + result);
             // 对json结果处理
             if (!TextUtils.isEmpty(result)) {
-                handleJsonResult(result);
+                info = getReceiverInfo(result);
+            } else {
+                info = null;
             }
+        } else {
+            info = null;
         }
+    }
+
+    private static SerialPortReceiverInfo info;
+
+    public static SerialPortReceiverInfo getRadarInfo() {
+        return info;
+    }
+
+    public static void setRadarInfo(SerialPortReceiverInfo info) {
+        SerialPortHandler.info = info;
     }
 
     //获取完整的json格式数据，可能丢帧
@@ -82,78 +96,26 @@ public class SerialPortHandler implements OnDataReceiveListener {
         return result;
     }
 
-    //对json数据结果处理
-    private void handleJsonResult(String result) {
-        if (!TextUtils.isEmpty(result)) {
-            SerialPortReceiverInfo info = getBluthReceiverInfo(result);
-        }
-    }
-
     //缓存数据
     private static StringBuffer buffer = new StringBuffer(1024);
-    private int headAngle;//头部角度
-    private int bodyAngle;//身体角度
-    private static int lastAngle = 0;// 最后一次的角度，跟转身相关
 
-    //对角度处理
-    //0-30  头向右转  ： 330-360  头向左转
-    //左右横向运动以正中为0度，向左10度即-10，向右10度即+10
-    private void handleAngle(int angle) {
-
-        if (angle > 180 && angle <= 360) {
-            angle = angle - 360;//-180-0
-        }
-
-        lastAngle += angle;
-
-        if (lastAngle > 30) {
-            bodyAngle = lastAngle;
-            headAngle = 0;
-            lastAngle = headAngle;
-        } else if (lastAngle < -30) {
-            bodyAngle = lastAngle;
-            headAngle = 0;
-            lastAngle = headAngle;
-        } else {// 只需转头，不需要转身体
-            headAngle = lastAngle;
-            bodyAngle = 0;
-        }
-
-        // < 0 向左   > 0 向右
-        if (bodyAngle > 180) {
-            bodyAngle = bodyAngle - 360;
-        } else if (bodyAngle < -180) {
-            bodyAngle = 360 + bodyAngle;
-        }
-
-    }
-
-    //{"rdl":0,"rdm":0,"rdr":0,"xf":1,"xag":20,"hw":1}
+    //{"act":"ult","datam":48,"datal":86,"datar":125}
     // 解析传来的数据
-    private SerialPortReceiverInfo getBluthReceiverInfo(String result) {
+    private SerialPortReceiverInfo getReceiverInfo(String result) {
         SerialPortReceiverInfo info = null;
         if (!TextUtils.isEmpty(result)) {
             try {
                 JSONTokener tokener = new JSONTokener(result);
                 JSONObject object = new JSONObject(tokener);
                 info = new SerialPortReceiverInfo();
-                if (object.has("rdl")) {
-                    info.setRdL(object.getInt("rdl"));
+                if (object.has("datal")) {
+                    info.setDataL(object.getInt("datal"));
                 }
-                if (object.has("rdm")) {
-                    info.setRdM(object.getInt("rdm"));
+                if (object.has("datam")) {
+                    info.setDataM(object.getInt("datam"));
                 }
-                if (object.has("rdr")) {
-                    info.setRdR(object.getInt("rdr"));
-                }
-                if (object.has("xf")) {
-                    info.setxF(object.getInt("xf"));
-                }
-                if (object.has("xag")) {
-                    info.setxAg(object.getInt("xag"));
-                }
-                if (object.has("hw")) {
-                    info.setHw(object.getInt("hw"));
+                if (object.has("datar")) {
+                    info.setDataR(object.getInt("datar"));
                 }
             } catch (JSONException e) {
                 Log.i(TAG, "JSONException==" + e.getMessage());

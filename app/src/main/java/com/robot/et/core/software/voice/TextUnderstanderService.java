@@ -127,11 +127,19 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
 
                                     break;
                                 case MUSIC://音乐
-                                    answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
                                     DataConfig.isJpushPlayMusic = false;
-                                    String content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
-
+//                                    answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
+//                                    String content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
+//                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
+                                    
+                                    // 播放本地音乐
+                                    String content = MusicManager.getRandomMusicName();
+                                    if (!TextUtils.isEmpty(content)) {
+                                        MusicManager.setMusicType(DataConfig.PLAY_MUSIC);
+                                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的，开始播放" + content);
+                                    } else {
+                                        speakContent(question, "");
+                                    }
                                     break;
                                 case RESTAURANT://餐馆
                                     // do nothing

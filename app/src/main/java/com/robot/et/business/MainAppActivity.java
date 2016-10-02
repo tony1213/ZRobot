@@ -30,6 +30,7 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
+import com.robot.et.core.software.common.move.FollowBody;
 import com.robot.et.core.software.common.network.NetWorkConnect;
 import com.robot.et.core.software.common.push.ali.ALiPush;
 import com.robot.et.core.software.common.receiver.HardwareReceiverService;
@@ -60,7 +61,6 @@ import com.robot.et.core.software.zxing.ScanCodeActivity;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
-import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
 import com.robot.et.util.Utilities;
 
@@ -539,14 +539,10 @@ public class MainAppActivity extends RosActivity {
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("BodyTRK", flag)) {
                     //视觉人体跟踪(获取人体xyz数值),更换为ROS Topic模式
-                    double x=bodyPositionSubscriber.getX();
-                    double y=bodyPositionSubscriber.getY();
-                    double z=bodyPositionSubscriber.getZ();
-                    Log.e("BodyPosition","获取到人体中心点的位置：X＝"+x+",Y="+y+",Z="+z);
-                    if (z<80){
-                        Log.e("body","response.getPosZ()<80,触发停止");
-                        BroadcastEnclosure.controlRobotMoveRos(context,5,"0");
-                    }
+                    Log.e("ROS_Client", "Service: BodyTRK");
+                    // 跟随
+                    FollowBody.handFollow(MainAppActivity.this, bodyPositionSubscriber);
+
                 } else if (TextUtils.equals("CloseBodyTRK", flag)) {
                     //视觉人体检测关闭
                     Log.e("ROS_Client", "Service: Start CloseBodyTRK");

@@ -24,6 +24,8 @@ import com.robot.et.core.hardware.light.LightHandler;
 import com.robot.et.core.hardware.serialport.SerialPortHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
+import com.robot.et.core.software.common.move.FollowBody;
+import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
@@ -214,7 +216,16 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isLookPhoto = false;
         DataConfig.isShowLoadPicQRCode = false;
         DataConfig.isShowChatQRCode = false;
-
+        // 如果是跟随的话停止
+        if (DataConfig.isFollow) {
+            DataConfig.isFollow = false;
+            FollowBody.stopTimer();
+        }
+        // 如果是漫游的话停止
+        if (DataConfig.isRoam) {
+            DataConfig.isRoam = false;
+            RoamMove.stopTimer();
+        }
         // 正在表演剧本
         if (DataConfig.isPlayScript) {
             ScriptHandler.playScriptEnd(this);
