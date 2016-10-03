@@ -68,9 +68,7 @@ public class MatchStringUtil {
     public static String forgetLearnRegex = "^" + baseRegex + "*(忘|删)+" + baseRegex + "*(学习)+" + baseRegex + "*$";
     //开启视觉人体检测
     public static String openVisualBodyTRK = "^" + baseRegex + "*(开|启)+" + baseRegex + "*(人体)+" + baseRegex + "*$";
-    //视觉人体检测
-    public static String visualBodyTRK = "^" + baseRegex + "*(检)+" + baseRegex + "*(人体)+" + baseRegex + "*$";
-    //关闭视觉人体检测A
+    //关闭视觉人体检测
     public static String closeVisualBodyTRK = "^" + baseRegex + "*(关|退)+" + baseRegex + "*(人体)+" + baseRegex + "*$";
     //导航到
     public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*(到|去)+" + baseRegex + "+$";

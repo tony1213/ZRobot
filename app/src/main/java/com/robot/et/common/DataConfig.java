@@ -190,4 +190,8 @@ public class DataConfig {
     public static boolean isFollow;
     // 是否是漫游
     public static boolean isRoam;
+
+    // 与硬件相关 0：沉睡  1：获取雷达数据
+    public static final int HARDWARE_SLEEP = 0;
+    public static final int HARDWARE_RADAR = 1;
 }

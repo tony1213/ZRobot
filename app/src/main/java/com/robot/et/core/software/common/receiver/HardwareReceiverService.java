@@ -78,9 +78,11 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         wakeUpHandler = new WakeUpHandler(this);
         // 初始化灯
         lightHandler = new LightHandler();
+        // 初始化串口
+        serialPortHandler = new SerialPortHandler(this);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastAction.ACTION_ROBOT_SLEEP);
+        filter.addAction(BroadcastAction.ACTION_OPEN_HARDWARE);
         filter.addAction(BroadcastAction.ACTION_CONTROL_EARS_LED);
         filter.addAction(BroadcastAction.ACTION_CONTROL_WAVING);
         filter.addAction(BroadcastAction.ACTION_CONTROL_MOUTH_LED);
@@ -93,9 +95,15 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(BroadcastAction.ACTION_ROBOT_SLEEP)) {// 机器人沉睡
-                Log.i(TAG, "HardwareReceiverService 机器人沉睡");
-                wakeUpHandler.sleepAwaken();
+            if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_HARDWARE)) {// 开启硬件
+                int type = intent.getIntExtra("type", 0);
+                if (type == DataConfig.HARDWARE_SLEEP) {
+                    Log.i(TAG, "HardwareReceiverService 机器人沉睡");
+                    wakeUpHandler.sleepAwaken();
+                } else {
+                    Log.i(TAG, "HardwareReceiverService 雷达数据");
+                    serialPortHandler.getRadarData();
+                }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_CONTROL_EARS_LED)) {// 耳朵灯
                 int LEDState = intent.getIntExtra("LEDState", 0);
                 Log.i(TAG, "HardwareReceiverService 耳朵灯LEDState==" + LEDState);
@@ -224,6 +232,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         // 如果是漫游的话停止
         if (DataConfig.isRoam) {
             DataConfig.isRoam = false;
+            // 停止漫游
             RoamMove.stopTimer();
         }
         // 正在表演剧本
@@ -559,10 +568,6 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             byte[] content = result.getBytes();
             byte[] end = new byte[]{0x0a};//结束符
             byte[] realContent = byteMerger(content, end);
-            if (serialPortHandler == null) {
-                // 初始化串口
-                serialPortHandler = new SerialPortHandler(this);
-            }
             serialPortHandler.sendData(realContent);
         }
     }
@@ -582,5 +587,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         TimerManager.cancelTimer(timer);
         timer = null;
         DataConfig.isSecurityCall = false;
+        DataConfig.isFollow = false;
+        DataConfig.isRoam = false;
     }
 }

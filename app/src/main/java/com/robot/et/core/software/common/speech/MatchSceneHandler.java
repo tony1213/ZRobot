@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.R;
-import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RosConfig;
@@ -319,11 +318,6 @@ public class MatchSceneHandler {
                 BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
 
                 break;
-            case VISUAL_BODY_TRK://人体侦测
-//                flag = true;
-//                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
-
-                break;
             case CLOSE_VISUAL_BODY_TRK://关闭人体侦测
                 flag = true;
                 BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
@@ -335,6 +329,8 @@ public class MatchSceneHandler {
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 DataConfig.isRoam = true;
+                // 获取雷达数据
+                BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
                 // 漫游
                 RoamMove.roam(context);
 
@@ -409,9 +405,7 @@ public class MatchSceneHandler {
             public void run() {
                 // 告诉机器人沉睡了
                 if (DataConfig.isSleep) {
-                    Intent intent = new Intent();
-                    intent.setAction(BroadcastAction.ACTION_ROBOT_SLEEP);
-                    context.sendBroadcast(intent);
+                    BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_SLEEP);
                 }
             }
         }, 5 * 1000);

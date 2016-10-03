@@ -185,12 +185,6 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.openVisualBodyTRK);
         }
     },
-    VISUAL_BODY_TRK {//人体检测
-
-        public boolean isScene(String str) {
-            return MatchStringUtil.matchString(str, MatchStringUtil.visualBodyTRK);
-        }
-    },
     CLOSE_VISUAL_BODY_TRK {//关闭人体检测
 
         public boolean isScene(String str) {

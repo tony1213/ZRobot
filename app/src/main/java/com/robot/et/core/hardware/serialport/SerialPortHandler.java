@@ -33,6 +33,11 @@ public class SerialPortHandler implements OnDataReceiveListener {
         }
     }
 
+    // 获取雷达数据
+    public void getRadarData() {
+        instance.getData();
+    }
+
     /**
      * 实现OnDataReceiveListener接口方法
      *

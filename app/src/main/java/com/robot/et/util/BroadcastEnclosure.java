@@ -119,6 +119,13 @@ public class BroadcastEnclosure {
         context.sendBroadcast(intent);
     }
 
+    // 开启与硬件相关的广播
+    public static void openHardware(Context context, int type) {
+        intent.putExtra("type", type);
+        intent.setAction(BroadcastAction.ACTION_OPEN_HARDWARE);
+        context.sendBroadcast(intent);
+    }
+
     //播放声音提示的广播
     public static void playSoundTips(Context context, int soundId, int playType) {
         intent.putExtra("playType", playType);

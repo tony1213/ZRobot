@@ -21,8 +21,8 @@ public class BroadcastAction {
     public static String ACTION_WAKE_UP_OR_INTERRUPT = "action.wake.up.or.interrupt";
     //唤醒后转身
     public static String ACTION_WAKE_UP_TURN_BY_DEGREE = "action.wake.up.turn.by.degree";
-    //机器人沉睡的广播
-    public static String ACTION_ROBOT_SLEEP = "action.robot.sleep";
+    //开启硬件的广播
+    public static String ACTION_OPEN_HARDWARE = "action.open.hardware";
     //人体监测的广播
     public static String ACTION_BODY_DETECTION = "action.body.detection";
     //开始播放音乐
