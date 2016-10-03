@@ -1,22 +1,16 @@
 package com.robot.et.core.hardware.light;
 
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import com.robot.et.common.EarsLightConfig;
-import com.robot.et.util.TimerManager;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by houdeming on 2016/9/18.
  */
 public class LightHandler {
     private static final String TAG = "light";
-    private Timer timer;
-    private int lightState;
+    private static int lightState;
+    private static boolean isStart = false;
 
     public LightHandler() {
         // 初始化耳朵灯
@@ -31,26 +25,36 @@ public class LightHandler {
     public void setEarsLight(int lightState) {
         Log.i(TAG, "lightState==" + lightState);
         this.lightState = lightState;
+        isStart = false;
+
         switch (lightState) {
             case EarsLightConfig.EARS_CLOSE:
-                stopTime();
                 EarsLight.setLightStatus(lightState);
+
                 break;
             case EarsLightConfig.EARS_BRIGHT:
-                stopTime();
                 EarsLight.setLightStatus(lightState);
+
                 break;
             case EarsLightConfig.EARS_BLINK:
-                startTimer();
+                isStart = true;
+                controlEarsLight();
+
                 break;
             case EarsLightConfig.EARS_CLOCKWISE_TURN:
-                startTimer();
+                isStart = true;
+                controlEarsLight();
+
                 break;
             case EarsLightConfig.EARS_ANTI_CLOCKWISE_TURN:
-                startTimer();
+                isStart = true;
+                controlEarsLight();
+
                 break;
             case EarsLightConfig.EARS_HORSE_RACE_LAMP:
-                startTimer();
+                isStart = true;
+                controlEarsLight();
+
                 break;
             default:
                 break;
@@ -62,29 +66,22 @@ public class LightHandler {
         FloodLight.setLightStatus(lightState);
     }
 
-    private void startTimer() {
-        stopTime();
-        timer = TimerManager.createTimer();
-        timer.schedule(new TimerTask() {
+    // 控制耳朵灯
+    private void controlEarsLight() {
+        // 不要用timer计时器来控制，如果时间较长的话，会对其他线程造成影响
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                handler.sendEmptyMessage(0);
+                while (isStart) {
+                    Log.i(TAG, "controlEarsLight lightState==" + lightState);
+                    EarsLight.setLightStatus(lightState);
+                    try {
+                        Thread.sleep(5000);// 5s执行一次（时间太短的话可能会造成影响）
+                    } catch (InterruptedException e) {
+                        Log.i(TAG, "controlEarsLight InterruptedException==" + e.getMessage());
+                    }
+                }
             }
-        }, 0, 5 * 1000);// 5s执行一次（时间太短的话可能会造成影响）
+        }).start();
     }
-
-    private void stopTime() {
-        if (timer != null) {
-            TimerManager.cancelTimer(timer);
-            timer = null;
-        }
-    }
-
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            EarsLight.setLightStatus(lightState);
-        }
-    };
 }
