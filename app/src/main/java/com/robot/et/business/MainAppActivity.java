@@ -162,11 +162,13 @@ public class MainAppActivity extends RosActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("network", "onResume()");
-        // 连接网络，有时候开机重启系统没有检测到网络断开, 有时候联网后检测慢，误打开扫码联网，所以放在这里判断
-        connectNet();
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.i("network", "onWindowFocusChanged()");
+        // 连接网络，有时候开机重启系统没有检测到网络断开, 所以再次判断一下
+        if (!isConnectIng) {
+            connectNet();
+        }
     }
 
     @Override
@@ -712,6 +714,7 @@ public class MainAppActivity extends RosActivity {
                         destroyService();
                         shutdownRos();
                     }
+                    // 检测网络
                     if (!isConnectIng) {
                         connectNet();
                     }
