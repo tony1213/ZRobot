@@ -714,6 +714,11 @@ public class MainAppActivity extends RosActivity {
                         destroyService();
                         shutdownRos();
                     }
+                    // 第一次联网比较慢，防止有网也打开扫码联网，第一次在onWindowFocusChanged方法中处理
+                    if (!isFirst) {
+                        isFirst = true;
+                        return;
+                    }
                     // 检测网络
                     if (!isConnectIng) {
                         connectNet();
@@ -722,6 +727,8 @@ public class MainAppActivity extends RosActivity {
             }
         }
     };
+
+    private boolean isFirst;
 
     /*
     * 硬编码控制Robot前进
