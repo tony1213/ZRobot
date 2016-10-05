@@ -145,6 +145,7 @@ public class CommandHandler {
     public boolean isMatchEmotion(String result) {
         EmotionEnum emotionEnum = EnumManager.getEmotionEnum(result);
         if (emotionEnum != null) {
+            DataConfig.isEmotionAnim = true;
             ViewCommon.initView();
             EmotionManager.showEmotionAnim(emotionEnum.getEmotionKey());
             String answer = emotionEnum.getRequireAnswer();

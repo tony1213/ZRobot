@@ -302,7 +302,7 @@ public class FaceDistinguishActivity extends Activity {
                     if (faces.length <= 0) {
                         noFaceCount++;
                         if (noFaceCount >= 250) {
-                            sendMsg("请将您的脸部对准我的头部哦，再试一次吧", false);
+                            sendMsg("请让我看见你", false);
                         } else {
                             mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
                             continue;
@@ -531,7 +531,7 @@ public class FaceDistinguishActivity extends Activity {
             Log.i("face", "注册成功");
             FaceManager.setAuthorId(auId);
             DataConfig.isFaceDetector = true;
-            sendMsg("你好，我叫小黄人，请问你叫什么名字呢？", true);
+            sendMsg("你好，我叫小雪，请问你叫什么名字呢？", true);
         } else {
             Log.i("face", "注册失败");
             sendMsg("可以靠近点，让我再认识你一次吗？", false);

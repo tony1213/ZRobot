@@ -290,7 +290,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         }
     };
 
-    //左右 -90 ---- -90    前后 +20 ----- +20   获取一直发的角度
+    //左右 -90 ---- +90    前后 -20 ----- +20   获取一直发的角度
     private int getAngle() {
         int data = 0;
         if (!TextUtils.isEmpty(angle)) {
@@ -428,6 +428,11 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         DataConfig.isPlayMusic = true;
         // 耳朵灯光闪烁
         BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_HORSE_RACE_LAMP);
+
+        // 如果是漫游的话，就不去加载剧本的问题，防止冲突
+        if (DataConfig.isRoam) {
+            return;
+        }
         // 来自app推送来的音乐，判断是否有动作
         if (DataConfig.isJpushPlayMusic) {
             new ScriptHandler().scriptPlayMusic(MsgReceiverService.this, true);
@@ -443,14 +448,20 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_CLOSE);
 
         //播放的是APP推送来的歌曲，继续播放下一首
-        if (DataConfig.isJpushPlayMusic) {
-            String musicName = MusicManager.getCurrentPlayName();
-            if (!TextUtils.isEmpty(musicName)) {
-                playAppLower(musicName);
-            }
+//        if (DataConfig.isJpushPlayMusic) {
+//            String musicName = MusicManager.getCurrentPlayName();
+//            if (!TextUtils.isEmpty(musicName)) {
+//                playAppLower(musicName);
+//            }
+//            return;
+//        }
+
+        // 不管是推送的还是语音播放全部自动下一首
+        String musicName = MusicManager.getCurrentPlayName();
+        if (!TextUtils.isEmpty(musicName)) {
+            playAppLower(musicName);
             return;
         }
-
         SpeechImpl.getInstance().startListen();
     }
 

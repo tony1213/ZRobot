@@ -26,6 +26,7 @@ import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
 import com.robot.et.core.software.common.move.FollowBody;
 import com.robot.et.core.software.common.move.RoamMove;
+import com.robot.et.core.software.common.move.Waving;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.network.RobotInfoCallBack;
 import com.robot.et.core.software.common.network.VoicePhoneCallBack;
@@ -173,15 +174,15 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
     // 摆手
     private void handWaving() {
-        setHand(ScriptConfig.HAND_LEFT, 60, 1000);
-        setHand(ScriptConfig.HAND_RIGHT, -60, 1000);
+        setHand(ScriptConfig.HAND_LEFT, 80, 1000);
+        setHand(ScriptConfig.HAND_RIGHT, -40, 1000);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 setHand(ScriptConfig.HAND_LEFT, 0, 1000);
                 setHand(ScriptConfig.HAND_RIGHT, 0, 1000);
             }
-        }, 1500);
+        }, 1000);
     }
 
     // 设置数据
@@ -238,6 +239,11 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         // 正在表演剧本
         if (DataConfig.isPlayScript) {
             ScriptHandler.playScriptEnd(this);
+        }
+        // 如果在摆手的话停止摆手
+        if (DataConfig.isWaving) {
+            DataConfig.isWaving = false;
+            Waving.stopTimer();
         }
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
@@ -300,6 +306,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
             // 摆手
             BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "30", 1000);
+        } else {
+            // 只头转的时候如果手没有归位的话，归位
+            BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "0", 1000);
         }
     }
 

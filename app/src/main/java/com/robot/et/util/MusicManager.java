@@ -77,8 +77,8 @@ public class MusicManager {
         return fileSrc;
     }
 
-    //获取任意一首歌名
-    public static String getRandomMusicName() {
+    //获取任意一首歌
+    public static String getRandomMusic() {
         String fileSrc = getMusicFile(RequestConfig.JPUSH_MUSIC);
         Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
         File file = new File(fileSrc);
@@ -90,8 +90,13 @@ public class MusicManager {
             String name = names[randomInt];
             StringBuffer buffer = new StringBuffer(1024);
             String musicSrc = buffer.append(fileSrc).append(File.separator).append(name).toString();
+            String musicName = getMusicNameOnly(name);
             setMusicSrc(musicSrc);
-            return getMusicNameOnly(name);
+            setMusicType(DataConfig.PLAY_MUSIC);
+            setCurrentMediaType(RequestConfig.JPUSH_MUSIC);
+            setCurrentMediaName("MUSIC");
+            setCurrentPlayName(musicName);
+            return musicName;
         }
         return "";
     }

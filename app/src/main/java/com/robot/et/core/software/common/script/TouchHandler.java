@@ -36,7 +36,7 @@ public class TouchHandler {
                 switch (key) {
                     case TOUCH_HEAD_TOP://头顶
                         Log.i("netty", "头");
-                        content = "你好，我叫小黄人，可以叫小黄小黄，和我交流";
+                        content = "你好，我叫小雪，可以叫小黄小黄，和我交流";
                         speakContent(DataConfig.SPEAK_TYPE_CHAT, content);
 
                         break;

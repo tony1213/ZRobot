@@ -13,7 +13,6 @@ import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
-import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
@@ -328,11 +327,8 @@ public class MatchSceneHandler {
                 // 显示正常表情
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                DataConfig.isRoam = true;
-                // 获取雷达数据
-                BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
-                // 漫游
-                RoamMove.roam(context);
+                
+                Roam.roam(context);
 
                 break;
             case FOLLOW_SCENE:// 跟着我

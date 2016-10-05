@@ -131,11 +131,10 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
 //                                    answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
 //                                    String content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
 //                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
-                                    
+
                                     // 播放本地音乐
-                                    String content = MusicManager.getRandomMusicName();
+                                    String content = MusicManager.getRandomMusic();
                                     if (!TextUtils.isEmpty(content)) {
-                                        MusicManager.setMusicType(DataConfig.PLAY_MUSIC);
                                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的，开始播放" + content);
                                     } else {
                                         speakContent(question, "");

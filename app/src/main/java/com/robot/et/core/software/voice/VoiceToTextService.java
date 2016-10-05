@@ -77,17 +77,19 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         if (DataConfig.isAppPushRemind) {
             commandHandler.noResponseApp();
         }
-
         // 开始计时听的时间
         if (!isFirstListen) {
             isFirstListen = true;
             startTimer();
         }
-
-        if (!DataConfig.isLookPhoto) {// 不是查看图片
-            handler.sendEmptyMessage(UPDATE_VIEW);
+        // 表情动画或查看图片时，不显示眼睛
+        if (!DataConfig.isLookPhoto) {
+            if (DataConfig.isEmotionAnim) {
+                DataConfig.isEmotionAnim = false;
+            } else {
+                handler.sendEmptyMessage(UPDATE_VIEW);
+            }
         }
-
         // 调用听方法
         boolean isSuccess = voiceDictate.listen(isFirstSetParam, DataConfig.DEFAULT_SPEAK_MEN);
         if (isSuccess) {
@@ -143,6 +145,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         DataConfig.isSleep = false;
         DataConfig.isLookPhoto = false;
         DataConfig.isSecuritySign = false;
+        DataConfig.isEmotionAnim = false;
         voiceDictate.destroy();
         TimerManager.cancelTimer(timer);
         timer = null;

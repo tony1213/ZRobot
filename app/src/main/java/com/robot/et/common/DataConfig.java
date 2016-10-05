@@ -194,4 +194,9 @@ public class DataConfig {
     // 与硬件相关 0：沉睡  1：获取雷达数据
     public static final int HARDWARE_SLEEP = 0;
     public static final int HARDWARE_RADAR = 1;
+
+    // 是否正在摆手
+    public static boolean isWaving;
+    // 是否是表情动画
+    public static boolean isEmotionAnim;
 }
