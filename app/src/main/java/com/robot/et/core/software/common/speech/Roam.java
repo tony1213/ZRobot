@@ -24,20 +24,20 @@ public class Roam {
     // 漫游
     public static void roam(Context context) {
         Roam.context = context;
-        DataConfig.isRoam = true;
         // 唱歌
         String content = MusicManager.getRandomMusic();
         if (!TextUtils.isEmpty(content)) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");
         }
+        DataConfig.isOpenRadar = true;
         // 获取雷达数据
         BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
         // 漫游
         RoamMove.roam(context);
-        // 表情
-        controlEmotion();
         // 手臂摆动
         Waving.waving(context);
+        // 表情
+        controlEmotion();
 
     }
 
@@ -46,7 +46,7 @@ public class Roam {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (DataConfig.isRoam) {
+                while (DataConfig.isOpenRadar) {
                     handler.sendEmptyMessage(0);
                     try {
                         Thread.sleep(6 * 1000);

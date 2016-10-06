@@ -128,17 +128,28 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
                                     break;
                                 case MUSIC://音乐
                                     DataConfig.isJpushPlayMusic = false;
-//                                    answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
+                                    answer = ResultParse.getMusicData(jObject, DataConfig.MUSIC_SPLITE);
 //                                    String content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
 //                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, content);
 
-                                    // 播放本地音乐
-                                    String content = MusicManager.getRandomMusic();
+                                    // 唱歌的时候，如果没有指定歌曲，就随机唱本地歌曲，否则先去本地找，本地没有的话，就去网络获取
+                                    String content;
+                                    String speakContent;
+                                    if (underStandContent.contains("首歌")) {// 随便唱本地歌曲
+                                        // 播放本地音乐
+                                        content = MusicManager.getRandomMusic();
+                                        speakContent = "好的，开始播放" + content;
+                                    } else {
+                                        content = MusicManager.getMusic(answer);
+                                        speakContent = content;
+                                    }
+
                                     if (!TextUtils.isEmpty(content)) {
-                                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的，开始播放" + content);
+                                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, speakContent);
                                     } else {
                                         speakContent(question, "");
                                     }
+
                                     break;
                                 case RESTAURANT://餐馆
                                     // do nothing

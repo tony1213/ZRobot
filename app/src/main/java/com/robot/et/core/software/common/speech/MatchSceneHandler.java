@@ -285,6 +285,18 @@ public class MatchSceneHandler {
 //                }
 
                 break;
+            case OPEN_MOTION_SCENE:// 打开运动
+                flag = true;
+                DataConfig.isControlMotion = true;
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，运动控制已开启，如若关闭，请说：关闭运动");
+
+                break;
+            case CLOSE_MOTION_SCENE:// 关闭运动
+                flag = true;
+                DataConfig.isControlMotion = false;
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，运动控制已关闭，如若开启，请说：打开运动");
+
+                break;
             case START_DISTINGUISH_SCENE:// 进入物体识别
                 flag = true;
                 DataConfig.isStartDistinguish = true;
@@ -327,7 +339,8 @@ public class MatchSceneHandler {
                 // 显示正常表情
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                
+                DataConfig.isControlRobotMove = false;
+
                 Roam.roam(context);
 
                 break;

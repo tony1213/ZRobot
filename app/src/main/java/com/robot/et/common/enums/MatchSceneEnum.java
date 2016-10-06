@@ -119,6 +119,18 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.playScriptRegex);
         }
     },
+    OPEN_MOTION_SCENE {// 打开运动
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.openMotionRegex);
+        }
+    },
+    CLOSE_MOTION_SCENE {// 关闭运动
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.closeMotionRegex);
+        }
+    },
     FACE_TEST_SCENE {// 脸部检测
 
         public boolean isScene(String str) {

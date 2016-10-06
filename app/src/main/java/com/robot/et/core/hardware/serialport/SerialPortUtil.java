@@ -105,7 +105,7 @@ public class SerialPortUtil {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (DataConfig.isRoam) {
+                while (DataConfig.isOpenRadar) {
                     int size;
                     try {
                         if (mInputStream == null) {

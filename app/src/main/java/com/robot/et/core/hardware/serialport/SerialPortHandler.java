@@ -4,8 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
 import com.robot.et.entity.SerialPortReceiverInfo;
+import com.robot.et.util.BroadcastEnclosure;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +61,17 @@ public class SerialPortHandler implements OnDataReceiveListener {
             // 对json结果处理
             if (!TextUtils.isEmpty(result)) {
                 info = getReceiverInfo(result);
+                // 只有在语音控制机器人运动的时候才会发送雷达广播
+                if (DataConfig.isControlRobotMove) {
+                    // 如果在蔽障范围内，发送停止的雷达广播
+                    if (info.getDataM() <= 80 || info.getDataL() <= 70 || info.getDataR() <= 70) {
+                        DataConfig.isOpenRadar = false;
+                        DataConfig.isComeIng = false;
+                        DataConfig.isControlRobotMove = false;
+                        // 发送雷达停止的广播
+                        BroadcastEnclosure.sendRadar(context);
+                    }
+                }
             } else {
                 info = null;
             }

@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import com.robot.et.R;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.core.software.common.baidumap.IMap;
 import com.robot.et.core.software.common.baidumap.Map;
 import com.robot.et.core.software.common.move.FollowBody;
@@ -61,6 +62,7 @@ import com.robot.et.core.software.zxing.ScanCodeActivity;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.LocationInfo;
 import com.robot.et.entity.VisionRecogniseEnvironmentInfo;
+import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.LocationManager;
 import com.robot.et.util.Utilities;
 
@@ -659,8 +661,11 @@ public class MainAppActivity extends RosActivity {
 //                moveClient=new MoveClient("base_link",0,0,0);
 //                nodeMainExecutorService.execute(moveClient,nodeConfiguration.setNodeName("moveClient"));
                 //方案二：（直接控制Twist）
-                Log.e("radar", "触发雷达安全距离，执行刹车指令");
-                doMoveAction("5");
+                Log.i("radar", "触发雷达安全距离，执行刹车指令");
+//                doMoveAction("5");
+                // 通过串口控制停止
+                BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.STOP.getMoveKey(), 0, 1000, 0);
+
             } else if (intent.getAction().equals(BroadcastAction.ACTION_SCAN_QR_CODE)) {// 扫码结果
                 String mCodeNo = intent.getStringExtra("result");
                 Log.i("network", "扫码结果mCodeNo==" + mCodeNo);

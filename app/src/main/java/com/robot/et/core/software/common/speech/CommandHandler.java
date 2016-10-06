@@ -71,42 +71,56 @@ public class CommandHandler {
             int moveKey = EnumManager.getMoveKey(result);
             Log.i("ifly", "moveKey===" + moveKey);
             if (moveKey != 0) {
+                if (DataConfig.isControlMotion) {// 运动开关开启
 //                if (DataConfig.isControlToyCar) {//控制小车
 //                    DataConfig.controlNum = 0;
 //                    BroadcastEnclosure.controlToyCarMove(context, moveKey, DataConfig.toyCarNum);
 //                    SpeechImpl.getInstance().startListen();
 //                } else {//控制机器人
 //                }
-                //控制机器人
-                Log.i("ifly", "执行语音控制机器人");
-                DataConfig.isControlRobotMove = true;
-                String content = "";
-                if (result.contains("过来")) {
-                    content = "好的，主人，我来啦";
-                } else {
-                    content = getRandomAnswer();
-                }
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                    //控制机器人
+                    Log.i("ifly", "执行语音控制机器人");
+                    DataConfig.isControlRobotMove = true;
 
-                int digit = Utilities.chineseNumber2Int(result);
-                Log.i("ifly", "result===" + result);
-                Log.i("ifly", "digit===" + digit);
-                if (moveKey == ControlMoveEnum.LEFT.getMoveKey() || moveKey == ControlMoveEnum.RIGHT.getMoveKey()) {
-                    // 左转右转
-                    if (digit == 0) {
-                        digit = 90;// 默认90度
+                    if (result.contains("过来")) {// 过来场景
+                        String content = "好的，主人，我来啦";
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+                        DataConfig.isOpenRadar = true;
+                        BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
+                        DataConfig.isComeIng = true;
+                        come();
+
+                    } else {// 运动的语音指令
+                        String content = getRandomAnswer();
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
+
+                        int digit = Utilities.chineseNumber2Int(result);
+                        Log.i("ifly", "result===" + result);
+                        Log.i("ifly", "digit===" + digit);
+                        if (moveKey == ControlMoveEnum.LEFT.getMoveKey() || moveKey == ControlMoveEnum.RIGHT.getMoveKey()) {
+                            // 左转右转
+                            if (digit == 0) {
+                                digit = 90;// 默认90度
+                            }
+                        } else if (moveKey == ControlMoveEnum.TURN_AFTER.getMoveKey()) {// 向后转
+                            digit = 180;
+                        } else {// 前进
+                            if (digit == 0) {
+                                digit = 1 * 1000;// 默认1米
+                            } else {
+                                digit *= 1000;// 单位是mm
+                            }
+                            // 前进的时候开启雷达监测，用来蔽障
+                            DataConfig.isOpenRadar = true;
+                            BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
+                        }
+                        // 距离：毫米  时间：毫秒
+                        BroadcastEnclosure.controlMoveBySerialPort(context, moveKey, digit, 1000, 0);
                     }
-                } else if (moveKey == ControlMoveEnum.TURN_AFTER.getMoveKey()) {// 向后转
-                    digit = 180;
-                } else {
-                    if (digit == 0) {
-                        digit = 1 * 1000;// 默认1米
-                    } else {
-                        digit *= 1000;// 单位是mm
-                    }
+
+                } else {// 运动开关关闭
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，运动控制已关闭，请说：打开运动开启运动控制");
                 }
-                // 距离：毫米  时间：毫秒
-                BroadcastEnclosure.controlMoveBySerialPort(context, moveKey, digit, 1000, 0);
                 return true;
             }
         }
@@ -187,6 +201,23 @@ public class CommandHandler {
                 }
             }, 15 * 1000);
         }
+    }
+
+    // 过来
+    private void come() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (DataConfig.isComeIng) {
+                    BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.FORWARD.getMoveKey(), 500, 1000, 0);
+                    try {
+                        Thread.sleep(1 * 1000);
+                    } catch (InterruptedException e) {
+                        Log.i("ifly", "come InterruptedException");
+                    }
+                }
+            }
+        }).start();
     }
 
     //控制移动的时候，随机回答内容

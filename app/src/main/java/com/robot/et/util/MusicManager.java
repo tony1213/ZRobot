@@ -101,7 +101,7 @@ public class MusicManager {
         return "";
     }
 
-    //获取音乐的名字不带.mp3
+    //获取音乐的名字不带.mp3（从链接中）
     public static String getMusicNameNoMp3(String content) {
         if (!TextUtils.isEmpty(content)) {
             int start = content.lastIndexOf("/");
@@ -111,7 +111,7 @@ public class MusicManager {
         return "";
     }
 
-    //获取音乐的名字
+    //获取音乐的名字（从音乐名字中）
     public static String getMusicNameOnly(String content) {
         if (!TextUtils.isEmpty(content)) {
             if (content.contains(".mp3")) {
@@ -120,6 +120,57 @@ public class MusicManager {
             }
         }
         return "";
+    }
+
+    // 获取音乐（本地或者网络）
+    public static String getMusic(String result) {
+        String content = "";
+        if (!TextUtils.isEmpty(result)) {
+            String playPrompt = "开始播放";
+            StringBuffer buffer = new StringBuffer(1024);
+            if (result.contains(DataConfig.MUSIC_SPLITE)) {
+                String[] datas = result.split(DataConfig.MUSIC_SPLITE);
+                if (datas != null && datas.length > 0) {
+                    //歌手+歌名 + 歌曲src
+                    String musicName = datas[1];
+                    setMusicName(musicName);
+                    setMusicType(DataConfig.PLAY_MUSIC);
+                    buffer.append("好的，").append(playPrompt);
+                    // 查看本地是否有这首歌
+                    boolean isContain = isContainMusic(musicName);
+                    if (isContain) {
+                        String fileSrc = Environment.getExternalStorageDirectory()
+                                .getAbsolutePath() + File.separator + "robot" + File.separator + "音乐" + File.separator + musicName + ".mp3";
+                        setMusicSrc(fileSrc);
+                        buffer.append(musicName);
+                    } else {
+                        setMusicSrc(datas[2]);
+                        buffer.append(datas[0]).append("：").append(musicName);
+                    }
+                    content = buffer.toString();
+                }
+            }
+        }
+        return content;
+    }
+
+    // 本地是否包含当前歌曲
+    private static boolean isContainMusic(String musicName) {
+        if (!TextUtils.isEmpty(musicName)) {
+            String fileSrc = getMusicFile(RequestConfig.JPUSH_MUSIC);
+            Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
+            File file = new File(fileSrc);
+            String[] names = file.list();
+            int length = names.length;
+            if (names != null && length > 0) {
+                for (int i = 0; i < length; i++) {
+                    if (TextUtils.equals(musicName, getMusicNameOnly(names[i]))) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     // 获取要播放音乐的话语

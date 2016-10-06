@@ -161,7 +161,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                         || direction == ControlMoveEnum.TURN_AFTER.getMoveKey()) {
                     // 左转右转后转是度数
                     speed = distance;
-                    moveTime = distance * 1000 / 30;// 默认速度30度/s
+                    moveTime = distance * 1000 / 50;// 默认速度50度/s
                 } else {// 前进后退是距离
                     speed = 300;// 默认速度300mm/s
                     moveTime = (distance * 10) / 3;
@@ -236,6 +236,12 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             // 停止漫游
             RoamMove.stopTimer();
         }
+
+        // 关掉雷达上传
+        if (DataConfig.isOpenRadar) {
+            DataConfig.isOpenRadar = false;
+            DataConfig.isControlRobotMove = false;
+        }
         // 正在表演剧本
         if (DataConfig.isPlayScript) {
             ScriptHandler.playScriptEnd(this);
@@ -244,6 +250,11 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         if (DataConfig.isWaving) {
             DataConfig.isWaving = false;
             Waving.stopTimer();
+        }
+
+        // 过来
+        if (DataConfig.isComeIng) {
+            DataConfig.isComeIng = false;
         }
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
@@ -511,6 +522,22 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
                     break;
                 case SHORT_PRESS:// 短按
+                    // 安保模式暂时先放这里处理
+                    if (DataConfig.isSecuritySign) {// 安保模式
+                        // 停止计时
+                        TimerManager.cancelTimer(timer);
+                        timer = null;
+                        // 解除预警，耳朵灯变常亮，照明灯30s后灭
+                        BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BRIGHT);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 照明灯灭
+                                controlLightLED(LIGHT_OFF);
+                            }
+                        }, 30 * 1000);
+                        return;
+                    }
                     // 如果正在音视频的话关掉
                     if (DataConfig.isVideoOrVoice) {
                         BroadcastEnclosure.closeAgora(HardwareReceiverService.this, false);

@@ -190,6 +190,8 @@ public class DataConfig {
     public static boolean isFollow;
     // 是否是漫游
     public static boolean isRoam;
+    // 是否开启雷达
+    public static boolean isOpenRadar;
 
     // 与硬件相关 0：沉睡  1：获取雷达数据
     public static final int HARDWARE_SLEEP = 0;
@@ -199,4 +201,10 @@ public class DataConfig {
     public static boolean isWaving;
     // 是否是表情动画
     public static boolean isEmotionAnim;
+
+    // 是否是运动控制
+    public static boolean isControlMotion;
+    // 是否是过来
+    public static boolean isComeIng;
+
 }

@@ -73,20 +73,25 @@ public class MatchStringUtil {
     //导航到
     public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*(到|去)+" + baseRegex + "+$";
 
+    // 打开运动
+    public static String openMotionRegex = "^" + baseRegex + "*开+" + baseRegex + "*(运动)+" + baseRegex + "*$";
+    // 关闭运动
+    public static String closeMotionRegex = "^" + baseRegex + "*关+" + baseRegex + "*(运动)+" + baseRegex + "*$";
+
     // 看看照片的标志
-    public static String lookPhotoRegex = "^" + baseRegex + "*看+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
+    public static String lookPhotoRegex = "^" + baseRegex + "*(看|(浏览))+" + baseRegex + "*((照片)|(图片)|(相册)|(相片))+" + baseRegex + "*$";
     // 上一张照片
     public static String lastPhotoRegex = "^" + baseRegex + "*((上一张)|(上一个)|(上一章))+" + baseRegex + "*$";
     // 下一张照片
     public static String nextPhotoRegex = "^" + baseRegex + "*((下一张)|(下一个)|(下一章))+" + baseRegex + "*$";
 
     // 进入安保场景的标志
-    public static String openSecuritySignRegex = "^" + baseRegex + "*((进入)|(打开)|(开启))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
+    public static String openSecuritySignRegex = "^" + baseRegex + "*((进入)|(打开)|(开启))+" + baseRegex + "*((安保)|(巡防))+" + baseRegex + "*$";
     // 解除安保场景的标志
-    public static String closeSecuritySignRegex = "^" + baseRegex + "*((解除)|(退出)|(关闭))+" + baseRegex + "*(安保)+" + baseRegex + "*$";
+    public static String closeSecuritySignRegex = "^" + baseRegex + "*((解除)|(退出)|(关闭))+" + baseRegex + "*((安保)|(巡防))+" + baseRegex + "*$";
 
     // 漫游的标志
-    public static String roamSignRegex = "^" + baseRegex + "*(((漫游)+)|(随+" + baseRegex + "*走+))" + baseRegex + "*$";
+    public static String roamSignRegex = "^" + baseRegex + "*(((漫游)+)|(((自己)|随)+" + baseRegex + "*走+))" + baseRegex + "*$";
     // 跟着我的标志
     public static String followSignRegex = "^" + baseRegex + "*跟+" + baseRegex + "*我+" + baseRegex + "*$";
 

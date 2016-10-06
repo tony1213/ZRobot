@@ -57,7 +57,10 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         matchSceneHandler = new MatchSceneHandler(this);
         // 上传词表
         uploadThesaurus();
-
+        // 语音控制运动默认打开
+        DataConfig.isControlMotion = true;
+        DataConfig.isComeIng = false;
+        DataConfig.isOpenRadar = false;
     }
 
     // 上传词表
@@ -146,6 +149,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         DataConfig.isLookPhoto = false;
         DataConfig.isSecuritySign = false;
         DataConfig.isEmotionAnim = false;
+        DataConfig.isControlRobotMove = false;
         voiceDictate.destroy();
         TimerManager.cancelTimer(timer);
         timer = null;

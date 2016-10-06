@@ -31,16 +31,15 @@ public class RoamMove {
         headAngle = 0;
         isRandomTurn = false;
         isForward = false;
-        if (DataConfig.isRoam) {
-            timer = TimerManager.createTimer();
-            // 500ms执行一次
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    handler.sendEmptyMessage(0);
-                }
-            }, 0, 500);
-        }
+        DataConfig.isRoam = true;
+        timer = TimerManager.createTimer();
+        // 500ms执行一次
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(0);
+            }
+        }, 0, 500);
     }
 
     private static Handler handler = new Handler() {
