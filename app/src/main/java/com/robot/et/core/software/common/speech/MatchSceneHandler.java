@@ -136,18 +136,18 @@ public class MatchSceneHandler {
                 break;
             case RAISE_LEFT_HAND_SCENE:// 抬左手
                 flag = true;
-                hand(ScriptConfig.HAND_LEFT, "60", 1000);
+                hand(ScriptConfig.HAND_LEFT, "70", 1000);
 
                 break;
             case RAISE_RIGHT_HAND_SCENE:// 抬右手
                 flag = true;
-                hand(ScriptConfig.HAND_RIGHT, "60", 1000);
+                hand(ScriptConfig.HAND_RIGHT, "70", 1000);
 
                 break;
             case RAISE_HAND_SCENE:// 抬手
                 flag = true;
-                hand(ScriptConfig.HAND_LEFT, "60", 1000);
-                hand(ScriptConfig.HAND_RIGHT, "60", 1000);
+                hand(ScriptConfig.HAND_LEFT, "70", 1000);
+                hand(ScriptConfig.HAND_RIGHT, "70", 1000);
 
                 break;
             case WAVING_SCENE:// 摆手
@@ -157,12 +157,12 @@ public class MatchSceneHandler {
                 break;
             case HEAD_UP_SCENE:// 抬头
                 flag = true;
-                head(DataConfig.TURN_HEAD_AROUND, "15", 1000);
+                head(DataConfig.TURN_HEAD_AROUND, "20", 1000);
 
                 break;
             case HEAD_DOWN_SCENE:// 低头
                 flag = true;
-                head(DataConfig.TURN_HEAD_AROUND, "-10", 1000);
+                head(DataConfig.TURN_HEAD_AROUND, "-15", 1000);
 
                 break;
             case PLAY_SCRIPT_SCENE:// 表演节目
@@ -229,6 +229,8 @@ public class MatchSceneHandler {
                 break;
             case PHOTOGRAPH_SCENE:// 拍照
                 flag = true;
+                // 头抬到最高点(20)
+                BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, String.valueOf(20), 1000);
                 // 拍照时手抬起来
                 BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "100", 1000);
                 // 说提示音
@@ -251,22 +253,20 @@ public class MatchSceneHandler {
 
                 break;
             case VISION_LEARN_SCENE:// 视觉学习
-                if (DataConfig.isStartDistinguish) {
-                    flag = true;
+                flag = true;
+                //该步骤需要进行视觉初始化，所以该地方需要视觉初始化
+                try {
+                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");//视觉初始化成功，需要时间大概是1～2秒
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化失败，错误码5");
+                    break;
+                } finally {
                     String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
-                    //该步骤需要进行视觉初始化，所以该地方需要视觉初始化
-                    try {
-                        BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");//视觉初始化成功，需要时间大概是1～2秒
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化失败，错误码5");
-                        break;
-                    } finally {
-                        if (TextUtils.isEmpty(visionContent)) {// 这是什么？
-                            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
-                        } else {// 这是手机
-                            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
-                        }
+                    if (TextUtils.isEmpty(visionContent)) {// 这是什么？
+                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
+                    } else {// 这是手机
+                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
                     }
                 }
                 break;
@@ -346,10 +346,10 @@ public class MatchSceneHandler {
                 break;
             case FOLLOW_SCENE:// 跟着我
                 flag = true;
-                DataConfig.isFollow = true;
                 // 显示正常表情
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
                 // 跟随
                 BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
 
@@ -382,7 +382,7 @@ public class MatchSceneHandler {
             public void run() {
                 BroadcastEnclosure.controlArm(context, handCategory, "0", moveTime);
             }
-        }, 1500);
+        }, 1400);
         SpeechImpl.getInstance().startListen();
     }
 

@@ -20,27 +20,27 @@ import java.util.TimerTask;
 public class Waving {
     private static final String TAG = "waving";
     private static Context context;
-    private static final String ANGLE_FORWARD = "80";// 向前摆的角度
-    private static final String ANGLE_BACK = "-40";// 向后摆的角度
-    private static final int WAVING_TIME = 1000;// 摆的时间
+    private static final String ANGLE_FORWARD = "70";// 向前摆的角度
+    private static final String ANGLE_BACK = "-30";// 向后摆的角度
+    private static final int WAVING_TIME = 800;// 摆的时间
     private static Timer timer;
 
-    // 摆手
+    // 摆手(现在速度都是50/s)
     public static void waving(Context context) {
         Waving.context = context;
-        DataConfig.isWaving = true;
         wavingCount = 0;
         isFirst = false;
         // 摆前先归位
         wavingStop();
+        DataConfig.isWaving = true;
         timer = TimerManager.createTimer();
-        // 1000ms执行一次
+        // 2000ms执行一次
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 handler.sendEmptyMessage(0);
             }
-        }, 0, 1000);
+        }, 0, 2 * 1000);
     }
 
     private static int wavingCount; // 摆动的次数

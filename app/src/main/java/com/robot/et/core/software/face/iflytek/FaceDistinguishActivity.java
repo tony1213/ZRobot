@@ -109,8 +109,8 @@ public class FaceDistinguishActivity extends Activity {
         DataConfig.isFaceRecogniseIng = true;
         // 获取已注册人脸的数据
         faceInfos = getIntent().getParcelableArrayListExtra("faceInfo");
-        // 开始人脸识别的时候头稍微向后转
-        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(15), 1000);
+        // 开始人脸识别的时候头抬到最高点(20)
+        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(20), 1000);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CLOSE_FACE_DISTINGUISH);
@@ -405,7 +405,7 @@ public class FaceDistinguishActivity extends Activity {
         // 提示灯关闭
         BroadcastEnclosure.controlEarsLED(this, EarsLightConfig.EARS_CLOSE);
         // 通知头部复位
-//        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(0), 1000);
+        BroadcastEnclosure.controlHead(this, DataConfig.TURN_HEAD_AROUND, String.valueOf(0), 1000);
     }
 
     @Override
@@ -414,7 +414,6 @@ public class FaceDistinguishActivity extends Activity {
         // 销毁对象
         mFaceDetector.destroy();
         DataConfig.isFaceRecogniseIng = false;
-        DataConfig.isVoiceFaceRecognise = false;
         unregisterReceiver(receiver);
     }
 
@@ -552,7 +551,7 @@ public class FaceDistinguishActivity extends Activity {
                 if (DataConfig.isVoiceFaceRecognise) {//语音开启人脸识别
                     sendMsg("你是" + FaceManager.getAuthorName(), true);
                 } else {//人体感应开启人脸识别
-                    sendMsg("你好，" + FaceManager.getAuthorName() + ",很高兴又见面了。", true);
+                    sendMsg("很高兴又见到你，" + FaceManager.getAuthorName() + ",有什么可以帮你", true);
                 }
             } else {
                 Log.i("face", "验证不通过");

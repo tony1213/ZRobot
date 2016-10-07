@@ -19,8 +19,5 @@
     <item
         android:drawable="@mipmap/emotion_rest_5"
         android:duration="300" />
-    <item
-        android:drawable="@mipmap/emotion_normal"
-        android:duration="500" />
 
 </animation-list>

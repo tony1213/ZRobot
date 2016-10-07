@@ -23,6 +23,7 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.speech.Gallery;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
@@ -183,14 +184,14 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 String contetn = intent.getStringExtra("content");
                 // 脸部识别是否成功
                 boolean isVerifySuccess = intent.getBooleanExtra("isVerifySuccess", false);
-                if (DataConfig.isSleep) {//处于沉睡状态
-                    DataConfig.isSleep = false;
+                if (!DataConfig.isVoiceFaceRecognise) {// 处于沉睡状态人体检测打开的人脸识别
                     if (isVerifySuccess) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                     } else {
-                        SpeechImpl.getInstance().startListen();
+                        // 如果验证不成功的话继续沉睡,防止误打开
+                        MatchSceneHandler.sleep(MsgReceiverService.this);
                     }
-                } else {//处于唤醒状态
+                } else {// 语音打开的人脸识别
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                 }
             } else if (intent.getAction().equals(BroadcastAction.ACTION_OPEN_FACE_DISTINGUISH)) {//打开脸部识别
@@ -221,6 +222,8 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                 Log.i(TAG, "MsgReceiverService  自动拍照完成");
                 // 拍完照手放下来
                 BroadcastEnclosure.controlArm(context, ScriptConfig.HAND_LEFT, "0", 1000);
+                // 通知头部复位
+                BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, String.valueOf(0), 1000);
                 // 获取拍照后传来的图片数据
                 byte[] photoData = intent.getByteArrayExtra("photoData");
                 if (photoData != null && photoData.length > 0) {

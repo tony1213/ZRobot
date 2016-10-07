@@ -11,6 +11,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.common.enums.EmotionEnum;
+import com.robot.et.core.software.common.move.Come;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
@@ -68,6 +69,11 @@ public class CommandHandler {
     public boolean isControlMove(String result) {
         Log.i("ifly", "执行语音运动控制");
         if (!TextUtils.isEmpty(result)) {
+            // 如果字数大于8个字数时，作为胡乱听得不处理
+            if (result.length() > 8) {
+                return false;
+            }
+
             int moveKey = EnumManager.getMoveKey(result);
             Log.i("ifly", "moveKey===" + moveKey);
             if (moveKey != 0) {
@@ -81,14 +87,34 @@ public class CommandHandler {
                     //控制机器人
                     Log.i("ifly", "执行语音控制机器人");
                     DataConfig.isControlRobotMove = true;
+                    // 防止运动的过程中，再执行指令，要先停止前面的指令，再执行
+                    if (DataConfig.isComeIng) {
+                        DataConfig.isComeIng = false;
+                        Come.stopTimer();
+                    }
+                    BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.STOP.getMoveKey(), 0, 1000, 0);
 
                     if (result.contains("过来")) {// 过来场景
                         String content = "好的，主人，我来啦";
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, content);
                         DataConfig.isOpenRadar = true;
                         BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
-                        DataConfig.isComeIng = true;
-                        come();
+                        // 过来的时候当唤醒时只有头转的时候，此时身体也要转过来，头部归位
+                        int degree = DataConfig.voiceDegree;
+                        long delay = 0;
+                        if (degree != 0) {
+                            delay = 600;
+                            if (degree <= 30) {// (0-30)身体向右转
+                                BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.RIGHT.getMoveKey(), degree, 1000, 0);
+                            } else {// (330-360)身体向左转
+                                int angle = 360 - degree;
+                                BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.LEFT.getMoveKey(), angle, 1000, 0);
+                            }
+                            // 头部归位
+                            BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_ABOUT, "0", 1000);
+                        }
+                        // 过来
+                        Come.come(context, delay);
 
                     } else {// 运动的语音指令
                         String content = getRandomAnswer();
@@ -110,9 +136,12 @@ public class CommandHandler {
                             } else {
                                 digit *= 1000;// 单位是mm
                             }
-                            // 前进的时候开启雷达监测，用来蔽障
-                            DataConfig.isOpenRadar = true;
-                            BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
+                            // 只有前进的时候加雷达
+                            if (moveKey == ControlMoveEnum.FORWARD.getMoveKey()) {
+                                // 前进的时候开启雷达监测，用来蔽障
+                                DataConfig.isOpenRadar = true;
+                                BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_RADAR);
+                            }
                         }
                         // 距离：毫米  时间：毫秒
                         BroadcastEnclosure.controlMoveBySerialPort(context, moveKey, digit, 1000, 0);
@@ -201,23 +230,6 @@ public class CommandHandler {
                 }
             }, 15 * 1000);
         }
-    }
-
-    // 过来
-    private void come() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (DataConfig.isComeIng) {
-                    BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.FORWARD.getMoveKey(), 500, 1000, 0);
-                    try {
-                        Thread.sleep(1 * 1000);
-                    } catch (InterruptedException e) {
-                        Log.i("ifly", "come InterruptedException");
-                    }
-                }
-            }
-        }).start();
     }
 
     //控制移动的时候，随机回答内容

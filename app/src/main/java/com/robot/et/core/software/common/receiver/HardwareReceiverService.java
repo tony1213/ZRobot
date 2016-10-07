@@ -24,6 +24,7 @@ import com.robot.et.core.hardware.light.LightHandler;
 import com.robot.et.core.hardware.serialport.SerialPortHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
+import com.robot.et.core.software.common.move.Come;
 import com.robot.et.core.software.common.move.FollowBody;
 import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.move.Waving;
@@ -81,6 +82,8 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         lightHandler = new LightHandler();
         // 初始化串口
         serialPortHandler = new SerialPortHandler(this);
+        // 默认角度为0
+        DataConfig.voiceDegree = 0;
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_OPEN_HARDWARE);
@@ -172,9 +175,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         }
     };
 
-    // 摆手
+    // 摆手(现在速度都是50/s)
     private void handWaving() {
-        setHand(ScriptConfig.HAND_LEFT, 80, 1000);
+        setHand(ScriptConfig.HAND_LEFT, 60, 1000);
         setHand(ScriptConfig.HAND_RIGHT, -40, 1000);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -182,7 +185,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 setHand(ScriptConfig.HAND_LEFT, 0, 1000);
                 setHand(ScriptConfig.HAND_RIGHT, 0, 1000);
             }
-        }, 1000);
+        }, 1200);
     }
 
     // 设置数据
@@ -236,7 +239,6 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             // 停止漫游
             RoamMove.stopTimer();
         }
-
         // 关掉雷达上传
         if (DataConfig.isOpenRadar) {
             DataConfig.isOpenRadar = false;
@@ -251,10 +253,10 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             DataConfig.isWaving = false;
             Waving.stopTimer();
         }
-
-        // 过来
+        // 停止过来
         if (DataConfig.isComeIng) {
             DataConfig.isComeIng = false;
+            Come.stopTimer();
         }
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
@@ -313,11 +315,13 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         }
         // 只有身体转的时候处理
         if (degree > 30 && degree < 330) {
+            DataConfig.voiceDegree = 0;
             // 耳朵的灯光在运动的时候进行闪烁
             BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BLINK);
             // 摆手
             BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "30", 1000);
         } else {
+            DataConfig.voiceDegree = degree;
             // 只头转的时候如果手没有归位的话，归位
             BroadcastEnclosure.controlArm(HardwareReceiverService.this, ScriptConfig.HAND_TWO, "0", 1000);
         }
@@ -403,6 +407,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                 return;
             }
 
+            DataConfig.isVoiceFaceRecognise = false;
             // 开启脸部识别
             BroadcastEnclosure.openFaceRecognise(HardwareReceiverService.this);
         }

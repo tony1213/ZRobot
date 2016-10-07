@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.hardware.serialport.SerialPortUtil.OnDataReceiveListener;
+import com.robot.et.core.software.common.move.Come;
 import com.robot.et.entity.SerialPortReceiverInfo;
 import com.robot.et.util.BroadcastEnclosure;
 
@@ -18,6 +19,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
     private static SerialPortUtil instance;
     private final String TAG = "SerialPort";
     private Context context;
+    private int stopCount;
 
     public SerialPortHandler(Context context) {
         Log.i(TAG, "串口实例化");
@@ -37,6 +39,12 @@ public class SerialPortHandler implements OnDataReceiveListener {
 
     // 获取雷达数据
     public void getRadarData() {
+        // 每次获取雷达数据时，一定要清空缓存的buffer
+        if (buffer != null && buffer.length() > 0) {
+            Log.i(TAG, "buffer 清空");
+            buffer.setLength(0);
+        }
+        stopCount = 0;
         instance.getData();
     }
 
@@ -64,12 +72,24 @@ public class SerialPortHandler implements OnDataReceiveListener {
                 // 只有在语音控制机器人运动的时候才会发送雷达广播
                 if (DataConfig.isControlRobotMove) {
                     // 如果在蔽障范围内，发送停止的雷达广播
-                    if (info.getDataM() <= 80 || info.getDataL() <= 70 || info.getDataR() <= 70) {
-                        DataConfig.isOpenRadar = false;
-                        DataConfig.isComeIng = false;
-                        DataConfig.isControlRobotMove = false;
-                        // 发送雷达停止的广播
-                        BroadcastEnclosure.sendRadar(context);
+                    if (info != null) {
+                        if (info.getDataM() <= 60 || info.getDataL() <= 60 || info.getDataR() <= 60) {
+                            stopCount++;
+                            // 防止缓存数据影响，连续3次的话，再发送雷达停止广播
+                            if (stopCount == 3) {
+                                stopCount = 0;
+                                info = null;
+                                DataConfig.isOpenRadar = false;
+                                if (DataConfig.isComeIng) {
+                                    DataConfig.isComeIng = false;
+                                    Come.stopTimer();
+                                }
+                                DataConfig.isControlRobotMove = false;
+                                // 发送雷达停止的广播
+                                Log.i(TAG, "发送雷达停止的广播");
+                                BroadcastEnclosure.sendRadar(context);
+                            }
+                        }
                     }
                 }
             } else {
@@ -126,6 +146,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
                 JSONTokener tokener = new JSONTokener(result);
                 JSONObject object = new JSONObject(tokener);
                 info = new SerialPortReceiverInfo();
+                Log.i(TAG, "getReceiverInfo 获取数据");
                 if (object.has("datal")) {
                     info.setDataL(object.getInt("datal"));
                 }

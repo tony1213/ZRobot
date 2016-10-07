@@ -206,5 +206,7 @@ public class DataConfig {
     public static boolean isControlMotion;
     // 是否是过来
     public static boolean isComeIng;
+    // 语音唤醒转动的角度
+    public static int voiceDegree;
 
 }

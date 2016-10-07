@@ -5,7 +5,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.robot.et.common.DataConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
+import com.robot.et.core.software.common.view.TextManager;
+import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.ros.BodyPositionSubscriber;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.TimerManager;
@@ -29,7 +32,7 @@ public class FollowBody {
         FollowBody.context = context;
         lastTurn = 0;
         isGo = false;
-
+        DataConfig.isFollow = true;
         timer = TimerManager.createTimer();
         // 500ms读一次
         timer.schedule(new TimerTask() {
@@ -37,7 +40,7 @@ public class FollowBody {
             public void run() {
                 handler.sendEmptyMessage(0);
             }
-        }, 0, 500);
+        }, 0, 300);
 
     }
 
@@ -55,6 +58,10 @@ public class FollowBody {
                 int posZ = (int) z;
                 Log.i(TAG, "获取到人体的位置：X＝" + x + ",Y=" + y + ",Z=" + z);
                 // x 代表左右位置【0-320】  y 代表上下位置【0-240】   z 代表距离人的距离
+                String result = "X＝" + posX + "\n" + "Z=" + posZ;
+                ViewCommon.initView();
+                TextManager.showText(result);
+
                 if ((posX != 0) && (posZ != 0)) {
                     boolean ret = followTurn(posX);
                     if (!ret) {
@@ -71,7 +78,7 @@ public class FollowBody {
     // 是否是直走
     private static boolean isGo;
     // 停止的距离
-    private static final int STOP_VALUE = 70;
+    private static final int STOP_VALUE = 140;
 
     // 左转右转 中间是160.在150-170之间默认走直线, <150左转  >170右转
     private static boolean followTurn(int posX) {
@@ -80,8 +87,7 @@ public class FollowBody {
             Log.i(TAG, "左转");
             lastTurn = posX;
             stop();
-            int angle = Math.abs(150 - posX);
-            BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.LEFT.getMoveKey(), angle, 1000, 0);
+            BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.LEFT.getMoveKey(), 10, 1000, 0);
             return true;
         }
 
@@ -89,8 +95,7 @@ public class FollowBody {
             Log.i(TAG, "右转");
             lastTurn = posX;
             stop();
-            int angle = Math.abs(posX - 170);
-            BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.RIGHT.getMoveKey(), angle, 1000, 0);
+            BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.RIGHT.getMoveKey(), 10, 1000, 0);
             return true;
         }
         return false;
