@@ -30,10 +30,10 @@ public class VisualClient extends AbstractNodeMain {
     * List all requestID
     * REC
     */
-    private static final short VISUAL_REC_OPEN = 1; //打开视觉
-    private static final short VISUAL_REC_STUDY = 2;// 视觉学习
-    private static final short VISUAL_REC_RECOGNIZE = 3;//视觉识别
-    private static final short VISUAL_REC_CLOSE = 4;//关闭视觉
+    private static final short VISUAL_REC_OPEN = 1; //打开视觉学习
+    private static final short VISUAL_REC_STUDY = 2;// 视觉学习（记住一个物体的特征）
+    private static final short VISUAL_REC_RECOGNIZE = 3;//视觉识别（根据特征，识别出物体）
+    private static final short VISUAL_REC_CLOSE = 4;//关闭视觉学习
     private static final short VISUAL_REC_CLEAR_DATA = 5;//删除所有的学习内容
     /*
     * List all requestID
@@ -84,9 +84,9 @@ public class VisualClient extends AbstractNodeMain {
                 if (flag == VISUAL_REC_OPEN) {
                     //打开视觉
                     if (response.getStatus() == 0) {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉已启动");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为视觉学习模式");
                     } else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉启动失败");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换视觉学习模式失败");
                     }
                 } else if (flag == VISUAL_REC_STUDY) {
                     //视觉学习
@@ -156,9 +156,9 @@ public class VisualClient extends AbstractNodeMain {
                 }else if (flag == VISUAL_REC_CLOSE){
                     //视觉关闭
                     if (response.getStatus()==0){
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模块");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式");
                     }else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模块失败");
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式失败");
                     }
                 }else if (flag == VISUAL_REC_CLEAR_DATA){
                     //删除所有视觉学习内容
