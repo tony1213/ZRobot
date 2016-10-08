@@ -64,8 +64,8 @@ public class ScriptHandler implements Script {
                     ScriptManager.setScriptActionInfos(infos);
                     DataConfig.isScriptPlayMusic = true;
                     DataConfig.isJpushPlayMusic = true;
-                    playScriptMusic(context, RequestConfig.JPUSH_MUSIC, content, info.getSpareContent());
-
+                    String musicSrc = MusicManager.getMusicSrcByName(RequestConfig.JPUSH_MUSIC, content, info.getSpareContent());
+                    BroadcastEnclosure.startPlayMusic(context, musicSrc, DataConfig.PLAY_MUSIC);
                     break;
                 case ScriptConfig.SCRIPT_FOLLOW://跟随
                     Log.i("netty", "doScriptAction() 跟随");
@@ -313,17 +313,6 @@ public class ScriptHandler implements Script {
 
     private static long getDealyTime(long custormTime) {
         return custormTime;
-    }
-
-    //播放剧本音乐
-    private static void playScriptMusic(Context context, int mediaType, String content, String url) {
-        String musicSrc = "";
-        if (!TextUtils.isEmpty(content)) {
-            musicSrc = MusicManager.getDetailMusicSrc(mediaType, content);
-        } else {
-            musicSrc = url;
-        }
-        BroadcastEnclosure.startPlayMusic(context, musicSrc, DataConfig.PLAY_MUSIC);
     }
 
     //插入本地剧本

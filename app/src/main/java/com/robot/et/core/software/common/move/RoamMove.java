@@ -150,10 +150,10 @@ public class RoamMove {
         if (isForward) {
             isForward = false;
             stop();
-            // 转之前后退一点
-            if (!isRandomTurn) {
-                moveBack();
-            }
+        }
+        // 转之前后退一点
+        if (!isRandomTurn) {
+            moveBack();
         }
     }
 

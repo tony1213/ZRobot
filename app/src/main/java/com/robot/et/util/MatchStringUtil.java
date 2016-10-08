@@ -58,18 +58,8 @@ public class MatchStringUtil {
     public static String visionLearnRegex = "^" + baseRegex + "*这+" + baseRegex + "*是+" + baseRegex + "+$";
     // 去哪里
     public static String goWhereRegex = "^" + baseRegex + "*去+" + baseRegex + "+$";
-    // 进入物体识别
-    public static String startDistinguishRegex = "^" + baseRegex + "*(开|启)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
-    // 退出物体识别
-    public static String closeDistinguishRegex = "^" + baseRegex + "*(关|退)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
-    // 初始化视觉
-    public static String initVisionRegex = "^" + baseRegex + "*(初始)+" + baseRegex + "*(视觉)+" + baseRegex + "*$";
     //忘记学习内容
     public static String forgetLearnRegex = "^" + baseRegex + "*(忘|删)+" + baseRegex + "*(学习)+" + baseRegex + "*$";
-    //开启视觉人体检测
-    public static String openVisualBodyTRK = "^" + baseRegex + "*(开|启)+" + baseRegex + "*(人体)+" + baseRegex + "*$";
-    //关闭视觉人体检测
-    public static String closeVisualBodyTRK = "^" + baseRegex + "*(关|退)+" + baseRegex + "*(人体)+" + baseRegex + "*$";
     //导航到
     public static String navigationRegex = "^" + baseRegex + "*(导航)+" + baseRegex + "*(到|去)+" + baseRegex + "+$";
 

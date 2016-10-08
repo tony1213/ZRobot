@@ -13,11 +13,13 @@ import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
+import com.robot.et.core.software.common.move.Dance;
 import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
+import com.robot.et.core.software.ros.client.VisualClient;
+import com.robot.et.core.software.ros.client.visual.IVisual;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.util.BroadcastEnclosure;
@@ -30,7 +32,7 @@ import com.robot.et.util.RobotLearnManager;
  * Created by houdeming on 2016/9/9.
  * 场景匹配处理
  */
-public class MatchSceneHandler {
+public class MatchSceneHandler implements IVisual {
     private Context context;
 
     public MatchSceneHandler(Context context) {
@@ -169,13 +171,15 @@ public class MatchSceneHandler {
                 flag = true;
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                if (isPlayCo) {
-                    isPlayCo = false;
-                    ScriptHandler.playScript(context, "合唱共舞");
-                } else {
-                    isPlayCo = true;
-                    ScriptHandler.playScript(context, "大家一起喜羊羊");
-                }
+//                if (isPlayCo) {
+//                    isPlayCo = false;
+//                    ScriptHandler.playScript(context, "合唱共舞");
+//                } else {
+//                    isPlayCo = true;
+//                    ScriptHandler.playScript(context, "大家一起喜羊羊");
+//                }
+
+                Dance.dance(context, "小跳蛙");
 
                 break;
             case FACE_NAME_SCENE:// 脸部名称
@@ -244,31 +248,33 @@ public class MatchSceneHandler {
                 break;
             case ENVIRONMENT_LEARN_SCENE:// 环境认识学习
                 //这里是xxx
-                String environmentContent = MatchStringUtil.getEnvironmentLearnAnswer(result);
-                Log.i("ifly", "environmentContent=====" + environmentContent);
-                if (!TextUtils.isEmpty(environmentContent)) {
-                    flag = true;
-                    BroadcastEnclosure.sendRos(context, RosConfig.POSITION, environmentContent);
-                }
+//                String environmentContent = MatchStringUtil.getEnvironmentLearnAnswer(result);
+//                Log.i("ifly", "environmentContent=====" + environmentContent);
+//                if (!TextUtils.isEmpty(environmentContent)) {
+//                    flag = true;
+//                    BroadcastEnclosure.sendRos(context, RosConfig.POSITION, environmentContent);
+//                }
 
                 break;
             case VISION_LEARN_SCENE:// 视觉学习
                 flag = true;
-                //该步骤需要进行视觉初始化，所以该地方需要视觉初始化
-                try {
-                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");//视觉初始化成功，需要时间大概是1～2秒
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉初始化失败，错误码5");
-                    break;
-                } finally {
-                    String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
-                    if (TextUtils.isEmpty(visionContent)) {// 这是什么？
-                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
-                    } else {// 这是手机
-                        BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
+                // 显示正常表情
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                tempResult = result;
+                // 视觉学习的时候，先关闭视觉人体监测，再打开视觉学习
+                if (!isFirstInitVision) {
+                    if (visualClient == null) {
+                        visualClient = new VisualClient(this);
                     }
+                    // 关闭视觉人体监测
+                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+                    // 打开视觉学习
+                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+                } else {
+                    learnThing(result);
                 }
+
                 break;
             case GO_WHERE_SCENE:// 去哪里的指令
 //                String whereContent = MatchStringUtil.getGoWhereAnswer(result);
@@ -297,26 +303,6 @@ public class MatchSceneHandler {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，运动控制已关闭，如若开启，请说：打开运动");
 
                 break;
-            case START_DISTINGUISH_SCENE:// 进入物体识别
-                flag = true;
-                DataConfig.isStartDistinguish = true;
-                // 开启视觉
-                BroadcastEnclosure.sendRos(context, RosConfig.START_DISTINGUISH, "");
-
-                break;
-            case CLOSE_DISTINGUISH_SCENE:// 退出物体识别
-                flag = true;
-                DataConfig.isStartDistinguish = false;
-                // 关闭视觉
-                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
-
-                break;
-            case INIT_VISION_SCENE:// 初始化视觉
-                flag = true;
-                // 初始化视觉
-
-                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
-                break;
             case FORGET_LEARN_SCENE:// 忘记学习内容
                 flag = true;
                 // 忘记学习内容
@@ -324,16 +310,6 @@ public class MatchSceneHandler {
 
                 break;
 
-            case OPEN_VISUAL_BODY_TRK://开启人体侦测
-                flag = true;
-                BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
-
-                break;
-            case CLOSE_VISUAL_BODY_TRK://关闭人体侦测
-                flag = true;
-                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-
-                break;
             case ROAM_SCENE:// 漫游
                 flag = true;
                 // 显示正常表情
@@ -349,19 +325,30 @@ public class MatchSceneHandler {
                 // 显示正常表情
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
-                // 跟随
-                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+
+                // 跟着我的时候先关闭视觉学习，再打开视觉人体监测，需要500ms
+                if (!isFirstInitFollow) {
+                    if (visualClient == null) {
+                        visualClient = new VisualClient(this);
+                    }
+                    // 关闭视觉学习
+                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
+                    // 打开视觉人体检测
+                    BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+                } else {
+                    // 跟随
+                    BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+                }
 
                 break;
 
             case NAVIGATION_SCENE:// 导航到
-                String area = MatchStringUtil.getNavigationArea(result);
-                if (!TextUtils.isEmpty(area)) {
-                    flag = true;
-                    // 导航到
-                    BroadcastEnclosure.sendRos(context, RosConfig.NAVIGATION, area);
-                }
+//                String area = MatchStringUtil.getNavigationArea(result);
+//                if (!TextUtils.isEmpty(area)) {
+//                    flag = true;
+//                    // 导航到
+//                    BroadcastEnclosure.sendRos(context, RosConfig.NAVIGATION, area);
+//                }
 
                 break;
 
@@ -372,7 +359,11 @@ public class MatchSceneHandler {
         return flag;
     }
 
-    private boolean isPlayCo;
+    //    private boolean isPlayCo;
+    private boolean isFirstInitVision;// 初始化视觉学习
+    private boolean isFirstInitFollow;// 初始化跟随
+    private String tempResult;
+    private VisualClient visualClient;
 
     //手臂
     private void hand(final String handCategory, final String angle, final int moveTime) {
@@ -398,6 +389,16 @@ public class MatchSceneHandler {
         SpeechImpl.getInstance().startListen();
     }
 
+    // 视觉学习东西
+    private void learnThing(String result) {
+        String visionContent = MatchStringUtil.getVisionLearnAnswer(result);
+        if (TextUtils.isEmpty(visionContent)) {// 这是什么？
+            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_WHAT, "");
+        } else {// 这是手机
+            BroadcastEnclosure.sendRos(context, RosConfig.LEARN_OBJECT_KNOWN, visionContent);
+        }
+    }
+
     //让机器人睡觉
     public static void sleep(final Context context) {
         DataConfig.isSleep = true;
@@ -418,5 +419,39 @@ public class MatchSceneHandler {
                 }
             }
         }, 5 * 1000);
+    }
+
+    // 初始化视觉
+    @Override
+    public void initVisual(String msg) {
+        if (!TextUtils.isEmpty(msg)) {
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, msg);
+        }
+    }
+
+    // 视觉学习
+    @Override
+    public void initVisualLearn(boolean isSuccess) {
+        if (isSuccess) {
+            isFirstInitVision = true;
+            isFirstInitFollow = false;
+            learnThing(tempResult);
+        } else {
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习打开失败");
+        }
+
+    }
+
+    // 视觉检测人体
+    @Override
+    public void initVisualBody(boolean isSuccess) {
+        if (isSuccess) {
+            isFirstInitFollow = true;
+            isFirstInitVision = false;
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
+            BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+        } else {
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉人体检测打开失败");
+        }
     }
 }

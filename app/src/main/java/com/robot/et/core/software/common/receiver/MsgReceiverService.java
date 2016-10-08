@@ -19,6 +19,7 @@ import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.UrlConfig;
+import com.robot.et.core.software.common.move.Dance;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
@@ -433,7 +434,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
         BroadcastEnclosure.controlEarsLED(MsgReceiverService.this, EarsLightConfig.EARS_HORSE_RACE_LAMP);
 
         // 如果是漫游的话，就不去加载剧本的问题，防止冲突
-        if (DataConfig.isRoam) {
+        if (DataConfig.isRoam || DataConfig.isDance) {
             return;
         }
         // 来自app推送来的音乐，判断是否有动作
@@ -459,6 +460,12 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
 //            return;
 //        }
 
+        // 跳舞的话不自动播放下一首
+        if (DataConfig.isDance) {
+            DataConfig.isDance = false;
+            Dance.stopTimer();
+            return;
+        }
         // 不管是推送的还是语音播放全部自动下一首
         String musicName = MusicManager.getCurrentPlayName();
         if (!TextUtils.isEmpty(musicName)) {
