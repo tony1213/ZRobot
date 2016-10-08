@@ -68,7 +68,10 @@ public class VisualClient extends AbstractNodeMain {
         try {
             serviceClient = connectedNode.newServiceClient("rai_learning", com.robot.et.core.software.ros.client.visual.Visual._TYPE);
         } catch (ServiceNotFoundException e) {
-//            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
+//            if (iVisual != null) {
+//                iVisual.initVisual("服务未初始化，请初始化视觉服务");
+//            }
             return;
 //            throw new RosRuntimeException(e);
         }
@@ -82,11 +85,19 @@ public class VisualClient extends AbstractNodeMain {
                 if (flag == VISUAL_REC_OPEN) {
                     //打开视觉
                     if (response.getStatus() == 0) {
+                        Log.e("Visual","VISUALREC OPEN");
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为视觉学习模式");
+//                        if (iVisual != null) {
+//                            iVisual.initVisualLearn(true);
+//                        }
                     } else {
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换视觉学习模式失败");
+//                        if (iVisual != null) {
+//                            iVisual.initVisualLearn(false);
+//                        }
                     }
                 } else if (flag == VISUAL_REC_STUDY) {
+                    Log.e("Visual","VISUALREC STUDY");
                     //视觉学习
                     if (response.getStatus() == -1) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
@@ -110,6 +121,7 @@ public class VisualClient extends AbstractNodeMain {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
                 } else if (flag == VISUAL_REC_RECOGNIZE) {
+                    Log.e("Visual","VISUALREC RECOGNIZE");
                     //视觉识别
                     if (response.getStatus() == -1) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
@@ -152,13 +164,15 @@ public class VisualClient extends AbstractNodeMain {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
                 } else if (flag == VISUAL_REC_CLOSE) {
+                    Log.e("Visual","VISUALREC CLOSE");
                     //视觉关闭
                     if (response.getStatus() == 0) {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式");
+//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式");
                     } else {
-                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式失败");
+//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式失败");
                     }
                 } else if (flag == VISUAL_REC_CLEAR_DATA) {
+                    Log.e("Visual","VISUALREC CLEAR DATA");
                     //删除所有视觉学习内容
                     if (response.getStatus() == 0) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已删除所学内容");
@@ -170,8 +184,14 @@ public class VisualClient extends AbstractNodeMain {
                     Log.e("body", "Open Body TRK");
                     if (response.getStatus() == 0) {
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为人体检测模式");
+//                        if (iVisual != null) {
+//                            iVisual.initVisualBody(true);
+//                        }
                     } else {
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换人体检测模式失败");
+//                        if (iVisual != null) {
+//                            iVisual.initVisualBody(false);
+//                        }
                     }
                 } else if (flag == VISUAL_TRK_POSITION) {
                     //获取人体的位置更改为Topic模式
@@ -180,19 +200,21 @@ public class VisualClient extends AbstractNodeMain {
                 } else if (flag == VISUAL_TRK_CLOSE) {
                     //关闭人体跟踪
                     Log.e("body", "Close Body TRK");
-//                    if (response.getStatus() == 0) {
+                    if (response.getStatus() == 0) {
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭人体检测模式");
-//                    } else {
+                    } else {
 //                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭人体检测模式失败");
-//                    }
+                    }
                 }
             }
 
             @Override
             public void onFailure(RemoteException e) {
-//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
-//                SpeechImpl.getInstance().startListen();
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
                 Log.e("ROS_Client", "onFailure");
+//                if (iVisual != null) {
+//                    iVisual.initVisual("视觉出现异常");
+//                }
 //                throw new RosRuntimeException(e);
             }
         });

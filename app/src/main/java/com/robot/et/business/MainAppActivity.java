@@ -511,30 +511,30 @@ public class MainAppActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearnInit", flag)) {
                     //视觉初始化(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                    visualClient = new VisualClient((short) 1, "");
+//                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 1, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     //视觉学习(service)
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
-                    visualClient = new VisualClient((short) 2, name);
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     //视觉识别(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
-                    visualClient = new VisualClient((short) 3, "");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
                     //视觉关闭(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnClose");
-                    visualClient = new VisualClient((short) 4, "");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 4, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeleteAllVisual", flag)) {
                     //视觉删除学习内容(service)
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
-                    visualClient = new VisualClient((short) 5, "");
+                    visualClient = new VisualClient(MainAppActivity.this,(short) 5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("OpenBodyTRK", flag)) {
                     //视觉人体检测开启
