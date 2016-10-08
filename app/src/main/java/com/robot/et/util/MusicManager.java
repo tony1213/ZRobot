@@ -173,6 +173,17 @@ public class MusicManager {
         return false;
     }
 
+    // 根据音乐的名字获取音乐路径
+    public static String getMusicSrcByName(int mediaType, String musicName, String url) {
+        String musicSrc;
+        if (!TextUtils.isEmpty(musicName)) {
+            musicSrc = getDetailMusicSrc(mediaType, musicName);
+        } else {
+            musicSrc = url;
+        }
+        return musicSrc;
+    }
+
     // 获取要播放音乐的话语
     public static String getMusicSpeakContent(int srcType, int mediaType, String result) {
         String content = "";
