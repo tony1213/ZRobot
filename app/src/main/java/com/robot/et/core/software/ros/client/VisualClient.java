@@ -1,14 +1,12 @@
 package com.robot.et.core.software.ros.client;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.ros.client.visual.VisualRequest;
 import com.robot.et.core.software.ros.client.visual.VisualResponse;
-import com.robot.et.util.BroadcastEnclosure;
 
 import org.ros.exception.RemoteException;
 import org.ros.exception.ServiceNotFoundException;
@@ -30,17 +28,17 @@ public class VisualClient extends AbstractNodeMain {
     * List all requestID
     * REC
     */
-    private static final short VISUAL_REC_OPEN = 1; //打开视觉学习
+    private static final short VISUAL_REC_OPEN = 1; //打开视觉学习   (打开时间<100ms)
     private static final short VISUAL_REC_STUDY = 2;// 视觉学习（记住一个物体的特征）
     private static final short VISUAL_REC_RECOGNIZE = 3;//视觉识别（根据特征，识别出物体）
-    private static final short VISUAL_REC_CLOSE = 4;//关闭视觉学习
+    private static final short VISUAL_REC_CLOSE = 4;//关闭视觉学习   (打开时间<100ms)
     private static final short VISUAL_REC_CLEAR_DATA = 5;//删除所有的学习内容
     /*
     * List all requestID
     * TRK
     */
-    private static final short VISUAL_TRK_OPEN = 21;//打开人体跟踪
-    private static final short VISUAL_TRK_CLOSE = 22;//关闭人体跟踪
+    private static final short VISUAL_TRK_OPEN = 21;//打开人体跟踪  (打开时间<100ms)
+    private static final short VISUAL_TRK_CLOSE = 22;//关闭人体跟踪 (打开时间<100ms)
     private static final short VISUAL_TRK_POSITION = 23;//人体位置返回
 
 
