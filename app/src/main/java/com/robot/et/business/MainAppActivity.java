@@ -523,7 +523,7 @@ public class MainAppActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     //视觉识别(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
+//                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
                     visualClient = new VisualClient(MainAppActivity.this,(short) 3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
