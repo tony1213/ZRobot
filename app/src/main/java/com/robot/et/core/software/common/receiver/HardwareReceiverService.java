@@ -18,30 +18,37 @@ import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
+import com.robot.et.common.UrlConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.core.hardware.light.LightHandler;
 import com.robot.et.core.hardware.serialport.SerialPortHandler;
 import com.robot.et.core.hardware.wakeup.IWakeUp;
 import com.robot.et.core.hardware.wakeup.WakeUpHandler;
 import com.robot.et.core.software.common.move.Come;
-import com.robot.et.core.software.common.move.Dance;
 import com.robot.et.core.software.common.move.FollowBody;
 import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.move.Waving;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.network.RobotInfoCallBack;
+import com.robot.et.core.software.common.network.VoicePhoneCallBack;
 import com.robot.et.core.software.common.receiver.util.MoveFormat;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
-import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.ViewCommon;
+import com.robot.et.core.software.voice.util.PhoneManager;
+import com.robot.et.entity.RobotInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;
+import com.robot.et.util.DeviceUuidFactory;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 import com.robot.et.util.TimerManager;
 
 import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by houdeming on 2016/9/10.
@@ -51,7 +58,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private final String TAG = "Receiver";
     private Timer timer;
     private WakeUpHandler wakeUpHandler;
-    private final int SHOW_TEXT = 1;
+    private final int CALL_PHONE = 1;
     private final int UPDATE_VIEW = 2;
     private final int SHORT_PRESS = 3;
     private final int TOUCH = 4;
@@ -232,11 +239,6 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             // 停止漫游
             RoamMove.stopTimer();
         }
-        // 如果是跳舞的话停止
-        if (DataConfig.isDance) {
-            DataConfig.isDance = false;
-            Dance.stopTimer();
-        }
         // 关掉雷达上传
         if (DataConfig.isOpenRadar) {
             DataConfig.isOpenRadar = false;
@@ -378,17 +380,29 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         int currentHour = DateTools.getCurrentHour(System.currentTimeMillis());
         // 如果早上6点-9点，问早安,不识别人
         if (currentHour >= 6 && currentHour <= 9) {
+            // 通知视觉寻找人体
+            // do thing
             // 说欢迎语并报天气
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_WEATHER, "早上好");
             return;
         } else {
             if (DataConfig.isSecuritySign) {// 安保模式
                 // 自身照明灯亮起
-//                controlLightLED(LIGHT_ON);
+                controlLightLED(LIGHT_ON);
                 // 耳朵灯旋转
                 BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_CLOCKWISE_TURN);
-                // 屏幕上显示  安保模式
-                handler.sendEmptyMessage(SHOW_TEXT);
+                // 防止在拨打电话前检测到多次，每次计时之前，先停止掉前面的计时器，保证最新的计时时间
+                TimerManager.cancelTimer(timer);
+                timer = null;
+                // 开始计时
+                timer = TimerManager.createTimer();
+                // 如果没人摸机器人头部，则30s后，拨打用户手机视频
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        handler.sendEmptyMessage(CALL_PHONE);
+                    }
+                }, 30 * 1000);
 
                 return;
             }
@@ -429,7 +443,23 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     private void touch(int touchId) {
         switch (touchId) {
             case TouchConfig.TOUCH_HEAD_TOP:// 头顶
-                TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_HEAD_TOP));
+                // 如果是安保模式的话，解除安保模式
+                if (DataConfig.isSecuritySign) {// 安保模式
+                    // 停止计时
+                    TimerManager.cancelTimer(timer);
+                    timer = null;
+                    // 解除预警，耳朵灯变常亮，照明灯30s后灭
+                    BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BRIGHT);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // 照明灯灭
+                            controlLightLED(LIGHT_OFF);
+                        }
+                    }, 30 * 1000);
+                } else {// 不是安保模式
+                    TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_HEAD_TOP));
+                }
                 break;
             case TouchConfig.TOUCH_HEAD_BACK:// 后脑勺
                 TouchHandler.responseTouch(this, String.valueOf(TouchHandler.TOUCH_HEAD_BACK));
@@ -456,11 +486,38 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case SHOW_TEXT:// 显示文字
-                    ViewCommon.initView();
-                    TextManager.showText("安保模式");
-                    // 发送信息
-                    HttpManager.pushMsgToBindApp("主人，家里发现异常，请注意查看", RequestConfig.ROBOT_HOME_COORDINATE);
+                case CALL_PHONE:// 呼叫电话
+                    // 拨打用户手机视频
+                    if (DataConfig.isSecuritySign) {// 安保模式
+                        TimerManager.cancelTimer(timer);
+                        timer = null;
+                        // 获取管理员手机号
+                        final SharedPreferencesUtils share = SharedPreferencesUtils.getInstance();
+                        String adminPhone = share.getString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, "");
+                        if (TextUtils.isEmpty(adminPhone)) {
+                            HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, new DeviceUuidFactory(HardwareReceiverService.this).getDeviceUuid(), new RobotInfoCallBack() {
+                                @Override
+                                public void onSuccess(RobotInfo info) {
+                                    if (info != null) {
+                                        String phone = info.getAdminPhone();
+                                        if (!TextUtils.isEmpty(phone)) {
+                                            share.putString(SharedPreferencesKeys.ADMINISTRATORS_PHONENUM, phone);
+                                            share.commitValue();
+                                            callPhone(phone);
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFail(String errorMsg) {
+
+                                }
+                            });
+
+                        } else {
+                            callPhone(adminPhone);
+                        }
+                    }
 
                     break;
                 case UPDATE_VIEW:// 更新view
@@ -470,6 +527,22 @@ public class HardwareReceiverService extends Service implements IWakeUp {
 
                     break;
                 case SHORT_PRESS:// 短按
+                    // 安保模式暂时先放这里处理
+                    if (DataConfig.isSecuritySign) {// 安保模式
+                        // 停止计时
+                        TimerManager.cancelTimer(timer);
+                        timer = null;
+                        // 解除预警，耳朵灯变常亮，照明灯30s后灭
+                        BroadcastEnclosure.controlEarsLED(HardwareReceiverService.this, EarsLightConfig.EARS_BRIGHT);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 照明灯灭
+                                controlLightLED(LIGHT_OFF);
+                            }
+                        }, 30 * 1000);
+                        return;
+                    }
                     // 如果正在音视频的话关掉
                     if (DataConfig.isVideoOrVoice) {
                         BroadcastEnclosure.closeAgora(HardwareReceiverService.this, false);
@@ -501,6 +574,24 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             }
         }
     };
+
+    // 呼叫电话
+    private void callPhone(String adminPhone) {
+        Log.i(TAG, "HardwareReceiverService adminPhone==" + adminPhone);
+        HttpManager.getRoomNum(adminPhone, new VoicePhoneCallBack() {
+            @Override
+            public void getPhoneInfo(String userName, String result) {
+                String content = PhoneManager.getCallContent(userName, result);
+                if (!TextUtils.isEmpty(content)) {
+                    // 是从安保模式打过去的电话
+                    DataConfig.isSecurityCall = true;
+                    // 默认开始视频通话
+                    DataConfig.isAgoraVideo = true;
+                    BroadcastEnclosure.connectAgora(HardwareReceiverService.this, RequestConfig.JPUSH_CALL_VIDEO);
+                }
+            }
+        });
+    }
 
     // 照明灯 1：开  0：关
     private final int LIGHT_ON = 1;
@@ -539,6 +630,5 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         DataConfig.isSecurityCall = false;
         DataConfig.isFollow = false;
         DataConfig.isRoam = false;
-        DataConfig.isDance = false;
     }
 }

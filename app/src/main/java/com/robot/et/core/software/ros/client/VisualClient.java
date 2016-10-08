@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.robot.et.common.DataConfig;
 import com.robot.et.core.software.common.speech.SpeechImpl;
-import com.robot.et.core.software.ros.client.visual.IVisual;
 import com.robot.et.core.software.ros.client.visual.VisualRequest;
 import com.robot.et.core.software.ros.client.visual.VisualResponse;
 
@@ -18,10 +17,10 @@ import org.ros.node.service.ServiceClient;
 import org.ros.node.service.ServiceResponseListener;
 
 /**
- * @author wudong10012
- * @description 视觉学习
- * @date 2016-09-19
- */
+* @author wudong10012
+* @description 视觉学习
+* @date 2016-09-19
+*/
 
 public class VisualClient extends AbstractNodeMain {
 
@@ -43,24 +42,19 @@ public class VisualClient extends AbstractNodeMain {
     private static final short VISUAL_TRK_POSITION = 23;//人体位置返回
 
 
+
     private Context context;
     private short flag;
     private String name;
-    private IVisual iVisual;
 
     public VisualClient(short flag, String name) {
         this.flag = flag;
         this.name = name;
     }
-
-    public VisualClient(Context context, short flag, String name) {
-        this.context = context;
+    public VisualClient(Context context,short flag, String name) {
+        this.context =context;
         this.flag = flag;
         this.name = name;
-    }
-
-    public VisualClient(IVisual iVisual) {
-        this.iVisual = iVisual;
     }
 
     @Override
@@ -70,14 +64,11 @@ public class VisualClient extends AbstractNodeMain {
 
     @Override
     public void onStart(final ConnectedNode connectedNode) {
-        ServiceClient<VisualRequest, VisualResponse> serviceClient = null;
+        ServiceClient<VisualRequest, VisualResponse> serviceClient =null;
         try {
             serviceClient = connectedNode.newServiceClient("rai_learning", com.robot.et.core.software.ros.client.visual.Visual._TYPE);
         } catch (ServiceNotFoundException e) {
-//            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
-            if (iVisual != null) {
-                iVisual.initVisual("服务未初始化，请初始化视觉服务");
-            }
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "服务未初始化，请初始化视觉服务");
             return;
 //            throw new RosRuntimeException(e);
         }
@@ -91,132 +82,117 @@ public class VisualClient extends AbstractNodeMain {
                 if (flag == VISUAL_REC_OPEN) {
                     //打开视觉
                     if (response.getStatus() == 0) {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为视觉学习模式");
-                        if (iVisual != null) {
-                            iVisual.initVisualLearn(true);
-                        }
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为视觉学习模式");
                     } else {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换视觉学习模式失败");
-                        if (iVisual != null) {
-                            iVisual.initVisualLearn(false);
-                        }
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换视觉学习模式失败");
                     }
                 } else if (flag == VISUAL_REC_STUDY) {
                     //视觉学习
-                    if (response.getStatus() == -1) {
+                    if (response.getStatus()== -1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
-                    } else if (response.getStatus() == 0) {
+                    }else if (response.getStatus()== 0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，记住了");
-                    } else if (response.getStatus() == 1) {
+                    }else if (response.getStatus()==1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");
-                    } else if (response.getStatus() == 2) {
+                    }else if (response.getStatus()==2){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太远了");
-                    } else if (response.getStatus() == 10) {
+                    }else if (response.getStatus()==10){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太低了");
-                    } else if (response.getStatus() == 11) {
+                    }else if (response.getStatus()==11){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太高了");
-                    } else if (response.getStatus() == 12) {
+                    }else if (response.getStatus()==12){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠左了");
-                    } else if (response.getStatus() == 13) {
+                    }else if (response.getStatus()==13){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠右了");
-                    } else if (response.getStatus() == 20) {
+                    }else if (response.getStatus()==20){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "没看见有东西");
-                    } else if (response.getStatus() == 21) {
+                    }else if (response.getStatus()==21){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
                 } else if (flag == VISUAL_REC_RECOGNIZE) {
                     //视觉识别
-                    if (response.getStatus() == -1) {
+                    if (response.getStatus()== -1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
-                    } else if (response.getStatus() == 0) {
-                        if (response.getConfidence() == 0) {
+                    }else if (response.getStatus()==0){
+                        if (response.getConfidence()==0){
                             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "我不认识这个东西，让我学习一下吧！");
-                        } else if (response.getConfidence() == 1) {
+                        }else if (response.getConfidence()== 1){
                             //可能（40%以上）
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这好像是：" + response.getOutputName());
-                        } else if (response.getConfidence() == 2) {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这好像是："+response.getOutputName());
+                        }else if (response.getConfidence()== 2){
                             //是（80%以上）
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这是：" + response.getOutputName());
-                        } else if (response.getConfidence() == 3) {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这是："+response.getOutputName());
+                        }else if (response.getConfidence()== 3){
                             //一定（95%以上）
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这是：" + response.getOutputName());
-                        } else if (response.getConfidence() == 10) {
-                            String[] temp = response.getOutputName().split("\\|");
-                            Log.e("ROS_Client", "content:" + temp[0] + ",==" + temp[1]);
-                            if (temp.length == 2) {
-                                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这个不是：" + temp[0] + "就是：" + temp[1]);
-                            } else {
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这是："+response.getOutputName());
+                        }else if (response.getConfidence()== 10){
+                            String[] temp=response.getOutputName().split("\\|");
+                            Log.e("ROS_Client","content:"+temp[0]+",=="+temp[1]);
+                            if (temp.length==2){
+                                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "这个不是："+temp[0]+"就是："+temp[1]);
+                            }else {
                                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "出现异常");
                             }
                         }
-                    } else if (response.getStatus() == 1) {
+                    }else if (response.getStatus()==1){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");
-                    } else if (response.getStatus() == 2) {
+                    }else if (response.getStatus()==2){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太远了");
-                    } else if (response.getStatus() == 10) {
+                    }else if (response.getStatus()==10){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太低了");
-                    } else if (response.getStatus() == 11) {
+                    }else if (response.getStatus()==11){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太高了");
-                    } else if (response.getStatus() == 12) {
+                    }else if (response.getStatus()==12){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠左了");
-                    } else if (response.getStatus() == 13) {
+                    }else if (response.getStatus()==13){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "物体太靠右了");
-                    } else if (response.getStatus() == 20) {
+                    }else if (response.getStatus()==20){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "没看见有东西");
-                    } else if (response.getStatus() == 21) {
+                    }else if (response.getStatus()==21){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "东西太小了，看不清");
                     }
-                } else if (flag == VISUAL_REC_CLOSE) {
+                }else if (flag == VISUAL_REC_CLOSE){
                     //视觉关闭
-                    if (response.getStatus() == 0) {
+                    if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式");
-                    } else {
+                    }else {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭视觉学习模式失败");
                     }
-                } else if (flag == VISUAL_REC_CLEAR_DATA) {
+                }else if (flag == VISUAL_REC_CLEAR_DATA){
                     //删除所有视觉学习内容
-                    if (response.getStatus() == 0) {
+                    if (response.getStatus()==0){
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已删除所学内容");
-                    } else {
+                    }else {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "删除学习内容失败");
                     }
-                } else if (flag == VISUAL_TRK_OPEN) {
+                }else if (flag == VISUAL_TRK_OPEN){
                     //打开人体跟踪
-                    Log.e("body", "Open Body TRK");
-                    if (response.getStatus() == 0) {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为人体检测模式");
-                        if (iVisual != null) {
-                            iVisual.initVisualBody(true);
-                        }
-                    } else {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换人体检测模式失败");
-                        if (iVisual != null) {
-                            iVisual.initVisualBody(false);
-                        }
+                    Log.e("body","Open Body TRK");
+                    if (response.getStatus()==0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "已切换为人体检测模式");
+                    }else {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "切换人体检测模式失败");
                     }
-                } else if (flag == VISUAL_TRK_POSITION) {
+                }else if (flag == VISUAL_TRK_POSITION){
                     //获取人体的位置更改为Topic模式
-                    Log.e("body", "Body TRK");
+                    Log.e("body","Body TRK");
 
-                } else if (flag == VISUAL_TRK_CLOSE) {
+                }else if (flag == VISUAL_TRK_CLOSE){
                     //关闭人体跟踪
-                    Log.e("body", "Close Body TRK");
-//                    if (response.getStatus() == 0) {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭人体检测模式");
-//                    } else {
-//                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "关闭人体检测模式失败");
-//                    }
+                    Log.e("body","Close Body TRK");
+                    if (response.getStatus()==0){
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"关闭人体检测模式");
+                    }else {
+                        SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"关闭人体检测模式失败");
+                    }
                 }
             }
 
             @Override
             public void onFailure(RemoteException e) {
-//                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
-//                SpeechImpl.getInstance().startListen();
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉出现异常");
+                SpeechImpl.getInstance().startListen();
                 Log.e("ROS_Client", "onFailure");
-                if (iVisual != null) {
-                    iVisual.initVisual("视觉出现异常");
-                }
 //                throw new RosRuntimeException(e);
             }
         });

@@ -167,12 +167,43 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.goWhereRegex);
         }
     },
+    START_DISTINGUISH_SCENE {// 进入物体识别
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.startDistinguishRegex);
+        }
+    },
+    CLOSE_DISTINGUISH_SCENE {// 退出物体识别
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.closeDistinguishRegex);
+        }
+    },
+    INIT_VISION_SCENE {// 初始化视觉
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.initVisionRegex);
+        }
+    },
     FORGET_LEARN_SCENE {// 忘记学习内容
 
         public boolean isScene(String str) {
             return MatchStringUtil.matchString(str, MatchStringUtil.forgetLearnRegex);
         }
     },
+    OPEN_VISUAL_BODY_TRK {//开启人体检测
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.openVisualBodyTRK);
+        }
+    },
+    CLOSE_VISUAL_BODY_TRK {//关闭人体检测
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.closeVisualBodyTRK);
+        }
+    },
+
     NAVIGATION_SCENE {// 导航到
 
         public boolean isScene(String str) {

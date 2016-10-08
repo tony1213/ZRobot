@@ -135,6 +135,9 @@ public class DataConfig {
     //是否开启漫游
     public static boolean isStartRoam = false;
 
+    //是否开始识别物体
+    public static boolean isStartDistinguish = false;
+
     //是否是语音打开人脸识别
     public static boolean isVoiceFaceRecognise = false;
 
@@ -189,8 +192,6 @@ public class DataConfig {
     public static boolean isRoam;
     // 是否开启雷达
     public static boolean isOpenRadar;
-    // 是否是跳舞
-    public static boolean isDance;
 
     // 与硬件相关 0：沉睡  1：获取雷达数据
     public static final int HARDWARE_SLEEP = 0;
