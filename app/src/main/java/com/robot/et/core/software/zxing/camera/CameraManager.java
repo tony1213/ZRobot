@@ -59,7 +59,7 @@ public final class CameraManager {
 
     private final Context context;
     private final CameraConfigurationManager configManager;
-    private Camera camera;
+    private static Camera camera;
     private Rect framingRect;
     private Rect framingRectInPreview;
     private boolean initialized;
@@ -84,6 +84,10 @@ public final class CameraManager {
         if (cameraManager == null) {
             cameraManager = new CameraManager(context);
         }
+    }
+
+    public static Camera getCamera() {
+        return camera;
     }
 
     /**
