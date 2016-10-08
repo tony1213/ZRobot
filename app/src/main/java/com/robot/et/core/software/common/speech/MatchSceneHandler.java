@@ -3,6 +3,7 @@ package com.robot.et.core.software.common.speech;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -18,8 +19,6 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.ViewCommon;
-import com.robot.et.core.software.ros.client.VisualClient;
-import com.robot.et.core.software.ros.client.visual.IVisual;
 import com.robot.et.core.software.system.media.MediaManager;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.util.BroadcastEnclosure;
@@ -32,7 +31,7 @@ import com.robot.et.util.RobotLearnManager;
  * Created by houdeming on 2016/9/9.
  * 场景匹配处理
  */
-public class MatchSceneHandler implements IVisual {
+public class MatchSceneHandler {
     private Context context;
 
     public MatchSceneHandler(Context context) {
@@ -264,13 +263,9 @@ public class MatchSceneHandler implements IVisual {
                 tempResult = result;
                 // 视觉学习的时候，先关闭视觉人体监测，再打开视觉学习
                 if (!isFirstInitVision) {
-                    if (visualClient == null) {
-                        visualClient = new VisualClient(this);
-                    }
                     // 关闭视觉人体监测
                     BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-                    // 打开视觉学习
-                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+                    handDelay(INIT_LEARN);
                 } else {
                     learnThing(result);
                 }
@@ -328,14 +323,11 @@ public class MatchSceneHandler implements IVisual {
 
                 // 跟着我的时候先关闭视觉学习，再打开视觉人体监测，需要500ms
                 if (!isFirstInitFollow) {
-                    if (visualClient == null) {
-                        visualClient = new VisualClient(this);
-                    }
                     // 关闭视觉学习
                     BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
-                    // 打开视觉人体检测
-                    BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+                    handDelay(INIT_BODY);
                 } else {
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
                     // 跟随
                     BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
                 }
@@ -363,7 +355,52 @@ public class MatchSceneHandler implements IVisual {
     private boolean isFirstInitVision;// 初始化视觉学习
     private boolean isFirstInitFollow;// 初始化跟随
     private String tempResult;
-    private VisualClient visualClient;
+
+    private static final int INIT_LEARN = 1;// 初始化学习
+    private static final int INIT_BODY = 2;// 初始化人体检测
+    private static final int LEARN = 3;// 学习
+    private static final int FOLLOW = 4;// 跟随
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case INIT_LEARN:// 初始化学习
+                    // 打开视觉学习
+                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+                    handDelay(LEARN);
+                    break;
+                case INIT_BODY:// 初始化人体检测
+                    // 打开视觉人体检测
+                    BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+                    handDelay(FOLLOW);
+                    break;
+                case LEARN:// 学习
+                    isFirstInitVision = true;
+                    isFirstInitFollow = false;
+                    learnThing(tempResult);
+                    break;
+                case FOLLOW:// 跟随
+                    isFirstInitFollow = true;
+                    isFirstInitVision = false;
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
+                    BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void handDelay(final int type) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handler.sendEmptyMessage(type);
+            }
+        }, 500);
+    }
 
     //手臂
     private void hand(final String handCategory, final String angle, final int moveTime) {
@@ -419,39 +456,5 @@ public class MatchSceneHandler implements IVisual {
                 }
             }
         }, 5 * 1000);
-    }
-
-    // 初始化视觉
-    @Override
-    public void initVisual(String msg) {
-        if (!TextUtils.isEmpty(msg)) {
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, msg);
-        }
-    }
-
-    // 视觉学习
-    @Override
-    public void initVisualLearn(boolean isSuccess) {
-        if (isSuccess) {
-            isFirstInitVision = true;
-            isFirstInitFollow = false;
-            learnThing(tempResult);
-        } else {
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习打开失败");
-        }
-
-    }
-
-    // 视觉检测人体
-    @Override
-    public void initVisualBody(boolean isSuccess) {
-        if (isSuccess) {
-            isFirstInitFollow = true;
-            isFirstInitVision = false;
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的");
-            BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
-        } else {
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉人体检测打开失败");
-        }
     }
 }
