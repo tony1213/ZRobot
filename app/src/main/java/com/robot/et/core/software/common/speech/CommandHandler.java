@@ -69,8 +69,8 @@ public class CommandHandler {
     public boolean isControlMove(String result) {
         Log.i("ifly", "执行语音运动控制");
         if (!TextUtils.isEmpty(result)) {
-            // 如果字数大于8个字数时，作为胡乱听得不处理
-            if (result.length() > 8) {
+            // 如果字数大于6个字数时，作为胡乱听得不处理
+            if (result.length() > 6) {
                 return false;
             }
 

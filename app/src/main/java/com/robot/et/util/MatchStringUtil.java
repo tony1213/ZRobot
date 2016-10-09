@@ -85,6 +85,9 @@ public class MatchStringUtil {
     // 跟着我的标志
     public static String followSignRegex = "^" + baseRegex + "*跟+" + baseRegex + "*我+" + baseRegex + "*$";
 
+    // 机器人编号的标志
+    public static String robotNumSignRegex = "^" + baseRegex + "*你+" + baseRegex + "*(编号)+" + baseRegex + "+$";
+
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {
         return str.matches(strRegex);

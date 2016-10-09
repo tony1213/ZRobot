@@ -197,6 +197,12 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.lookPhotoRegex);
         }
     },
+    ROBOT_NUM_SCENE {// 机器人编号的标志
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.robotNumSignRegex);
+        }
+    },
     OPEN_SECURITY_SCENE {// 进入安保场景的标志
 
         public boolean isScene(String str) {
