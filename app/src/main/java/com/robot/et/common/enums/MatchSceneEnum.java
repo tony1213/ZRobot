@@ -203,6 +203,12 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.robotNumSignRegex);
         }
     },
+    STORY_SCENE {// 讲故事的标志
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.storyRegex);
+        }
+    },
     OPEN_SECURITY_SCENE {// 进入安保场景的标志
 
         public boolean isScene(String str) {

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
+import com.robot.et.common.RequestConfig;
 import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.MatchSceneEnum;
@@ -25,6 +26,7 @@ import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
 import com.robot.et.util.FaceManager;
 import com.robot.et.util.MatchStringUtil;
+import com.robot.et.util.MusicManager;
 import com.robot.et.util.RobotLearnManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
@@ -172,14 +174,7 @@ public class MatchSceneHandler {
                 flag = true;
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-//                if (isPlayCo) {
-//                    isPlayCo = false;
-//                    ScriptHandler.playScript(context, "合唱共舞");
-//                } else {
-//                    isPlayCo = true;
-//                    ScriptHandler.playScript(context, "大家一起喜羊羊");
-//                }
-
+                // 跳舞
                 Dance.dance(context, "小跳蛙");
 
                 break;
@@ -232,6 +227,14 @@ public class MatchSceneHandler {
                     speakContent = "抱歉，我还没有编号呢，快点绑定我吧";
                 }
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, speakContent);
+
+                break;
+            case STORY_SCENE:// 讲故事的场景
+                String storyName = MusicManager.getRandomMusic(RequestConfig.JPUSH_STORY, "STORY");
+                if (!TextUtils.isEmpty(storyName)) {
+                    flag = true;
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");
+                }
 
                 break;
             case OPEN_SECURITY_SCENE:// 进入安保场景

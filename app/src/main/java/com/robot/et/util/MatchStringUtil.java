@@ -44,7 +44,7 @@ public class MatchStringUtil {
     // 摆手
     public static String wavingRegex = "^" + baseRegex + "*摆+" + baseRegex + "*手+" + baseRegex + "*$";
     // 表演节目
-    public static String playScriptRegex = "^" + baseRegex + "*(表演)+" + baseRegex + "*(节目|(剧本))+" + baseRegex + "*$";
+    public static String playScriptRegex = "^" + baseRegex + "*((跳+" + baseRegex + "*舞+)|((表演)+" + baseRegex + "*(节目|(剧本))+))" + baseRegex + "*$";
     // 脸检测
     public static String faceTestRegex = "^" + baseRegex + "*((我是谁)|(认识我))+" + baseRegex + "*$";
     // 识别问名字
@@ -87,6 +87,8 @@ public class MatchStringUtil {
 
     // 机器人编号的标志
     public static String robotNumSignRegex = "^" + baseRegex + "*你+" + baseRegex + "*(编号)+" + baseRegex + "+$";
+    // 讲故事
+    public static String storyRegex = "^" + baseRegex + "*(讲|将|说)+" + baseRegex + "*(故事)+" + baseRegex + "*$";
 
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {

@@ -84,8 +84,8 @@ public class RequestConfig {
     //机器人本体给APP推送code信息标示
     //返回给APP提醒的情况
     public final static String TO_APP_REMIND = "REPLY_REMIND";
-    //返回给APP蓝牙控制家电的情况
-    public final static String TO_APP_BLUETOOTH_CONTROLLER = "BLUETOOTH_CONTROLLER";
     //本体给所有绑定的用户发送坐标消息
     public final static String ROBOT_HOME_COORDINATE = "40033";
+    // 安保模式下检测到人体向app发送警告通知
+    public final static String SECURITY_MODEL = "40037";
 }

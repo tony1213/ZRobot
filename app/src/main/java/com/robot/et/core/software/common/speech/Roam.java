@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.robot.et.common.DataConfig;
+import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.core.software.common.move.RoamMove;
 import com.robot.et.core.software.common.move.Waving;
@@ -25,7 +26,7 @@ public class Roam {
     public static void roam(Context context) {
         Roam.context = context;
         // 唱歌
-        String content = MusicManager.getRandomMusic();
+        String content = MusicManager.getRandomMusic(RequestConfig.JPUSH_MUSIC, "MUSIC");
         if (!TextUtils.isEmpty(content)) {
             SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_MUSIC_START, "好的");
         }

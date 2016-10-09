@@ -460,7 +460,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
                     ViewCommon.initView();
                     TextManager.showText("安保模式");
                     // 发送信息
-                    HttpManager.pushMsgToBindApp("主人，家里发现异常，请注意查看", RequestConfig.ROBOT_HOME_COORDINATE);
+                    HttpManager.pushMsgToBindApp("主人，家里发现异常，请注意查看", RequestConfig.SECURITY_MODEL);
 
                     break;
                 case UPDATE_VIEW:// 更新view

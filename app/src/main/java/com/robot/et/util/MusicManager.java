@@ -30,6 +30,11 @@ public class MusicManager {
         Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
         Log.i(TAG, "playcontrol  currentMusicName===" + currentMusicName);
         File file = new File(fileSrc);
+        // 文件如果不存在直接返回空
+        if (!file.exists()) {
+            Log.i(TAG, "文件不存在");
+            return "";
+        }
         String[] names = file.list();
         int length = names.length;
         if (names != null && length > 0) {
@@ -78,10 +83,15 @@ public class MusicManager {
     }
 
     //获取任意一首歌
-    public static String getRandomMusic() {
-        String fileSrc = getMusicFile(RequestConfig.JPUSH_MUSIC);
+    public static String getRandomMusic(int type, String mediaName) {
+        String fileSrc = getMusicFile(type);
         Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
         File file = new File(fileSrc);
+        // 文件如果不存在直接返回空
+        if (!file.exists()) {
+            Log.i(TAG, "文件不存在");
+            return "";
+        }
         String[] names = file.list();
         int length = names.length;
         if (names != null && length > 0) {
@@ -93,8 +103,8 @@ public class MusicManager {
             String musicName = getMusicNameOnly(name);
             setMusicSrc(musicSrc);
             setMusicType(DataConfig.PLAY_MUSIC);
-            setCurrentMediaType(RequestConfig.JPUSH_MUSIC);
-            setCurrentMediaName("MUSIC");
+            setCurrentMediaType(type);
+            setCurrentMediaName(mediaName);
             setCurrentPlayName(musicName);
             return musicName;
         }
@@ -160,6 +170,11 @@ public class MusicManager {
             String fileSrc = getMusicFile(RequestConfig.JPUSH_MUSIC);
             Log.i(TAG, "playcontrol  fileSrc===" + fileSrc);
             File file = new File(fileSrc);
+            // 文件如果不存在直接返回
+            if (!file.exists()) {
+                Log.i(TAG, "文件不存在");
+                return false;
+            }
             String[] names = file.list();
             int length = names.length;
             if (names != null && length > 0) {

@@ -44,16 +44,30 @@ public class PushResultHandler implements NettyClientCallBack {
 
     //推送来的结果
     public void setPushResult(String result) {
+        Log.i(TAG, "result==" + result);
+
         if (!TextUtils.isEmpty(result)) {
-            JpushInfo info = NetResultParse.getJpushInfo(result);
+            JpushInfo info = new JpushInfo();
+            if (result.contains("msg")) {
+                info = NetResultParse.getJpushInfo(result);
+            } else {
+                // 格式：result==="1"
+                int length = result.length();
+                Log.i(TAG, "result.length==" + length);
+                if (length > 2) {
+                    result = result.substring(1, length - 1);
+                }
+                info.setDirection(result);
+            }
+
             if (info != null) {
                 String direction = info.getDirection();
+                Log.i(TAG, "direction===" + direction);
                 if (TextUtils.isEmpty(direction)) {
                     doPushResult(info);
                     return;
                 }
                 DataConfig.isHeadStop = false;
-                Log.i(TAG, "direction===" + direction);
                 if (TextUtils.isDigitsOnly(direction)) {
                     int moveKey = Integer.parseInt(direction);
                     if (moveKey < 10) {

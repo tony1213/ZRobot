@@ -137,9 +137,14 @@ public class TextUnderstanderService extends SpeechService implements ITextUnder
                                     String speakContent;
                                     if (underStandContent.contains("首歌")) {// 随便唱本地歌曲
                                         // 播放本地音乐
-                                        content = MusicManager.getRandomMusic();
-                                        speakContent = "好的，开始播放" + content;
-                                    } else {
+                                        content = MusicManager.getRandomMusic(RequestConfig.JPUSH_MUSIC, "MUSIC");
+                                        if (!TextUtils.isEmpty(content)) {// 本地有歌曲
+                                            speakContent = "好的，开始播放" + content;
+                                        } else {// 本地没有歌曲
+                                            content = MusicManager.getMusicSpeakContent(DataConfig.MUSIC_SRC_FROM_OTHER, 0, answer);
+                                            speakContent = content;
+                                        }
+                                    } else {// 唱网络歌曲
                                         content = MusicManager.getMusic(answer);
                                         speakContent = content;
                                     }

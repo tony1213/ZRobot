@@ -34,6 +34,8 @@ public class ALiPush implements RobotInfoCallBack {
             Log.i(TAG, "deviceId===" + deviceId);
             // 获取机器信息
             HttpManager.getRobotInfo(UrlConfig.GET_ROBOT_INFO_BY_DEVICEID, deviceId, this);
+        } else {
+            setAlia(robotNum);
         }
     }
 

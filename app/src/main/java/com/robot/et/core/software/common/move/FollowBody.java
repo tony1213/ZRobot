@@ -67,6 +67,9 @@ public class FollowBody {
                     if (!ret) {
                         followMove(posZ);
                     }
+                } else {
+                    Log.i(TAG, "停止");
+                    stop();
                 }
 
             }

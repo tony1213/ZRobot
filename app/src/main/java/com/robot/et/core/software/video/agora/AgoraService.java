@@ -99,6 +99,7 @@ public class AgoraService extends Service {
                 break;
             case RequestConfig.JPUSH_CALL_CLOSE:// 关闭agora声网
                 Log.i("agoravideo", "关闭agora声网");
+                Log.i("agoravideo", "DataConfig.isVideoOrVoice==" + DataConfig.isVideoOrVoice);
                 if (DataConfig.isVideoOrVoice) {
                     BroadcastEnclosure.closeAgora(this, true);
                 }

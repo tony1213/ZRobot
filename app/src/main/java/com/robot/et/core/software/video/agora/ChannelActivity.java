@@ -367,6 +367,11 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         isUserJoined = true;
         DataConfig.isAlarmTips = true;
         DataConfig.isAgoraLook = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         DataConfig.isVideoOrVoice = false;
     }
 
@@ -512,9 +517,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
                 Log.i("agoravideo", "当前房间还剩余人数======" + mRemoteUserContainer.getChildCount());
                 //当前没人视频或者通话
-//                if (mRemoteUserContainer.getChildCount() == 0) {
-//                    closeChannel();
-//                }
+                if (mRemoteUserContainer.getChildCount() == 0) {
+                    closeChannel(true);
+                }
             }
         });
 
