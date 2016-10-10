@@ -18,6 +18,7 @@ import com.robot.et.core.software.common.move.Dance;
 import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
+import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.system.media.MediaManager;
@@ -240,7 +241,10 @@ public class MatchSceneHandler {
             case OPEN_SECURITY_SCENE:// 进入安保场景
                 flag = true;
                 DataConfig.isSecuritySign = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，已开启安保模式");
+                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "好的，已开启安保模式");
+                // 进入安保模式后，直接进入沉睡
+                sleep(context);
+
                 break;
             case CLOSE_SECURITY_SCENE:// 解除安保场景
                 flag = true;
@@ -488,10 +492,19 @@ public class MatchSceneHandler {
         BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
         // 胸口灯呼吸
         BroadcastEnclosure.controlChestLED(context, ScriptConfig.LED_BLINK);
-        // 显示睡觉表情
         ViewCommon.initView();
-        EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
-        // 防止人体检测立即开启，5s之后再开启人体检测
+        // 如果是安保模式的话，延迟10s开启人体检测，正常情况下5s开启
+        long delay;// 延迟的时间
+        if (DataConfig.isSecuritySign) {// 安保模式
+            delay = 10 * 1000;
+            // 显示文字提示
+            TextManager.showText("安保模式");
+        } else {// 不是安保模式
+            delay = 5 * 1000;
+            // 显示睡觉表情
+            EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
+        }
+        // 防止人体检测立即开启，延迟再开启人体检测
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -500,6 +513,6 @@ public class MatchSceneHandler {
                     BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_SLEEP);
                 }
             }
-        }, 5 * 1000);
+        }, delay);
     }
 }

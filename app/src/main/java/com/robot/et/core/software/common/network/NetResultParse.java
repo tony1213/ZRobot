@@ -8,6 +8,7 @@ import com.robot.et.entity.JpushInfo;
 import com.robot.et.entity.PictureInfo;
 import com.robot.et.entity.RemindInfo;
 import com.robot.et.entity.RobotInfo;
+import com.robot.et.entity.ScriptActionInfo;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
 
@@ -274,5 +275,53 @@ public class NetResultParse {
             }
         }
         iWiFiInfo.getWiFi(WiFiName, userName);
+    }
+
+    // 解析手臂
+    public static ScriptActionInfo parseArm(String result) {
+        ScriptActionInfo info = new ScriptActionInfo();
+        if (!TextUtils.isEmpty(result)) {
+            try {
+                JSONTokener tokener = new JSONTokener(result);
+                JSONObject object = new JSONObject(tokener);
+                if (object.has("actionType")) {
+                    String actionType = object.getString("actionType");
+                    if (!TextUtils.isEmpty(actionType)) {
+                        if (TextUtils.isDigitsOnly(actionType)) {
+                            info.setActionType(Integer.parseInt(actionType));
+                        }
+                    }
+                }
+                if (object.has("content")) {
+                    String content = object.getString("content");
+                    if (!TextUtils.isEmpty(content)) {
+                        info.setContent(content);
+                    }
+                }
+                if (object.has("spareType")) {
+                    String spareType = object.getString("spareType");
+                    if (!TextUtils.isEmpty(spareType)) {
+                        if (TextUtils.isDigitsOnly(spareType) || spareType.contains("-")) {
+                            info.setSpareType(Integer.parseInt(spareType));
+                        }
+                    }
+                }
+                if (object.has("spareContent")) {
+                    String spareContent = object.getString("spareContent");
+                    if (!TextUtils.isEmpty(spareContent)) {
+                        info.setSpareContent(spareContent);
+                    }
+                }
+                if (object.has("spareContent2")) {
+                    String spareContent2 = object.getString("spareContent2");
+                    if (!TextUtils.isEmpty(spareContent2)) {
+                        info.setSpareContent2(spareContent2);
+                    }
+                }
+            } catch (JSONException e) {
+                Log.i("netty", "parseArm JSONException");
+            }
+        }
+        return info;
     }
 }

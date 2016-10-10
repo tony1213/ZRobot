@@ -37,6 +37,10 @@ public class SerialPortHandler implements OnDataReceiveListener {
         }
     }
 
+    // 停止的距离
+    private int stopValue;
+    private int leftRightValue;
+
     // 获取雷达数据
     public void getRadarData() {
         // 每次获取雷达数据时，一定要清空缓存的buffer
@@ -45,6 +49,15 @@ public class SerialPortHandler implements OnDataReceiveListener {
             buffer.setLength(0);
         }
         stopCount = 0;
+        // 过来的时候停止距离是90，正常的是60
+        if (DataConfig.isComeIng) {
+            stopValue = 90;
+            leftRightValue = 60;
+        } else {
+            stopValue = 60;
+            leftRightValue = 60;
+        }
+
         instance.getData();
     }
 
@@ -73,7 +86,7 @@ public class SerialPortHandler implements OnDataReceiveListener {
                 if (DataConfig.isControlRobotMove) {
                     // 如果在蔽障范围内，发送停止的雷达广播
                     if (info != null) {
-                        if (info.getDataM() <= 60 || info.getDataL() <= 60 || info.getDataR() <= 60) {
+                        if (info.getDataM() <= stopValue || info.getDataL() <= leftRightValue || info.getDataR() <= leftRightValue) {
                             stopCount++;
                             // 防止缓存数据影响，连续3次的话，再发送雷达停止广播
                             if (stopCount == 3) {

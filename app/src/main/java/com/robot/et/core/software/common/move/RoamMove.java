@@ -152,7 +152,12 @@ public class RoamMove {
             stop();
             // 转之前后退一点
             if (!isRandomTurn) {
-                moveBack();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        moveBack();
+                    }
+                }, 160);
             }
         }
     }

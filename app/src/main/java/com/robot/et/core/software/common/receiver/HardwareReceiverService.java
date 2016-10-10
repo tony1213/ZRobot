@@ -34,7 +34,6 @@ import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.script.TouchHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
-import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;
@@ -457,10 +456,9 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             super.handleMessage(msg);
             switch (msg.what) {
                 case SHOW_TEXT:// 显示文字
-                    ViewCommon.initView();
-                    TextManager.showText("安保模式");
+                    // 这里不显示文字提示，只发送信息
                     // 发送信息
-                    HttpManager.pushMsgToBindApp("主人，家里发现异常，请注意查看", RequestConfig.SECURITY_MODEL);
+                    HttpManager.pushMsgToBindApp("发现家里异常，请主人查看", RequestConfig.SECURITY_MODEL);
 
                     break;
                 case UPDATE_VIEW:// 更新view
