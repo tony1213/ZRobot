@@ -61,7 +61,6 @@ public class AgoraService extends Service {
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
-        DataConfig.isSwitchCamera = false;
     }
 
     //加入agora房间

@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.robot.et.R;
+import com.robot.et.app.CustomApplication;
 import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.RequestConfig;
@@ -40,7 +41,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     private String vendorKey;
     private String channelId;
     private LinearLayout mRemoteUserContainer;
-    private int mRemoteUserViewWidth = 0;
     private RtcEngine rtcEngine;
     //判断用户是否接通 默认不接通
     private static boolean isUserJoined;
@@ -53,6 +53,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     private boolean isNetWorkNotGood;
     private int currentType;
     private boolean isCurrentVideo;
+    private LinearLayout localViewContainer;
 
     @Override
     public void onCreate(Bundle savedInstance) {
@@ -62,8 +63,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         DataConfig.isVideoOrVoice = true;
-        //单位标准尺寸转化的一个函数
-        mRemoteUserViewWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics());
         mCallingType = getIntent().getIntExtra(DataConfig.AGORA_EXTRA_CALLING_TYPE, 0);
         channelId = getIntent().getStringExtra(DataConfig.AGORA_EXTRA_CHANNEL_ID);
         Log.i("agoravideo", "ChannelActivity channelId===" + channelId);
@@ -76,7 +75,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
         setupRtcEngine();
 
-        //显示当前通话对方的预览布局
+        rtcEngine.setEnableSpeakerphone(true);
         mRemoteUserContainer = (LinearLayout) findViewById(R.id.user_remote_views);
         setRemoteUserViewVisibility(false);
         isLook = false;
@@ -148,12 +147,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         filter.addAction(BroadcastAction.ACTION_MONITOR_WATCH_NETWORK_TRAFFIC_SPEED);
         registerReceiver(receiver, filter);
 
-        // 暂时为了解决新板子，打不开摄像头问题,只打开一次便可以
-        if (!DataConfig.isSwitchCamera) {
-            DataConfig.isSwitchCamera = true;
-            rtcEngine.switchCamera();
-        }
-
     }
 
     BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -191,7 +184,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
         setRemoteUserViewVisibility(false);
         leaveChannel();
         isUserJoined = true;
-        finish();
         if (isNeedVoiceType) {
             Log.i("agoravideo", "islook222===" + isLook);
             if (isLook || isNetWorkNotGood) { // 查看
@@ -225,9 +217,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     // 初始化声网的RtcEngine对象
     private void setupRtcEngine() {
         vendorKey = getIntent().getStringExtra(DataConfig.AGORA_EXTRA_VENDOR_KEY);
-        MessageHandler messageHandler = new MessageHandler();
-        rtcEngine = RtcEngine.create(this, vendorKey, messageHandler);
-        messageHandler.setActivity(this);
+        CustomApplication.getInstance().setRtcEngine(vendorKey);
+        rtcEngine = CustomApplication.getInstance().getRtcEngine();
+        CustomApplication.getInstance().setEngineEventHandlerActivity(this);
         rtcEngine.enableVideo();
     }
 
@@ -235,7 +227,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     @SuppressWarnings("static-access")
     private void ensureLocalViewIsCreated() {
         if (this.mLocalView == null) {
-            FrameLayout localViewContainer = (FrameLayout) findViewById(R.id.user_local_view);
+            localViewContainer = (LinearLayout) findViewById(R.id.user_local_view);
             SurfaceView localView = rtcEngine.CreateRendererView(getApplicationContext());
             this.mLocalView = localView;
             localViewContainer.addView(localView, new FrameLayout.LayoutParams(
@@ -257,7 +249,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     //语音通话
     private void voice() {
         mCallingType = RequestConfig.JPUSH_CALL_VOICE;
-        findViewById(R.id.user_local_voice_bg).setVisibility(View.VISIBLE);
         isCurrentVideo = false;
 
         ensureLocalViewIsCreated();
@@ -284,7 +275,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
     //视频通话
     private void video() {
-        findViewById(R.id.user_local_voice_bg).setVisibility(View.GONE);
         isCurrentVideo = true;
         ensureLocalViewIsCreated();
 
@@ -327,7 +317,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
     private void setRemoteUserViewVisibility(boolean isVisible) {
         findViewById(R.id.user_remote_views).getLayoutParams().height = isVisible ? (int) TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80, getResources().getDisplayMetrics()) : 0;
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, LinearLayout.LayoutParams.MATCH_PARENT, getResources().getDisplayMetrics()) : 0;
     }
 
     //切换视频音频通话时，更新 view 的显示。只是更新重用的 view，并不新添加
@@ -352,7 +342,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                         remoteView.setZOrderOnTop(true);
                         remoteView.setZOrderMediaOverlay(true);
                         int savedUid = (Integer) remoteVideoUser.getTag();
-                        rtcEngine.setupRemoteVideo(new VideoCanvas(remoteView, VideoCanvas.RENDER_MODE_ADAPTIVE, savedUid));
+                        rtcEngine.setupRemoteVideo(new VideoCanvas(remoteView, VideoCanvas.RENDER_MODE_HIDDEN, savedUid));
                     }
                 }
 
@@ -362,16 +352,12 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
     @Override
     protected void onDestroy() {
+        Log.i("agoravideo", "onDestroy()");
         super.onDestroy();
         unregisterReceiver(receiver);
         isUserJoined = true;
         DataConfig.isAlarmTips = true;
         DataConfig.isAgoraLook = false;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
         DataConfig.isVideoOrVoice = false;
     }
 
@@ -414,7 +400,7 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                     TextView username = (TextView) singleRemoteUser.findViewById(R.id.remote_user_name);
                     username.setText(String.valueOf(uid));
 
-                    mRemoteUserContainer.addView(singleRemoteUser, new LinearLayout.LayoutParams(mRemoteUserViewWidth, mRemoteUserViewWidth));
+                    mRemoteUserContainer.addView(singleRemoteUser, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
                     remoteUserView = singleRemoteUser;
                 }
@@ -425,22 +411,19 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
 
                 // ensure remote video view setup
                 final SurfaceView remoteView = RtcEngine.CreateRendererView(getApplicationContext());
-                remoteVideoUser.addView(remoteView,
-                        new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-                                FrameLayout.LayoutParams.MATCH_PARENT));
+                remoteVideoUser.addView(remoteView,new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
                 remoteView.setZOrderOnTop(true);
                 remoteView.setZOrderMediaOverlay(true);
 
                 rtcEngine.enableVideo();
                 int successCode = rtcEngine.setupRemoteVideo(new VideoCanvas(
-                        remoteView, VideoCanvas.RENDER_MODE_ADAPTIVE, uid));
+                        remoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
 
                 if (successCode < 0) {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            rtcEngine.setupRemoteVideo(new VideoCanvas(remoteView,
-                                    VideoCanvas.RENDER_MODE_ADAPTIVE, uid));
+                            rtcEngine.setupRemoteVideo(new VideoCanvas(remoteView, VideoCanvas.RENDER_MODE_HIDDEN, uid));
                             remoteView.invalidate();
                         }
                     }, 500);
@@ -452,8 +435,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                     remoteUserView.findViewById(R.id.remote_user_voice_container).setVisibility(View.VISIBLE);
                 }
 
-                TextView appNotification = (TextView) findViewById(R.id.app_notification);
-                appNotification.setText("");
                 setRemoteUserViewVisibility(true);
             }
         });
@@ -488,11 +469,9 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
                 TextView username = (TextView) singleRemoteUser.findViewById(R.id.remote_user_name);
                 username.setText(String.valueOf(uid));
 
-                mRemoteUserContainer.addView(singleRemoteUser, new LinearLayout.LayoutParams(mRemoteUserViewWidth,
-                        mRemoteUserViewWidth));
+                mRemoteUserContainer.addView(singleRemoteUser, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT));
 
-                TextView appNotification = (TextView) findViewById(R.id.app_notification);
-                appNotification.setText("");
                 setRemoteUserViewVisibility(true);
                 rtcEngine.setRemoteRenderMode(uid, 1);
             }
@@ -530,7 +509,6 @@ public class ChannelActivity extends BaseEngineEventHandlerActivity {
     public void onLeaveChannel(IRtcEngineEventHandler.RtcStats stats) {
         Log.i("agoravideo", "onLeaveChannel");
         try {
-            super.onLeaveChannel(stats);
             finish();
         } catch (Exception e) {
             Log.i("agoravideo", "onLeaveChannel Exception==" + e.getMessage());

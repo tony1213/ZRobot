@@ -10,12 +10,17 @@ import com.baidu.mapapi.SDKInitializer;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.video.agora.BaseEngineEventHandlerActivity;
+import com.robot.et.core.software.video.agora.MessageHandler;
 import com.squareup.leakcanary.LeakCanary;
+
+import io.agora.rtc.RtcEngine;
 
 public class CustomApplication extends Application {
 
     private static CustomApplication instance;
-
+    private RtcEngine rtcEngine;
+    private MessageHandler messageHandler;
     public static CustomApplication getInstance() {
         return instance;
     }
@@ -32,6 +37,8 @@ public class CustomApplication extends Application {
         initCloudChannel();
         // 初始化百度地图
         initBaiDuMap();
+        // 初始化agora视频
+        initAgora();
     }
 
     // 初始化科大讯飞
@@ -74,5 +81,24 @@ public class CustomApplication extends Application {
     private void initBaiDuMap() {
         // 初始化sdk，上下文必须要是application的，最好放在这里初始化sdk
         SDKInitializer.initialize(this);
+    }
+
+    // 初始化视频（注释：agora视频一定要在这里初始化，否则多次打开视频的时候不能保证拿到对方视频流）
+    private void initAgora() {
+        messageHandler = new MessageHandler();
+    }
+
+    public void setRtcEngine(String vendorKey){
+        if(rtcEngine==null) {
+            rtcEngine = RtcEngine.create(getApplicationContext(), vendorKey, messageHandler);
+        }
+    }
+
+    public RtcEngine getRtcEngine(){
+        return rtcEngine;
+    }
+
+    public void setEngineEventHandlerActivity(BaseEngineEventHandlerActivity engineEventHandlerActivity){
+        messageHandler.setActivity(engineEventHandlerActivity);
     }
 }

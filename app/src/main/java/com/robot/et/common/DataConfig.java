@@ -165,8 +165,6 @@ public class DataConfig {
     //机器人周围的小车的编号,默认是0
     public static int toyCarNum = 0;
 
-    // 是否切换摄像头
-    public static boolean isSwitchCamera = false;
     // 电话是否是从安保模式过来
     public static boolean isSecurityCall = false;
 
