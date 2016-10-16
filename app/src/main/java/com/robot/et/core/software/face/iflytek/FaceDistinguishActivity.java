@@ -299,13 +299,15 @@ public class FaceDistinguishActivity extends Activity {
                     canvas.setMatrix(mScaleMatrix);
 
                     // 如果没有检测到人脸一直检测，连续检测次数大于250次（大约15秒左右）的时候自动关闭人脸检测
-                    if (faces.length <= 0) {
-                        noFaceCount++;
-                        if (noFaceCount >= 250) {
-                            sendMsg("请让我看见你", false);
-                        } else {
-                            mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
-                            continue;
+                    if (faces != null) {
+                        if (faces.length <= 0) {
+                            noFaceCount++;
+                            if (noFaceCount >= 250) {
+                                sendMsg("请让我看见你", false);
+                            } else {
+                                mFaceSurface.getHolder().unlockCanvasAndPost(canvas);
+                                continue;
+                            }
                         }
                     }
 

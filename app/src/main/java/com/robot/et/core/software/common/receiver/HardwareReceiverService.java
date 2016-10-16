@@ -16,6 +16,7 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
+import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
@@ -254,6 +255,16 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         if (DataConfig.isComeIng) {
             DataConfig.isComeIng = false;
             Come.stopTimer();
+        }
+        // 关闭视觉学习
+        if (DataConfig.isOpenLearn) {
+            DataConfig.isOpenLearn = false;
+            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_DISTINGUISH, "");
+        }
+        // 关闭人体检测
+        if (DataConfig.isOpenBodyDistinguish) {
+            DataConfig.isOpenBodyDistinguish = false;
+            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
         }
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);

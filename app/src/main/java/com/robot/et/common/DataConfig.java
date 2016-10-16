@@ -206,4 +206,14 @@ public class DataConfig {
     // 语音唤醒转动的角度
     public static int voiceDegree;
 
+    // 是否开启视觉学习
+    public static boolean isOpenLearn;
+    // 是否开启人体监测
+    public static boolean isOpenBodyDistinguish;
+
+    // 1号机器人  192.168.8.11
+    // 2号机器人  192.168.8.12
+    // 3号机器人  192.168.8.13
+    public static final String masterUri = "http://192.168.8.11:11311/";
+
 }

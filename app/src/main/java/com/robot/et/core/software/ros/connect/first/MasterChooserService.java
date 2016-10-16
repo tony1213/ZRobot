@@ -14,6 +14,7 @@ import com.github.rosjava.android_remocons.common_tools.zeroconf.Logger;
 import com.github.rosjava.zeroconf_jmdns_suite.jmdns.DiscoveredService;
 import com.github.rosjava.zeroconf_jmdns_suite.jmdns.Zeroconf;
 import com.github.rosjava.zeroconf_jmdns_suite.jmdns.ZeroconfDiscoveryHandler;
+import com.robot.et.common.DataConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -113,7 +114,7 @@ public class MasterChooserService extends Service {
                         }
                         for (int i = 0; i < discoveredMasters.size(); i++) {
                             Log.e("MasterChooserService", "name:" + discoveredMasters.get(i).name + ",Type:" + discoveredMasters.get(i).type + ",domain:" + discoveredMasters.get(i).domain + ",description:" + discoveredMasters.get(i).description + ",hostname:" + discoveredMasters.get(i).hostname + ",port:" + discoveredMasters.get(i).port + ",ipv4:" + discoveredMasters.get(i).ipv4_addresses);
-                            if ("192.168.2.158".equals(discoveredMasters.get(i).ipv4_addresses.get(0))){
+                            if (DataConfig.masterUri.equals(discoveredMasters.get(i).ipv4_addresses.get(0))){
                                 Log.e("MasterChooserService","找到：192.168.2.158");
                                 enterMasterInfo(discoveredMasters.get(i));
                             }

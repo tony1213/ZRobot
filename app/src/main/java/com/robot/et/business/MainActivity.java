@@ -54,7 +54,7 @@ public class MainActivity extends RosActivity {
 
 
     public MainActivity() {
-        super("XRobot", "Xrobot", URI.create("http://192.168.2.158:11311"));//本体的ROS IP和端口
+        super("XRobot", "Xrobot", URI.create(DataConfig.masterUri));//本体的ROS IP和端口
 //		super("XRobot","Xrobot",URI.create("http://192.168.2.164:11311"));
     }
 

@@ -27,8 +27,6 @@ public class MasterFactory extends Activity {
     private List<MasterItem> masterItems;
     private Yaml yaml = new Yaml();
 
-    private static final String masterUri = "http://192.168.2.168:11311/";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,15 +56,15 @@ public class MasterFactory extends Activity {
             }else {
                 for (int i = 0;i<masters.size();i++){
                     RoconDescription concert=masters.get(i);
-                    if (concert.getMasterUri().equals(masterUri)){
+                    if (concert.getMasterUri().equals(DataConfig.masterUri)){
                         if (concert == null || concert.getConnectionStatus() == null || concert.getConnectionStatus().equals(RoconDescription.ERROR)) {
                             Log.e("Remocon","Failed: Cannot contact concert");
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码1");
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF,"连接异常，请检查。错误码1");
                         } else if ( concert.getConnectionStatus().equals(RoconDescription.UNAVAILABLE) ) {
                             Log.e("Remocon","Master Unavailable!   Currently busy serving another.");
-                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码2");
+                            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF,"连接异常，请检查。错误码2");
                         } else {
-                            choose(0);
+                            choose(i);
                         }
                     }
                 }
@@ -94,7 +92,7 @@ public class MasterFactory extends Activity {
 
     private void enterMasterInfo(){
         Map<String, Object> data = new HashMap<String, Object>();
-        data.put("URL", masterUri);
+        data.put("URL", DataConfig.masterUri);
         try {
             addMaster(new MasterId(data));
         } catch (Exception e) {
@@ -109,7 +107,7 @@ public class MasterFactory extends Activity {
     private void addMaster(MasterId masterId, boolean connectToDuplicates) {
         Log.i("MasterChooserActivity", "adding master to the concert master chooser [" + masterId.toString() + "]");
         if (masterId == null || masterId.getMasterUri() == null) {
-            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT,"连接异常，请检查。错误码3");
+            SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF,"连接异常，请检查。错误码3");
         } else {
             for (int i = 0; i < masters.toArray().length; i++) {
                 RoconDescription concert = masters.get(i);

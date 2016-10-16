@@ -289,7 +289,7 @@ public class MainAppActivity extends RosActivity {
                     for (int i = 0; i < availableAppsCache.size(); i++) {
                         Log.e(TAG, "DisplayName:" + availableAppsCache.get(i).getDisplayName());
                     }
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "小黄人我来啦");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来啦");
                     //开启视觉模块 
                     startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Rai Learning");
                 } else {
@@ -335,7 +335,7 @@ public class MainAppActivity extends RosActivity {
                             } else if (result == AppLauncher.Result.NOTHING) {
                                 Log.e(TAG, "Android app nothing");
                                 if (TextUtils.equals(selectedInteraction.getDisplayName(), "Rai Learning")) {
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉已开启");
+                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "视觉已开启");
                                 }
                                 Log.e(TAG, "Android app nothing2");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());

@@ -318,6 +318,8 @@ public class MatchSceneHandler {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                DataConfig.isOpenLearn = true;
+                                DataConfig.isOpenBodyDistinguish = false;
                                 // 视觉学习 
                                 learnThing(result);
                             }
@@ -375,6 +377,8 @@ public class MatchSceneHandler {
                 // 显示正常表情
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                // 头部抬起来
+                BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, String.valueOf(20), 1000);
 
                 // 跟着我的时候先关闭视觉学习，再打开视觉人体监测，需要500ms
                 if (!isFirstInitFollow) {
@@ -417,6 +421,8 @@ public class MatchSceneHandler {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
+                                DataConfig.isOpenBodyDistinguish = true;
+                                DataConfig.isOpenLearn = false;
                                 BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
                             }
                         }, 500);
