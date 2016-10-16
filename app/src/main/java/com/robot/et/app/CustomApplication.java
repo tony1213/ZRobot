@@ -10,6 +10,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.robot.et.common.DataConfig;
+import com.robot.et.core.software.common.log.AppCrash;
 import com.robot.et.core.software.video.agora.BaseEngineEventHandlerActivity;
 import com.robot.et.core.software.video.agora.MessageHandler;
 import com.squareup.leakcanary.LeakCanary;
@@ -17,7 +18,6 @@ import com.squareup.leakcanary.LeakCanary;
 import io.agora.rtc.RtcEngine;
 
 public class CustomApplication extends Application {
-
     private static CustomApplication instance;
     private RtcEngine rtcEngine;
     private MessageHandler messageHandler;
@@ -39,6 +39,9 @@ public class CustomApplication extends Application {
         initBaiDuMap();
         // 初始化agora视频
         initAgora();
+        // 初始化APP崩溃的记录日志
+        AppCrash.instance().init();
+
     }
 
     // 初始化科大讯飞
