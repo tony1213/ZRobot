@@ -517,6 +517,7 @@ public class MainAppActivity extends RosActivity {
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     //视觉学习(service)
                     Log.e("ROS_Client", "Service：Start DeepLearn");
+                    DataConfig.isVisionLearnComplected = false;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
                     visualClient = new VisualClient(MainAppActivity.this, (short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));

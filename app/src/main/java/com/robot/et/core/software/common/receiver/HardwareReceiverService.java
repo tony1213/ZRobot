@@ -16,7 +16,6 @@ import com.robot.et.common.BroadcastAction;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
 import com.robot.et.common.RequestConfig;
-import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.TouchConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
@@ -33,9 +32,11 @@ import com.robot.et.core.software.common.network.HttpManager;
 import com.robot.et.core.software.common.receiver.util.MoveFormat;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.script.TouchHandler;
+import com.robot.et.core.software.common.speech.MatchSceneHandler;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
+import com.robot.et.core.software.video.VideoPlayActivity;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.DateTools;
 import com.robot.et.util.TimerManager;
@@ -256,16 +257,13 @@ public class HardwareReceiverService extends Service implements IWakeUp {
             DataConfig.isComeIng = false;
             Come.stopTimer();
         }
-        // 关闭视觉学习
-        if (DataConfig.isOpenLearn) {
-            DataConfig.isOpenLearn = false;
-            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_DISTINGUISH, "");
+        // 关闭宣传片播放
+        if (VideoPlayActivity.instance != null) {
+            VideoPlayActivity.instance.finish();
+            VideoPlayActivity.instance = null;
         }
-        // 关闭人体检测
-        if (DataConfig.isOpenBodyDistinguish) {
-            DataConfig.isOpenBodyDistinguish = false;
-            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-        }
+        // 关闭视觉
+        MatchSceneHandler.closeVision(this);
         // 停止运动
         BroadcastEnclosure.controlMoveBySerialPort(this, ControlMoveEnum.STOP.getMoveKey(), 1000, 1000, 0);
 
@@ -297,6 +295,10 @@ public class HardwareReceiverService extends Service implements IWakeUp {
     @Override
     public void getVoiceWakeUpDegree(int degree) {
         Log.i(TAG, "HardwareReceiverService 接受到唤醒中断的广播");
+        // 当是睡觉指令时，语音不唤醒
+        if (!DataConfig.isAwaken) {
+            return;
+        }
         // 如果正在音视频的话关掉
         if (DataConfig.isVideoOrVoice) {
             return;
@@ -430,6 +432,7 @@ public class HardwareReceiverService extends Service implements IWakeUp {
         Log.i(TAG, "HardwareReceiverService 短按");
         // 当一直按的时候会一直触发，防止一直按着不放
         if (!isFirstPress) {
+            DataConfig.isAwaken = true;
             isFirstPress = true;
             handler.sendEmptyMessage(SHORT_PRESS);
         }

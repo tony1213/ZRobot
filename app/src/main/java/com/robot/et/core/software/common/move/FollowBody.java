@@ -97,7 +97,7 @@ public class FollowBody {
     // 是否是直走
     private static boolean isGo;
     // 停止的距离
-    private static final int STOP_VALUE = 120;
+    private static final int STOP_VALUE = 115;
 
     // 左转右转 中间是160.在150-170之间默认走直线, <150左转  >170右转
     private static boolean followTurn(int posX) {
@@ -122,7 +122,7 @@ public class FollowBody {
         if (posZ < STOP_VALUE) {
             Log.i(TAG, "后退");
             BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.BACKWARD.getMoveKey(), 150, 1000, 0);
-        } else if (posZ >= STOP_VALUE && posZ <= STOP_VALUE + 30) {// 在停止的范围内30个差距内就停止
+        } else if (posZ >= STOP_VALUE && posZ <= STOP_VALUE + 40) {// 在停止的范围内30个差距内就停止
             Log.i(TAG, "停止");
             stop();
         } else {

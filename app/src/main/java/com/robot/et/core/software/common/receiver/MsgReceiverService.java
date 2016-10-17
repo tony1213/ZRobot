@@ -189,6 +189,7 @@ public class MsgReceiverService extends Service implements IMusic, IXiMaLaYa {
                     if (isVerifySuccess) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, contetn);
                     } else {
+                        DataConfig.isAwaken = true;
                         // 如果验证不成功的话继续沉睡,防止误打开
                         MatchSceneHandler.sleep(MsgReceiverService.this);
                     }

@@ -209,6 +209,12 @@ public enum MatchSceneEnum {
             return MatchStringUtil.matchString(str, MatchStringUtil.storyRegex);
         }
     },
+    PLAY_TRAILER_SCENE {// 播放宣传片的标志
+
+        public boolean isScene(String str) {
+            return MatchStringUtil.matchString(str, MatchStringUtil.playTrailerRegex);
+        }
+    },
     OPEN_SECURITY_SCENE {// 进入安保场景的标志
 
         public boolean isScene(String str) {

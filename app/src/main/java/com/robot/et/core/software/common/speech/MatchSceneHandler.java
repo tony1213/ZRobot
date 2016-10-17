@@ -2,6 +2,7 @@ package com.robot.et.core.software.common.speech;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +23,7 @@ import com.robot.et.core.software.common.view.TextManager;
 import com.robot.et.core.software.common.view.ViewCommon;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.system.media.MediaManager;
+import com.robot.et.core.software.video.VideoPlayActivity;
 import com.robot.et.entity.LearnAnswerInfo;
 import com.robot.et.util.BroadcastEnclosure;
 import com.robot.et.util.EnumManager;
@@ -31,6 +33,8 @@ import com.robot.et.util.MusicManager;
 import com.robot.et.util.RobotLearnManager;
 import com.robot.et.util.SharedPreferencesKeys;
 import com.robot.et.util.SharedPreferencesUtils;
+
+import java.io.File;
 
 /**
  * Created by houdeming on 2016/9/9.
@@ -124,9 +128,11 @@ public class MatchSceneHandler {
                 flag = true;
                 // 如果说的是 [睡觉] 的话，就不开启红外，否则开启红外
                 if (result.contains("睡觉")) {
+                    DataConfig.isAwaken = false;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我睡觉了，白白");
                     sleepNoAwaken(context);
                 } else {
+                    DataConfig.isAwaken = true;
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
                     sleep(context);
                 }
@@ -202,6 +208,7 @@ public class MatchSceneHandler {
                                 if (DataConfig.isShowChatQRCode) {
                                     DataConfig.isShowChatQRCode = false;
                                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "我休息去了");
+                                    DataConfig.isAwaken = true;
                                     // 沉睡
                                     sleep(context);
                                 }
@@ -244,10 +251,26 @@ public class MatchSceneHandler {
                 }
 
                 break;
+            case PLAY_TRAILER_SCENE:// 播放宣传片
+                flag = true;
+                String fileSrc = Environment.getExternalStorageDirectory() + File.separator + "robot" + File.separator + "视频"
+                        + File.separator + "宣传片.mp4";
+                if (!TextUtils.isEmpty(fileSrc)) {
+                    Intent mIntent = new Intent();
+                    mIntent.setClass(context, VideoPlayActivity.class);
+                    mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mIntent.putExtra("fileSrc", fileSrc);
+                    context.startActivity(mIntent);
+                } else {
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "抱歉，视频文件不存在");
+                }
+
+                break;
             case OPEN_SECURITY_SCENE:// 进入安保场景
                 flag = true;
                 DataConfig.isSecuritySign = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "好的，已开启安保模式");
+                DataConfig.isAwaken = true;
                 // 进入安保模式后，直接进入沉睡
                 sleep(context);
 
@@ -326,6 +349,8 @@ public class MatchSceneHandler {
                             public void run() {
                                 DataConfig.isOpenLearn = true;
                                 DataConfig.isOpenBodyDistinguish = false;
+                                // 默认学习完成
+                                DataConfig.isVisionLearnComplected = true;
                                 // 视觉学习 
                                 learnThing(result);
                             }
@@ -533,6 +558,23 @@ public class MatchSceneHandler {
         } else {// 不是安保模式
             // 显示睡觉表情
             EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
+        }
+    }
+
+    // 关闭视觉（做视觉不相关的时候要关闭）
+    public static void closeVision(Context context) {
+        // 关闭视觉学习
+        if (DataConfig.isOpenLearn) {
+            if (DataConfig.isVisionLearnComplected) {
+                DataConfig.isVisionLearnComplected = false;
+                DataConfig.isOpenLearn = false;
+                BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
+            }
+        }
+        // 关闭人体检测
+        if (DataConfig.isOpenBodyDistinguish) {
+            DataConfig.isOpenBodyDistinguish = false;
+            BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
         }
     }
 }

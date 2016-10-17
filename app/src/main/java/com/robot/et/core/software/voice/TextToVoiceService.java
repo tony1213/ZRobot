@@ -80,6 +80,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
             // 电话查看时或者安保场景挂断没有提示音
             if (currentType == DataConfig.SPEAK_TYPE_PHONE_NO_TIPS) {
                 Log.i("ifly", "查看时电话挂断");
+                DataConfig.isAwaken = true;
                 // 沉睡
                 MatchSceneHandler.sleep(TextToVoiceService.this);
                 return;
@@ -210,6 +211,7 @@ public class TextToVoiceService extends SpeechService implements ISpeak {
 
                 break;
             case RequestConfig.JPUSH_CALL_CLOSE://视频或语音时电话挂断
+                DataConfig.isAwaken = true;
                 // 电话结束后让机器人沉睡
                 MatchSceneHandler.sleep(this);
                 break;

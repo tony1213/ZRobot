@@ -102,6 +102,7 @@ public class VisualClient extends AbstractNodeMain {
                     if (response.getStatus() == -1) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "视觉学习未开启");
                     } else if (response.getStatus() == 0) {
+                        DataConfig.isVisionLearnComplected = true;
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，记住了");
                     } else if (response.getStatus() == 1) {
                         SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "距离太近了");

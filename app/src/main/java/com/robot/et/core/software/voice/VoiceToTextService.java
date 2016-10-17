@@ -11,7 +11,6 @@ import com.iflytek.cloud.SpeechError;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
 import com.robot.et.common.EarsLightConfig;
-import com.robot.et.common.RosConfig;
 import com.robot.et.core.software.common.speech.CommandHandler;
 import com.robot.et.core.software.common.speech.Gallery;
 import com.robot.et.core.software.common.speech.MatchSceneHandler;
@@ -62,6 +61,8 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         DataConfig.isControlMotion = true;
         DataConfig.isComeIng = false;
         DataConfig.isOpenRadar = false;
+        // 默认任何方式都可以唤醒
+        DataConfig.isAwaken = true;
     }
 
     // 上传词表
@@ -133,6 +134,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
                     TimerManager.cancelTimer(timer);
                     timer = null;
                     voiceDictate.stopListen();
+                    DataConfig.isAwaken = true;
                     // 沉睡
                     MatchSceneHandler.sleep(VoiceToTextService.this);
 
@@ -142,20 +144,6 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
             }
         }
     };
-
-    // 关闭视觉（做视觉不相关的时候要关闭）
-    private void closeVision() {
-        // 关闭视觉学习
-        if (DataConfig.isOpenLearn) {
-            DataConfig.isOpenLearn = false;
-            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_DISTINGUISH, "");
-        }
-        // 关闭人体检测
-        if (DataConfig.isOpenBodyDistinguish) {
-            DataConfig.isOpenBodyDistinguish = false;
-            BroadcastEnclosure.sendRos(this, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-        }
-    }
 
     @Override
     public void onDestroy() {
@@ -167,6 +155,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
         DataConfig.isControlRobotMove = false;
         DataConfig.isOpenLearn = false;
         DataConfig.isOpenBodyDistinguish = false;
+        DataConfig.isVisionLearnComplected = false;
         voiceDictate.destroy();
         TimerManager.cancelTimer(timer);
         timer = null;
@@ -267,7 +256,7 @@ public class VoiceToTextService extends SpeechService implements IVoiceDictate {
             TimerManager.cancelTimer(timer);
             timer = null;
             isFirstListen = false;
-            closeVision();
+            MatchSceneHandler.closeVision(VoiceToTextService.this);
 
             if (DataConfig.isLookPhoto) {// 查看图片
                 if (MatchStringUtil.matchString(result, MatchStringUtil.lastPhotoRegex)) {// 上一张照片

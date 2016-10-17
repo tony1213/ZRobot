@@ -89,6 +89,8 @@ public class MatchStringUtil {
     public static String robotNumSignRegex = "^" + baseRegex + "*你+" + baseRegex + "*(编号)+" + baseRegex + "+$";
     // 讲故事
     public static String storyRegex = "^" + baseRegex + "*(讲|将|说)+" + baseRegex + "*(故事)+" + baseRegex + "*$";
+    // 播放宣传片
+    public static String playTrailerRegex = "^" + baseRegex + "*((播放)|(演示)|(展示))+" + baseRegex + "*(宣传)+" + baseRegex + "*$";
 
     //匹配场景字符串
     public static boolean matchString(String str, String strRegex) {

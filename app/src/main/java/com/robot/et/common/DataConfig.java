@@ -210,11 +210,15 @@ public class DataConfig {
     public static boolean isOpenLearn;
     // 是否开启人体监测
     public static boolean isOpenBodyDistinguish;
+    // 视觉是否学习完成
+    public static boolean isVisionLearnComplected;
+    // 是否唤醒（睡觉的时候只能按键唤醒）
+    public static boolean isAwaken;
 
     // 机器人连接ros的ip
     // 1号机器人  192.168.8.11
     // 2号机器人  192.168.8.12
     // 3号机器人  192.168.8.13
-    public static final String masterUri = "http://192.168.8.11:11311/";
+    public static final String masterUri = "http://192.168.8.13:11311/";
 
 }
