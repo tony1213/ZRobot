@@ -211,6 +211,7 @@ public class DataConfig {
     // 是否开启人体监测
     public static boolean isOpenBodyDistinguish;
 
+    // 机器人连接ros的ip
     // 1号机器人  192.168.8.11
     // 2号机器人  192.168.8.12
     // 3号机器人  192.168.8.13

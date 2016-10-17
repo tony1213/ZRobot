@@ -120,10 +120,15 @@ public class MatchSceneHandler {
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的，免打扰模式已关闭");
 
                 break;
-            case SHUT_UP_SCENE:// 闭嘴
+            case SHUT_UP_SCENE:// 休息
                 flag = true;
                 SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
-                sleep(context);
+                // 如果说的是 [睡觉] 的话，就不开启红外，否则开启红外
+                if (result.contains("睡觉")) {
+                    sleepNoAwaken(context);
+                } else {
+                    sleep(context);
+                }
 
                 break;
             case DO_ACTION_SCENE:// 智能学习做动作
@@ -493,22 +498,13 @@ public class MatchSceneHandler {
 
     //让机器人睡觉
     public static void sleep(final Context context) {
-        DataConfig.isSleep = true;
-        // 耳朵灯灭
-        BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
-        // 胸口灯呼吸
-        BroadcastEnclosure.controlChestLED(context, ScriptConfig.LED_BLINK);
-        ViewCommon.initView();
+        sleepNoAwaken(context);
         // 如果是安保模式的话，延迟10s开启人体检测，正常情况下5s开启
         long delay;// 延迟的时间
         if (DataConfig.isSecuritySign) {// 安保模式
             delay = 10 * 1000;
-            // 显示文字提示
-            TextManager.showText("安保模式");
         } else {// 不是安保模式
             delay = 5 * 1000;
-            // 显示睡觉表情
-            EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
         }
         // 防止人体检测立即开启，延迟再开启人体检测
         new Handler().postDelayed(new Runnable() {
@@ -520,5 +516,22 @@ public class MatchSceneHandler {
                 }
             }
         }, delay);
+    }
+
+    // 沉睡不带唤醒
+    private static void sleepNoAwaken(Context context) {
+        DataConfig.isSleep = true;
+        // 耳朵灯灭
+        BroadcastEnclosure.controlEarsLED(context, EarsLightConfig.EARS_CLOSE);
+        // 胸口灯呼吸
+        BroadcastEnclosure.controlChestLED(context, ScriptConfig.LED_BLINK);
+        ViewCommon.initView();
+        if (DataConfig.isSecuritySign) {// 安保模式
+            // 显示文字提示
+            TextManager.showText("安保模式");
+        } else {// 不是安保模式
+            // 显示睡觉表情
+            EmotionManager.showEmotionAnim(R.drawable.emotion_rest);
+        }
     }
 }
