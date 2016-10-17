@@ -122,11 +122,12 @@ public class MatchSceneHandler {
                 break;
             case SHUT_UP_SCENE:// 休息
                 flag = true;
-                SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
                 // 如果说的是 [睡觉] 的话，就不开启红外，否则开启红外
                 if (result.contains("睡觉")) {
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我睡觉了，白白");
                     sleepNoAwaken(context);
                 } else {
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_SLEEP, "那我休息了，白白");
                     sleep(context);
                 }
 

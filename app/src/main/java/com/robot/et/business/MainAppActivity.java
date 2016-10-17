@@ -289,7 +289,7 @@ public class MainAppActivity extends RosActivity {
                     for (int i = 0; i < availableAppsCache.size(); i++) {
                         Log.e(TAG, "DisplayName:" + availableAppsCache.get(i).getDisplayName());
                     }
-                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小黄人我来啦");
+                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "小雪我来啦");
                     //开启视觉模块 
                     startRosInteraction(availableAppsCache, roconDescription.getCurrentRole(), "Rai Learning");
                 } else {
@@ -334,9 +334,9 @@ public class MainAppActivity extends RosActivity {
                                 // TODO try to no finish so statusPublisher remains while on app;  risky, but seems to work!    finish();
                             } else if (result == AppLauncher.Result.NOTHING) {
                                 Log.e(TAG, "Android app nothing");
-                                if (TextUtils.equals(selectedInteraction.getDisplayName(), "Rai Learning")) {
-                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "视觉已开启");
-                                }
+//                                if (TextUtils.equals(selectedInteraction.getDisplayName(), "Rai Learning")) {
+//                                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "视觉已开启");
+//                                }
                                 Log.e(TAG, "Android app nothing2");
                                 //statusPublisher.update(false, selectedInteraction.getHash(), selectedInteraction.getName());
                             } else if (result == AppLauncher.Result.NOT_INSTALLED) {
@@ -512,29 +512,29 @@ public class MainAppActivity extends RosActivity {
                     //视觉初始化(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnInit");
 //                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_CHAT, "好的");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 1, "");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 1, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearn", flag)) {
                     //视觉学习(service)
                     Log.e("ROS_Client", "Service：Start DeepLearn");
                     SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在学习中，请不同角度展示物体");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 2, name);
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 2, name);
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnRec", flag)) {
                     //视觉识别(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnRec");
 //                    SpeechImpl.getInstance().startSpeak(DataConfig.SPEAK_TYPE_DO_NOTHINF, "好的，正在识别中");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 3, "");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 3, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeepLearnClose", flag)) {
                     //视觉关闭(service)
                     Log.e("ROS_Client", "Service：Start DeepLearnClose");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 4, "");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 4, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("DeleteAllVisual", flag)) {
                     //视觉删除学习内容(service)
                     Log.e("ROS_Client", "Service：Start DeleteAllVisual");
-                    visualClient = new VisualClient(MainAppActivity.this,(short) 5, "");
+                    visualClient = new VisualClient(MainAppActivity.this, (short) 5, "");
                     nodeMainExecutorService.execute(visualClient, nodeConfiguration.setNodeName("visualclient"));
                 } else if (TextUtils.equals("OpenBodyTRK", flag)) {
                     //视觉人体检测开启
