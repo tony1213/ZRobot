@@ -85,13 +85,19 @@ public class ScriptHandler implements Script {
                     break;
                 case ScriptConfig.SCRIPT_TURN_AROUND://转圈
                     Log.i("netty", "doScriptAction() 转圈");
-                    int direction = ScriptManager.getTurnDirection(content);
+                    String turnAngle = info.getSpareContent2();
+                    Log.i("netty", "doScriptAction() turnAngle====" + turnAngle);
+                    int angleInt = 90;
+                    if (!TextUtils.isEmpty(turnAngle)) {
+                        if (TextUtils.isDigitsOnly(turnAngle) || turnAngle.contains("-")) {
+                            angleInt = Integer.parseInt(turnAngle);
+                        }
+                    }
                     int spareType = info.getSpareType();
-                    Log.i("netty", "doScriptAction() direction====" + direction);
                     Log.i("netty", "doScriptAction() num====" + info.getSpareContent());
                     // 转圈
-                    BroadcastEnclosure.controlMoveBySerialPort(context, direction, 500, 1000, spareType);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(1000));
+                    BroadcastEnclosure.controlMoveBySerialPort(context, ControlMoveEnum.LEFT.getMoveKey(), angleInt, 1000, spareType);
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1800));
 
                     break;
                 case ScriptConfig.SCRIPT_QUESTION_ANSWER://问答
@@ -133,9 +139,9 @@ public class ScriptHandler implements Script {
                     int moveDirection = EnumManager.getMoveKey(content);
                     String spareContent = info.getSpareContent();
                     String distance = info.getSpareContent2();
-                    int distanceInt = 500;
+                    int distanceInt = 300;
                     if (!TextUtils.isEmpty(distance)) {
-                        if (TextUtils.isDigitsOnly(distance)) {
+                        if (TextUtils.isDigitsOnly(distance) || distance.contains("-")) {
                             distanceInt = Integer.parseInt(distance);
                         }
                     }
@@ -150,7 +156,7 @@ public class ScriptHandler implements Script {
                         }
                     }
 
-                    handleNewScriptInfos(context, infos, true, getDealyTime(500));
+                    handleNewScriptInfos(context, infos, true, getDealyTime(1000));
 
                     break;
                 case ScriptConfig.SCRIPT_TURN://左转右转
@@ -158,14 +164,18 @@ public class ScriptHandler implements Script {
                     int turnDirection = EnumManager.getMoveKey(content);
                     String spareContent2 = info.getSpareContent2();
                     int moveRadius = info.getSpareType();
-                    int turnInt = 60;
-                    if (!TextUtils.isEmpty(spareContent2)) {
+                    int turnInt = 90;
+                    if (!TextUtils.isEmpty(spareContent2) || spareContent2.contains("-")) {
                         if (TextUtils.isDigitsOnly(spareContent2)) {
                             turnInt = Integer.parseInt(spareContent2);
                         }
                     }
                     BroadcastEnclosure.controlMoveBySerialPort(context, turnDirection, turnInt, 1000, moveRadius);
-                    handleNewScriptInfos(context, infos, true, getDealyTime(500));
+                    long turnTime = 1800;
+                    if (turnDirection == ControlMoveEnum.TURN_AFTER.getMoveKey()) {// 后转
+                        turnTime = 3600;
+                    }
+                    handleNewScriptInfos(context, infos, true, getDealyTime(turnTime));
 
                     break;
                 case ScriptConfig.SCRIPT_STOP://停止
@@ -273,6 +283,13 @@ public class ScriptHandler implements Script {
 
             if (isResume) {
                 if (DataConfig.isPlayScript) {
+                    if (!DataConfig.isPlayMusic) {
+                        // 音乐唱完动作结束
+                        ScriptManager.setScriptActionInfos(null);
+                        playScriptEnd(context);
+                        return;
+                    }
+
                     Log.i("netty", "delayTime111==" + delayTime);
                     new Handler().postDelayed(new Runnable() {
                         @Override

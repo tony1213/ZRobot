@@ -17,6 +17,7 @@ import com.robot.et.common.enums.MatchSceneEnum;
 import com.robot.et.core.software.camera.TakePhotoActivity;
 import com.robot.et.core.software.common.move.Dance;
 import com.robot.et.core.software.common.network.HttpManager;
+import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.OneImgManager;
 import com.robot.et.core.software.common.view.TextManager;
@@ -187,6 +188,21 @@ public class MatchSceneHandler {
                 flag = true;
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
+                boolean isAdd = SharedPreferencesUtils.getInstance().getBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, false);
+                if (!isAdd) {
+                    Log.i("ifly", "添加剧本");
+                    ScriptHandler.addLocalScript(context, "script3");
+                    SharedPreferencesUtils.getInstance().putBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, true);
+                    SharedPreferencesUtils.getInstance().commitValue();
+                }
+
+                ScriptHandler.playScript(context, "一起跳舞");
+
+                break;
+            case DANCE_SCENE:// 跳舞
+                flag = true;
+                ViewCommon.initView();
+                EmotionManager.showEmotion(R.mipmap.emotion_normal);
                 // 跳舞
                 Dance.dance(context, "小跳蛙");
 
@@ -254,7 +270,12 @@ public class MatchSceneHandler {
             case PLAY_TRAILER_SCENE:// 播放宣传片
                 flag = true;
                 String fileSrc = Environment.getExternalStorageDirectory() + File.separator + "robot" + File.separator + "视频"
-                        + File.separator + "宣传片.mp4";
+                        + File.separator;
+                if (result.contains("宣传")) {
+                    fileSrc += "宣传片.mp4";
+                } else {
+                    fileSrc += "熊出没.mp4";
+                }
                 if (!TextUtils.isEmpty(fileSrc)) {
                     Intent mIntent = new Intent();
                     mIntent.setClass(context, VideoPlayActivity.class);

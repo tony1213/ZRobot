@@ -219,6 +219,6 @@ public class DataConfig {
     // 1号机器人  192.168.8.11
     // 2号机器人  192.168.8.12
     // 3号机器人  192.168.8.13
-    public static final String masterUri = "http://192.168.8.13:11311/";
+    public static final String masterUri = "http://192.168.8.12:11311/";
 
 }

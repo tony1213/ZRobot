@@ -16,5 +16,7 @@ public class SharedPreferencesKeys {
     public static final String AGORA_CALL_PHONENUM = "agora_call_phonenum";
     //管理员的手机号
     public static final String ADMINISTRATORS_PHONENUM = "administrators_phonenum";
+    //第一次添加剧本
+    public static final String SCRIPT_FIRST_ADD = "script_first_add";
 
 }
