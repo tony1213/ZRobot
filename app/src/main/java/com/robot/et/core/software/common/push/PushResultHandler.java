@@ -286,7 +286,9 @@ public class PushResultHandler implements NettyClientCallBack {
                         return;
                     }
                     ScriptHandler.playScriptStart(context);
-                    ScriptHandler.playScript(context, musicContent);
+//                    ScriptHandler.playScript(context, musicContent);
+                    // 表演本地剧本
+                    ScriptHandler.playLocalScript(context);
 
                     break;
                 case RequestConfig.JPUSH_GRAPHIC_EDITOR:// 图形编辑

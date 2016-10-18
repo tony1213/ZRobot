@@ -188,15 +188,8 @@ public class MatchSceneHandler {
                 flag = true;
                 ViewCommon.initView();
                 EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                boolean isAdd = SharedPreferencesUtils.getInstance().getBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, false);
-                if (!isAdd) {
-                    Log.i("ifly", "添加剧本");
-                    ScriptHandler.addLocalScript(context, "script3");
-                    SharedPreferencesUtils.getInstance().putBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, true);
-                    SharedPreferencesUtils.getInstance().commitValue();
-                }
-
-                ScriptHandler.playScript(context, "一起跳舞");
+                // 表演本地剧本
+                ScriptHandler.playLocalScript(context);
 
                 break;
             case DANCE_SCENE:// 跳舞

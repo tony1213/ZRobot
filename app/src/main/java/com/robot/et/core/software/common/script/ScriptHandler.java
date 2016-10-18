@@ -10,6 +10,7 @@ import com.robot.et.common.RequestConfig;
 import com.robot.et.common.RosConfig;
 import com.robot.et.common.ScriptConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
+import com.robot.et.core.software.common.move.Waving;
 import com.robot.et.core.software.common.speech.SpeechImpl;
 import com.robot.et.db.RobotDB;
 import com.robot.et.entity.ScriptActionInfo;
@@ -19,6 +20,8 @@ import com.robot.et.util.EnumManager;
 import com.robot.et.util.FileUtils;
 import com.robot.et.util.MatchStringUtil;
 import com.robot.et.util.MusicManager;
+import com.robot.et.util.SharedPreferencesKeys;
+import com.robot.et.util.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -285,6 +288,10 @@ public class ScriptHandler implements Script {
                 if (DataConfig.isPlayScript) {
                     if (!DataConfig.isPlayMusic) {
                         // 音乐唱完动作结束
+                        if (DataConfig.isWaving) {
+                            DataConfig.isWaving = false;
+                            Waving.stopTimer();
+                        }
                         ScriptManager.setScriptActionInfos(null);
                         playScriptEnd(context);
                         return;
@@ -348,6 +355,20 @@ public class ScriptHandler implements Script {
             }
         });
 
+    }
+
+    // 表演本地剧本
+    public static void playLocalScript(Context context) {
+        boolean isAdd = SharedPreferencesUtils.getInstance().getBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, false);
+        if (!isAdd) {
+            Log.i("netty", "添加剧本");
+            addLocalScript(context, "script3");
+            SharedPreferencesUtils.getInstance().putBoolean(SharedPreferencesKeys.SCRIPT_FIRST_ADD, true);
+            SharedPreferencesUtils.getInstance().commitValue();
+        }
+        // 要摆手
+        Waving.waving(context);
+        playScript(context, "一起跳舞");
     }
 
     //增加APP发来的图形编辑
