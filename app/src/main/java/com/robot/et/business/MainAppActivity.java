@@ -51,7 +51,6 @@ import com.robot.et.core.software.ros.client.MoveClient;
 import com.robot.et.core.software.ros.client.RmapClient;
 import com.robot.et.core.software.ros.client.VisualClient;
 import com.robot.et.core.software.ros.connect.first.MasterChooserService;
-import com.robot.et.core.software.ros.connect.second.MasterFactory;
 import com.robot.et.core.software.ros.move.MoveControler;
 import com.robot.et.core.software.ros.position.PositionControler;
 import com.robot.et.core.software.video.agora.AgoraService;
@@ -180,7 +179,7 @@ public class MainAppActivity extends RosActivity {
 
 //        startService(new Intent(this, MasterChooserService.class));
 //        super.startActivityForResult(new Intent(this, MasterChooserActivity.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
-        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
+//        super.startActivityForResult(new Intent(this, MasterFactory.class), CONCERT_MASTER_CHOOSER_REQUEST_CODE);
     }
 
     // 初始化UI

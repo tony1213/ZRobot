@@ -167,10 +167,10 @@ public class BroadcastEnclosure {
 
     //ros的广播
     public static void sendRos(Context context, String rosKey, String name) {
-        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
-        intent.putExtra("rosKey", rosKey);
-        intent.putExtra("name", name);
-        context.sendBroadcast(intent);
+//        intent.setAction(BroadcastAction.ACTION_ROS_SERVICE);
+//        intent.putExtra("rosKey", rosKey);
+//        intent.putExtra("name", name);
+//        context.sendBroadcast(intent);
     }
 
     //ros移动的广播
