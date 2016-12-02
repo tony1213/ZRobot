@@ -131,10 +131,10 @@
         <!-- 阿里移动推送 -->
         <meta-data
             android:name="com.alibaba.app.appkey"
-            android:value="" /> <!-- 请填写你自己的- appKey  23448575-->
+            android:value="" /> <!-- 请填写你自己的- appKey -->
         <meta-data
             android:name="com.alibaba.app.appsecret"
-            android:value="" /> <!-- 请填写你自己的appSecret  d8bc03450ecc34dc75f71096dbaf475e-->
+            android:value="" /> <!-- 请填写你自己的appSecret -->
         <!-- 通道保持服务（幽灵进程自动保活该服务） -->
 
         <service

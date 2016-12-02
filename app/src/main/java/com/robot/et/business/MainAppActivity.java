@@ -710,7 +710,7 @@ public class MainAppActivity extends RosActivity {
                     // 初始化百度地图
                     initBaiDuMap();
                     // 初始化阿里推送
-                    new ALiPush(MainAppActivity.this);
+//                    new ALiPush(MainAppActivity.this);
 //                    startMasterChooser();
                 } else {
                     Log.i("network", "网络断开");
