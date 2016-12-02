@@ -1,19 +1,14 @@
 package com.robot.et.core.software.common.speech;
 
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
 import com.robot.et.R;
 import com.robot.et.common.DataConfig;
-import com.robot.et.common.RequestConfig;
 import com.robot.et.common.enums.ControlMoveEnum;
 import com.robot.et.common.enums.EmotionEnum;
 import com.robot.et.core.software.common.move.Come;
-import com.robot.et.core.software.common.network.HttpManager;
-import com.robot.et.core.software.common.push.PushResultHandler;
 import com.robot.et.core.software.common.script.ScriptHandler;
 import com.robot.et.core.software.common.view.EmotionManager;
 import com.robot.et.core.software.common.view.ViewCommon;
@@ -215,20 +210,20 @@ public class CommandHandler {
     public void noResponseApp() {
         if (!DataConfig.isStartTime) {
             DataConfig.isStartTime = true;
-            new Handler().postDelayed(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (DataConfig.isStartTime) {
-                        ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
-                        mInfo.setAnswer("");
-                        mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
-
-                        doAppRemindNoResponse();
-                    }
-                }
-            }, 15 * 1000);
+//            new Handler().postDelayed(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    if (DataConfig.isStartTime) {
+//                        ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
+//                        mInfo.setAnswer("");
+//                        mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
+//                        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
+//
+//                        doAppRemindNoResponse();
+//                    }
+//                }
+//            }, 15 * 1000);
         }
     }
 
@@ -244,7 +239,7 @@ public class CommandHandler {
         ResponseAppRemindInfo mInfo = new ResponseAppRemindInfo();
         mInfo.setAnswer(result);
         mInfo.setOriginalTime(AlarmRemindManager.getOriginalAlarmTime());
-        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
+//        HttpManager.pushMsgToApp(JSON.toJSONString(mInfo), RequestConfig.TO_APP_REMIND, new PushResultHandler(context));
 
         if (!TextUtils.isEmpty(result)) {
             String answer = AlarmRemindManager.getRequireAnswer();

@@ -34,7 +34,7 @@ public class CustomApplication extends Application {
         // 初始化科大讯飞
         initVoice();
         // 初始化云推送
-        initCloudChannel();
+//        initCloudChannel();
         // 初始化百度地图
         initBaiDuMap();
         // 初始化agora视频

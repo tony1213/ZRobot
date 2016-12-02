@@ -320,57 +320,57 @@ public class MatchSceneHandler {
 
                 break;
             case VISION_LEARN_SCENE:// 视觉学习
-                flag = true;
-                tempResult = result;
-                // 视觉学习的时候，先关闭视觉人体监测，再打开视觉学习
-                if (!isFirstInitVision) {
-                    Log.e("Visual", "Is Second VisualREC");
-//                    if (visualClient == null) {
-//                        visualClient = new VisualClient(this);
-//                    }
-//                    // 关闭视觉人体监测
+//                flag = true;
+//                tempResult = result;
+//                // 视觉学习的时候，先关闭视觉人体监测，再打开视觉学习
+//                if (!isFirstInitVision) {
+//                    Log.e("Visual", "Is Second VisualREC");
+////                    if (visualClient == null) {
+////                        visualClient = new VisualClient(this);
+////                    }
+////                    // 关闭视觉人体监测
+////                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+////                    // 打开视觉学习
+////                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+//
 //                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-//                    // 打开视觉学习
-//                    BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
-
-                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 打开视觉学习 
-                            BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
-                        }
-                    }, 500);
-                    learnThing(tempResult);
-                } else {
-                    Log.e("Visual", "Is First VisualREC");
-                    try {
-                        Log.e("Visual", "step rec one");
-                        BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
-                            }
-                        }, 500);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        Log.e("Visual", "step rec two");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                DataConfig.isOpenLearn = true;
-                                DataConfig.isOpenBodyDistinguish = false;
-                                // 默认学习完成
-                                DataConfig.isVisionLearnComplected = true;
-                                // 视觉学习 
-                                learnThing(result);
-                            }
-                        }, 2000);
-                    }
-                }
+//
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            // 打开视觉学习 
+//                            BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+//                        }
+//                    }, 500);
+//                    learnThing(tempResult);
+//                } else {
+//                    Log.e("Visual", "Is First VisualREC");
+//                    try {
+//                        Log.e("Visual", "step rec one");
+//                        BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_VISUAL_BODY_TRK, "");
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                BroadcastEnclosure.sendRos(context, RosConfig.INIT_VISION, "");
+//                            }
+//                        }, 500);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        Log.e("Visual", "step rec two");
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                DataConfig.isOpenLearn = true;
+//                                DataConfig.isOpenBodyDistinguish = false;
+//                                // 默认学习完成
+//                                DataConfig.isVisionLearnComplected = true;
+//                                // 视觉学习 
+//                                learnThing(result);
+//                            }
+//                        }, 2000);
+//                    }
+//                }
 
                 break;
             case GO_WHERE_SCENE:// 去哪里的指令
@@ -401,9 +401,9 @@ public class MatchSceneHandler {
 
                 break;
             case FORGET_LEARN_SCENE:// 忘记学习内容
-                flag = true;
-                // 忘记学习内容
-                BroadcastEnclosure.sendRos(context, RosConfig.FORGET_LEARN_CONTENT, "");
+//                flag = true;
+//                // 忘记学习内容
+//                BroadcastEnclosure.sendRos(context, RosConfig.FORGET_LEARN_CONTENT, "");
 
                 break;
 
@@ -418,61 +418,61 @@ public class MatchSceneHandler {
 
                 break;
             case FOLLOW_SCENE:// 跟着我
-                flag = true;
-                // 显示正常表情
-                ViewCommon.initView();
-                EmotionManager.showEmotion(R.mipmap.emotion_normal);
-                // 头部抬起来
-                BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, String.valueOf(20), 1000);
-
-                // 跟着我的时候先关闭视觉学习，再打开视觉人体监测，需要500ms
-                if (!isFirstInitFollow) {
-                    Log.e("Visual", "Is Second VisualBody TRK");
-//                    if (visualClient == null) {
-//                        visualClient = new VisualClient(this);
-//                    }
-//                    // 关闭视觉学习
+//                flag = true;
+//                // 显示正常表情
+//                ViewCommon.initView();
+//                EmotionManager.showEmotion(R.mipmap.emotion_normal);
+//                // 头部抬起来
+//                BroadcastEnclosure.controlHead(context, DataConfig.TURN_HEAD_AROUND, String.valueOf(20), 1000);
+//
+//                // 跟着我的时候先关闭视觉学习，再打开视觉人体监测，需要500ms
+//                if (!isFirstInitFollow) {
+//                    Log.e("Visual", "Is Second VisualBody TRK");
+////                    if (visualClient == null) {
+////                        visualClient = new VisualClient(this);
+////                    }
+////                    // 关闭视觉学习
+////                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
+////                    // 打开视觉人体检测
+////                    BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+//
 //                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
-//                    // 打开视觉人体检测
-//                    BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
-
-                    BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
-
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 打开人体跟随
-                            BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
-                        }
-                    }, 500);
-
-                } else {
-                    // 跟随
-                    Log.e("Visual", "Is First VisualBody TRK");
-                    // 打开人体跟随
-                    try {
-                        Log.e("Visual", "step trk 1");
-                        BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
-                            }
-                        }, 500);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        Log.e("Visual", "step trk 2");
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                DataConfig.isOpenBodyDistinguish = true;
-                                DataConfig.isOpenLearn = false;
-                                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
-                            }
-                        }, 500);
-                    }
-                }
+//
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            // 打开人体跟随
+//                            BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+//                        }
+//                    }, 500);
+//
+//                } else {
+//                    // 跟随
+//                    Log.e("Visual", "Is First VisualBody TRK");
+//                    // 打开人体跟随
+//                    try {
+//                        Log.e("Visual", "step trk 1");
+//                        BroadcastEnclosure.sendRos(context, RosConfig.CLOSE_DISTINGUISH, "");
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                BroadcastEnclosure.sendRos(context, RosConfig.OPEN_VISUAL_BODY_TRK, "");
+//                            }
+//                        }, 500);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        Log.e("Visual", "step trk 2");
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                DataConfig.isOpenBodyDistinguish = true;
+//                                DataConfig.isOpenLearn = false;
+//                                BroadcastEnclosure.sendRos(context, RosConfig.VISUAL_BODY_TRK, "");
+//                            }
+//                        }, 500);
+//                    }
+//                }
                 break;
 
             case NAVIGATION_SCENE:// 导航到
@@ -540,22 +540,22 @@ public class MatchSceneHandler {
     public static void sleep(final Context context) {
         sleepNoAwaken(context);
         // 如果是安保模式的话，延迟10s开启人体检测，正常情况下5s开启
-        long delay;// 延迟的时间
-        if (DataConfig.isSecuritySign) {// 安保模式
-            delay = 10 * 1000;
-        } else {// 不是安保模式
-            delay = 5 * 1000;
-        }
-        // 防止人体检测立即开启，延迟再开启人体检测
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // 告诉机器人沉睡了
-                if (DataConfig.isSleep) {
-                    BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_SLEEP);
-                }
-            }
-        }, delay);
+//        long delay;// 延迟的时间
+//        if (DataConfig.isSecuritySign) {// 安保模式
+//            delay = 10 * 1000;
+//        } else {// 不是安保模式
+//            delay = 5 * 1000;
+//        }
+//        // 防止人体检测立即开启，延迟再开启人体检测
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                // 告诉机器人沉睡了
+//                if (DataConfig.isSleep) {
+//                    BroadcastEnclosure.openHardware(context, DataConfig.HARDWARE_SLEEP);
+//                }
+//            }
+//        }, delay);
     }
 
     // 沉睡不带唤醒

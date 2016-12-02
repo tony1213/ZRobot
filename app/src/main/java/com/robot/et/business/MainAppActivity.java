@@ -139,7 +139,7 @@ public class MainAppActivity extends RosActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.ACTION_CONTROL_ROBOT_MOVE_WITH_VOICE);
         filter.addAction(BroadcastAction.ACTION_WAKE_UP_TURN_BY_DEGREE);
-        filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
+//        filter.addAction(BroadcastAction.ACTION_ROS_SERVICE);
         filter.addAction(BroadcastAction.ACTION_ROBOT_RADAR);
         filter.addAction(BroadcastAction.ACTION_SCAN_QR_CODE);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
